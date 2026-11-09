@@ -1,0 +1,8 @@
+# Hakoniwa R.A. FE: bundled images are copyrighted and redistribution is
+# prohibited (see hako-r-a_FE/hako-readme.txt), so keep them out of this
+# public repository.
+hako-r-a_FE/**/*.gif
+hako-r-a_FE/**/*.GIF
+hako-r-a_FE/**/*.zip
+hako-r-a_FE/**/*.lzh
+Thumbs.db

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<META name="GENERATOR" content="IBM HomePage Builder 2001 V5.0.0 for Windows">
+
+<STYLE type="text/css">
+<!--
+
+	A:link.type1 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type1 { color:#800080; text-decoration: none; }
+
+	A:hover.type1, A:focus.type1 { color:#0000FF; text-decoration: underline; }
+
+	A:action.type1 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type2 { color:#0000FF; text-decoration: underline; }
+
+	A:visited.type2 { color:#800080; text-decoration: underline; }
+
+	A:hover.type2, A:focus.type2 { color:#FF00FF; text-decoration: underline; }
+
+	A:action.type2 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type3 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type3 { color:#800080; text-decoration: none; }
+
+	A:hover.type3, A:focus.type3 { background-color: pink; color: #FFFFFF; text-decoration: none; }
+
+	A:action.type3 { color:#FF0000; text-decoration: none; }
+
+	body{ scrollbar-3dlight-color:royalblue;
+	scrollbar-arrow-color:royalblue;
+	scrollbar-darkshadow-color:lemonchiffon;
+	scrollbar-face-color:lemonchiffon;
+	scrollbar-highlight-color:lemonchiffon;
+	scrollbar-shadow-color:royalblue;
+	scrollbar-track-color:lemonchiffon;
+
+	cursor: crosshair;
+
+-->
+</STYLE>
+
+<TITLE>人工衛星</TITLE>
+</HEAD>
+<BODY bgcolor="lemonchiffon">
+
+<p><B>人工衛星</B></p>
+衛星を打ち上げます。打ち上げには２つの要素が必要です。<BR>
+それぞれの衛星はエネルギー(以下ＥＮ)を持っており０％になると崩壊します。<BR>
+人工衛星打ち上げのコマンドのコストは指定数量倍です。<BR>
+能力は下のリストを参考にしてください。<img SRC="kisho.gif" ><img SRC="kansoku.gif" ><img SRC="geigeki.gif" ><img SRC="gunji.gif" ><img SRC="bouei.gif" ><img SRC="ire.gif" ><BR>
+<BR>
+人工衛星修復のコマンドを実行すると衛星を修復し、性能が戻ります。<BR>
+数量は、打ち上げ時、修復時、衛星破壊砲のターゲット共通です。<BR>
+<BR>
+
+<TABLE bgcolor="white" cellpadding="1" cellspacing="1" border="1">
+    <tr>
+        <td ALIGN=CENTER>＠</td>
+        <td ALIGN=CENTER>名称</td>
+        <td ALIGN=CENTER>数量</td>
+        <td ALIGN=CENTER>初期ＥＮ</td>
+        <td ALIGN=CENTER>効果( )内は消費ＥＮ</td>
+        <td ALIGN=CENTER>備考</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="kisho.gif" ></td>
+        <td ALIGN=CENTER>気象衛星</td>
+        <td ALIGN=CENTER>下記以外</td>
+        <td ALIGN=CENTER>100%</td>
+        <td ALIGN=CENTER>台風、火災率低下</td>
+        <td ALIGN=CENTER>―</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="kansoku.gif" ></td>
+        <td ALIGN=CENTER>観測衛星</td>
+        <td ALIGN=CENTER>２</td>
+        <td ALIGN=CENTER>100%</td>
+        <td ALIGN=CENTER>噴火、地震、津波率低下</td>
+        <td ALIGN=CENTER>―</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="geigeki.gif" ></td>
+        <td ALIGN=CENTER>迎撃衛星</td>
+        <td ALIGN=CENTER>３</td>
+        <td ALIGN=CENTER>100%</td>
+        <td ALIGN=CENTER>隕石落下率低下</td>
+        <td ALIGN=CENTER>―</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="gunji.gif" ></td>
+        <td ALIGN=CENTER>軍事衛星</td>
+        <td ALIGN=CENTER>４</td>
+        <td ALIGN=CENTER>100%</td>
+        <td ALIGN=CENTER>衛星レーザー使用可(10%)・衛星破壊砲使用可(30%)</td>
+        <td ALIGN=CENTER>―</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="bouei.gif" ></td>
+        <td ALIGN=CENTER>防衛衛星</td>
+        <td ALIGN=CENTER>５</td>
+        <td ALIGN=CENTER>100%</td>
+        <td ALIGN=CENTER>軍事技術/500の確立でミサイル撃ち落とし(2%)</td>
+        <td ALIGN=CENTER>ＳＴミサイルレーダー付き</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="ire.gif" ></td>
+        <td ALIGN=CENTER>イレギュラー</td>
+        <td ALIGN=CENTER>６</td>
+        <td ALIGN=CENTER>250%</td>
+        <td ALIGN=CENTER>衛星レーザー使用可(5%)・衛星破壊砲使用可(30%)・怪獣攻撃(10%)</td>
+        <td ALIGN=CENTER>修復不可</td>
+    </tr>
+    <tr>
+        <td ALIGN=CENTER><img SRC="cst.gif" ></td>
+        <td ALIGN=CENTER>宇宙ステーション</td>
+        <td ALIGN=CENTER>99</td>
+        <td ALIGN=CENTER>25%</td>
+        <td ALIGN=CENTER>人口(半無限増加)</td>
+        <td ALIGN=CENTER>1000000億円必要です</td>
+    </tr>
+    <tr>
+        <TD align="left" colspan="6"><FONT color="#ff0000">宇宙ステーションについて</FONT><BR>
+      衛星打ち上げの数量99で打ち上げられます。コストは1000000億円必要です。<BR>
+      資金の最大を超えていますがうまく打ち上げてください。打ち上げてすぐはＥＮが２５％でまだ未完成です。<BR>
+      修復コマンドを使い完成させましょう。宇宙ステーションは人口を有し島の人口としてカウントされます。<BR>
+      完成後に修復コマンドを続けて使用することにより住居スペースを増設し人口を増やすことが可能です。<BR>
+      毎ターン、ステーションに食料を運ぶため人口に比例したロケットと１万人につき100億の送料が必要になります。<BR>
+      食料不足時、ロケット不足時は人口が減り、衛星破壊砲を被弾した場合は人口とＥＮが共に減少し、<BR>
+      どちらかが０になった場合崩壊します。</TD>
+    </tr>
+</table>
+</BODY>
+</HTML>

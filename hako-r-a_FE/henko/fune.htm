@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<META name="GENERATOR" content="IBM HomePage Builder 2001 V5.0.0 for Windows">
+
+<STYLE type="text/css">
+<!--
+
+	A:link.type1 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type1 { color:#800080; text-decoration: none; }
+
+	A:hover.type1, A:focus.type1 { color:#0000FF; text-decoration: underline; }
+
+	A:action.type1 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type2 { color:#0000FF; text-decoration: underline; }
+
+	A:visited.type2 { color:#800080; text-decoration: underline; }
+
+	A:hover.type2, A:focus.type2 { color:#FF00FF; text-decoration: underline; }
+
+	A:action.type2 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type3 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type3 { color:#800080; text-decoration: none; }
+
+	A:hover.type3, A:focus.type3 { background-color: pink; color: #FFFFFF; text-decoration: none; }
+
+	A:action.type3 { color:#FF0000; text-decoration: none; }
+
+	body{ scrollbar-3dlight-color:royalblue;
+	scrollbar-arrow-color:royalblue;
+	scrollbar-darkshadow-color:lemonchiffon;
+	scrollbar-face-color:lemonchiffon;
+	scrollbar-highlight-color:lemonchiffon;
+	scrollbar-shadow-color:royalblue;
+	scrollbar-track-color:lemonchiffon;
+
+	cursor: crosshair;
+
+-->
+</STYLE>
+
+<TITLE>船舶一覧表</TITLE>
+</HEAD>
+<BODY bgcolor="lemonchiffon">
+<p><B>船舶一覧表</B></p>
+
+<TABLE bgcolor="white" cellpadding="1" cellspacing="1" border="1">
+  
+    <tr>
+      <th>名前</th>
+      <th>外見</th>
+      <th>数量指定</th>
+      <th><nobr>維持費(毎ターン減るもの)</nobr></th>
+      <th><nobr>利益(毎ターン増えるもの)</nobr></th>
+      <th>備考</th>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>小型漁船</td>
+      <td ALIGN=CENTER><img SRC="fune1.gif" ></td>
+      <td ALIGN=CENTER>１(０の場合も)</td>
+      <td ALIGN=CENTER>５億円</td>
+      <td ALIGN=CENTER>食料30000トン程度</td>
+      <td ALIGN=CENTER>数量０の場合は小型漁船になります。</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>中型漁船</td>
+      <td ALIGN=CENTER><img SRC="fune2.gif" ></td>
+      <td ALIGN=CENTER>２</td>
+      <td ALIGN=CENTER>20億円</td>
+      <td ALIGN=CENTER>食料50000トン程度</td>
+      <td ALIGN=CENTER>－</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>海底探査船</td>
+      <td ALIGN=CENTER><img SRC="fune5.gif" ></td>
+      <td ALIGN=CENTER>３</td>
+      <td ALIGN=CENTER>300億円</td>
+      <td ALIGN=CENTER>稀に油田や財宝を発見</td>
+      <td ALIGN=CENTER>財宝は高収入です</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>帆船</td>
+      <td ALIGN=CENTER><img SRC="fune4.gif" ></td>
+      <td ALIGN=CENTER>４</td>
+      <td ALIGN=CENTER>食料100,000トン</td>
+      <td ALIGN=CENTER>150～400億円</td>
+      <td ALIGN=CENTER>観光収入です</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>大型漁船</td>
+      <td ALIGN=CENTER><img SRC="fune3.gif" ></td>
+      <td ALIGN=CENTER>５</td>
+      <td ALIGN=CENTER>60億円</td>
+      <td ALIGN=CENTER>食料70000トン程度</td>
+      <td ALIGN=CENTER>食料不足の時に活躍しますね</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>高速漁船</td>
+      <td ALIGN=CENTER><img SRC="fune6.gif" ></td>
+      <td ALIGN=CENTER>６</td>
+      <td ALIGN=CENTER>30億円×移動回数</td>
+      <td ALIGN=CENTER>食料50000トン程度×移動回数</td>
+      <td ALIGN=CENTER>１ターンに2hex動いて効果2倍あり</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>海底探査船・改</td>
+      <td ALIGN=CENTER><img SRC="fune5.gif" ></td>
+      <td ALIGN=CENTER>７</td>
+      <td ALIGN=CENTER>500億円×移動回数</td>
+      <td ALIGN=CENTER>油田や財宝を発見</td>
+      <td ALIGN=CENTER>確率と移動回数ＵＰ</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>超豪華客船</td>
+      <td ALIGN=CENTER><img SRC="fune7.gif" ></td>
+      <td ALIGN=CENTER>８</td>
+      <td ALIGN=CENTER>食料300,000トン</td>
+      <td ALIGN=CENTER>"1500＋人口÷1000"億円</td>
+      <td ALIGN=CENTER>TITANICです。お約束付きです。</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>戦艦</td>
+      <td ALIGN=CENTER><img SRC="fune8.gif" ></td>
+      <td ALIGN=CENTER>９</td>
+      <td ALIGN=CENTER>100億円</td>
+      <td ALIGN=CENTER>怪獣を自動攻撃</td>
+      <td ALIGN=CENTER>テトラ同能力,事故率低</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>超最新戦艦</td>
+      <td ALIGN=CENTER><img SRC="fune9.gif" ></td>
+      <td ALIGN=CENTER>10</td>
+      <td ALIGN=CENTER>400億円＆ミサイル発射×3000億円</td>
+      <td ALIGN=CENTER>怪獣瞬殺</td>
+      <td ALIGN=CENTER>留守中の怪獣の被害が心配な方にオススメ,事故率低</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>漁船MASTER</td>
+      <td ALIGN=CENTER><img SRC="fune10.gif" ></td>
+      <td ALIGN=CENTER>11</td>
+      <td ALIGN=CENTER>60億円×移動回数</td>
+      <td ALIGN=CENTER>食料70000トン程度×移動回数</td>
+      <td ALIGN=CENTER>最高性能漁船</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER>海上都市</td>
+      <td ALIGN=CENTER><img SRC="land39.gif" ></td>
+      <td ALIGN=CENTER>77</td>
+      <td ALIGN=CENTER>特に無し</td>
+      <td ALIGN=CENTER>人口あります。</td>
+      <td ALIGN=CENTER>地震・火事・津波・事故ありません。</td>
+    </tr>
+    <tr>
+      <td ALIGN=CENTER><nobr>超最新戦艦・改</nobr></td>
+      <td ALIGN=CENTER><img SRC="fune11.gif" ></td>
+      <td ALIGN=CENTER>－</td>
+      <td ALIGN=CENTER>1000億円＆エネルギー砲発射×50000億円</td>
+      <td ALIGN=CENTER>怪獣ＰＰ瞬殺</td>
+      <td ALIGN=CENTER>軍事技術でスペック上昇,事故率低</td>
+    </tr>
+  
+</table>
+
+
+</BODY></HTML>
