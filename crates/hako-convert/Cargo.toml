@@ -1,0 +1,11 @@
+[package]
+name = "hako-convert"
+description = "Convert Hakoniwa R.A. (Perl) save data into the Rust port's JSON format"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+hakoniwa-core.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+rand.workspace = true

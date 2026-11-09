@@ -6,3 +6,7 @@ hako-r-a_FE/**/*.GIF
 hako-r-a_FE/**/*.zip
 hako-r-a_FE/**/*.lzh
 Thumbs.db
+
+# Rust build output and local runtime data
+/target/
+/data/

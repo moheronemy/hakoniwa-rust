@@ -1,0 +1,16 @@
+[package]
+name = "hakoniwa-core"
+description = "Game rules, data model and storage for the Rust port of Hakoniwa R.A."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+thiserror.workspace = true
+encoding_rs.workspace = true
+rand.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
