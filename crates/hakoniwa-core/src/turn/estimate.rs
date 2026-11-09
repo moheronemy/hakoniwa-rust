@@ -1,9 +1,10 @@
 //! 人口・面積などの集計と総合ポイントの計算 (`estimate`)。
 //!
 //! Perl 版の `estimate` を、処理順と Perl 特有の挙動も含めて移植したもの。
+//! Perl 版はコンデンサの充電量 (`$n/2`) が小数になり、ターンの間は地形の値に小数が残る
+//! (保存時に `%03x` で切り捨てられる)。移植版は小数部分を `IslandScratch::land_frac` に持つ。
+//!
 //! 移植版の都合で変えた点:
-//! - Perl 版はコンデンサの充電量 (`$n/2`) が小数になり、地形の値に小数が残ることがある。
-//!   移植版は地形の値を整数で持つので切り捨てる (Perl 版も保存時に `%03x` で切り捨てる)。
 //! - 複合値の欄が空 (`"1,,3"`) のとき、Perl 版は空のまま書き戻すが、移植版は 0 を書く。
 
 use crate::model::Island;
@@ -55,6 +56,8 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     let (mut rena, mut fore, mut tare, mut zipro, mut leje) = (0, 0, 0, 0, 0);
     let mut ownfe = 0;
     let mut ene = 0i64;
+    // コンデンサの値の小数部分 (Perl 版では ene も小数になる)
+    let mut ene_frac = 0.0f64;
     let mut con99 = 0;
     let mut choki2 = 0;
     // 1 マスごとの数え上げ (Perl 版の my($oil) などに対応)
@@ -210,11 +213,14 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
                 con99 += 1;
             }
             if kind == k(L::Conden) || kind == k(L::Conden2) || kind == k(L::Conden3) {
-                ene += if kind == k(L::Conden3) {
-                    value * 2
+                let frac = sc.land_frac.remove(&(x, y)).unwrap_or(0.0);
+                if kind == k(L::Conden3) {
+                    ene += value * 2;
+                    ene_frac += frac * 2.0;
                 } else {
-                    value
-                };
+                    ene += value;
+                    ene_frac += frac;
+                }
                 island.map.get_mut(x, y).expect("in range").value = 0;
             }
 
@@ -281,7 +287,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
         c.tra + trunc(sc.trainmoney as f64 / 1000.0) + trunc(sc.trainmoney2 as f64 / 500.0);
     sc.ownfe = ownfe;
 
-    ene = trunc(ene as f64 * (1.0 + c.co8 as f64 / 10.0));
+    ene = trunc((ene as f64 + ene_frac) * (1.0 + c.co8 as f64 / 10.0));
     if ene < 0 {
         ene = 0;
     }
@@ -332,15 +338,26 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
             let Some(cell) = island.map.get_mut(x, y) else {
                 continue;
             };
-            let lv = cell.value as f64;
+            // 小数部分も含めた値 (Perl 版の $landValue)
+            let lv = cell.value as f64 + sc.land_frac.get(&(x, y)).copied().unwrap_or(0.0);
+            // 値を書き込む。小数部分は land_frac に残す
+            let mut store = |cell: &mut crate::model::LandCell, v: f64| {
+                cell.value = trunc(v);
+                let frac = v - v.trunc();
+                if frac == 0.0 {
+                    sc.land_frac.remove(&(x, y));
+                } else {
+                    sc.land_frac.insert((x, y), frac);
+                }
+            };
             if cell.kind == k(L::Conden) && lv < 2000.0 {
                 let n = trunc((2000.0 - lv) / 2.0) as f64;
                 let n = (n + n).trunc().min(sc.sabun);
                 sc.sabun -= n;
-                cell.value = trunc(cell.value as f64 + n);
+                store(cell, lv + n);
                 // Perl 版は最後に見たマスの値 ($value) と比べている
                 if last_value > 2000 {
-                    cell.value = 2000;
+                    store(cell, 2000.0);
                 }
             }
             if cell.kind == k(L::Conden2) && lv < 4000.0 {
@@ -348,18 +365,18 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
                 let r = ctx.rand_f64(n);
                 let n = (n * 9.0 + r).trunc().min(sc.sabun);
                 sc.sabun -= n;
-                cell.value = trunc(cell.value as f64 + n);
+                store(cell, lv + n);
                 if last_value > 4000 {
-                    cell.value = 4000;
+                    store(cell, 4000.0);
                 }
             }
             if cell.kind == k(L::Conden3) && lv < 7000.0 {
                 let n = trunc((7000.0 - lv) / 2.0) as f64;
                 let n = (n + n).trunc().min(sc.sabun);
                 sc.sabun -= n / 2.0;
-                cell.value = trunc(cell.value as f64 + n / 2.0);
+                store(cell, lv + n / 2.0);
                 if last_value > 7000 {
-                    cell.value = 7000;
+                    store(cell, 7000.0);
                 }
             }
             if sc.sabun <= 0.0 {

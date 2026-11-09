@@ -1,8 +1,16 @@
 #!/usr/bin/perl
-# Run the original Perl turn code that phase 1 ported on a legacy data directory and
-# dump the results: estimate() twice, then income(), then the command phase.
+# Run stages of the original Perl turn code on a legacy data directory and dump
+# the state after each stage.
 #
-# Usage: perl phase1_dump.pl MAIN.pl TURN.cgi DATA_DIR > expected.json
+# Usage: STEPS=estimate,income,commands,eachhex perl turn_dump.pl MAIN.pl TURN.cgi DATA_DIR
+#
+# Each step runs for every island in array order:
+#   estimate  estimate($i)
+#   income    income($island)
+#   commands  while (doCommand($island) == 0) {}
+#   eachhex   doEachHex($island)
+# After every step the islands (persisted values, transient values, land values and
+# planned commands) and the log pools so far (in logFlush order) are dumped.
 #   MAIN.pl  : hako-main.cgi without its top-level main code (see run-phase1.sh)
 #   TURN.cgi : hako-turn.cgi
 #
@@ -71,23 +79,27 @@ sub snapshot {
 
 sub pass {
     my ($name) = @_;
-    return { name => $name, islands => snapshot(), oyasumiritu => str($oyasumiritu) };
+    return {
+        name => $name,
+        islands => snapshot(),
+        oyasumiritu => str($oyasumiritu),
+        # logFlush の順 (機密・遅延・通常、それぞれ新しい順)
+        logs => [map { str($_) }
+            reverse(@HsecretLogPool), reverse(@HlateLogPool), reverse(@HlogPool)],
+        history => [map { str($_) } @history],
+    };
 }
 
+my %step = (
+    estimate => sub { estimate($_[0]) },
+    income   => sub { income($Hislands[$_[0]]) },
+    commands => sub { while (doCommand($Hislands[$_[0]]) == 0) {} },
+    eachhex  => sub { doEachHex($Hislands[$_[0]]) },
+);
 my @passes;
-for my $pass (1 .. 2) {
-    estimate($_) for 0 .. $HislandNumber - 1;
-    push @passes, pass("estimate$pass");
+for my $name (split /,/, ($ENV{STEPS} // 'estimate')) {
+    my $f = $step{$name} or die "unknown step $name";
+    $f->($_) for 0 .. $HislandNumber - 1;
+    push @passes, pass($name);
 }
-income($Hislands[$_]) for 0 .. $HislandNumber - 1;
-push @passes, pass("income");
-for my $i (0 .. $HislandNumber - 1) {
-    while (doCommand($Hislands[$i]) == 0) {}
-}
-my $commands = pass("commands");
-# logFlush の順 (機密・遅延・通常、それぞれ新しい順)
-$commands->{'logs'} = [map { str($_) }
-    reverse(@HsecretLogPool), reverse(@HlateLogPool), reverse(@HlogPool)];
-$commands->{'history'} = [map { str($_) } @history];
-push @passes, $commands;
 print JSON::PP->new->utf8->canonical->pretty->encode(\@passes);

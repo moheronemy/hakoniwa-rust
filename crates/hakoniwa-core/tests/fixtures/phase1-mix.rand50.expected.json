@@ -1,5 +1,6 @@
 [
    {
+      "history" : [],
       "islands" : [
          {
             "absent" : "23",
@@ -863,10 +864,12 @@
             "zoo" : "1"
          }
       ],
-      "name" : "estimate1",
+      "logs" : [],
+      "name" : "estimate",
       "oyasumiritu" : "1"
    },
    {
+      "history" : [],
       "islands" : [
          {
             "absent" : "23",
@@ -1730,10 +1733,12 @@
             "zoo" : "1"
          }
       ],
-      "name" : "estimate2",
+      "logs" : [],
+      "name" : "estimate",
       "oyasumiritu" : "2"
    },
    {
+      "history" : [],
       "islands" : [
          {
             "absent" : "23",
@@ -2596,6 +2601,9 @@
             "zipro" : "0",
             "zoo" : "1"
          }
+      ],
+      "logs" : [
+         "0,3,3,,<FONT COLOR=\"#a06040\"><B>箱庭島</B></FONT>の<FONT COLOR=\"#ff0000\"><B>電力が不足</B></FONT>しています！！"
       ],
       "name" : "income",
       "oyasumiritu" : "2"

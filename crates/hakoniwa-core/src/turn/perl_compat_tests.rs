@@ -1,10 +1,13 @@
 //! Perl 版との突き合わせテスト。
 //!
-//! `tests/fixtures/phase1-mix.rand*.expected.json` は、元の Perl コードを
-//! `tools/perl-harness/run-phase1.sh` で実行して作ったもの。`rand()` の値を固定し
-//! (0 と 0.5)、座標の並びは行優先にしてある。同じ条件で移植版を動かし、
-//! `estimate` 2 回、`income`、計画の実行 (費用不足・資金繰り・自動放棄・放棄) の
-//! 各段階で、島の値・一時値・地形の値・計画・ログがすべて一致することを確かめる。
+//! `tests/fixtures/<名前>.rand*.expected.json` は、元の Perl コードを
+//! `tools/perl-harness/run-harness.sh` で実行して作ったもの。`rand()` の値を固定し
+//! (0 と 0.5)、座標の並びは行優先にしてある。同じ条件で移植版を同じ段階
+//! (`estimate`, `income`, `commands`, `eachhex`) の順に動かし、各段階のあとで
+//! 島の値・一時値・地形の値・計画・ログがすべて一致することを確かめる。
+//!
+//! 新しい突き合わせを足すには、Perl 形式のデータを `tests/fixtures/<名前>/` に置き、
+//! `run-harness.sh <名前> <段階>` で期待値を作り、ここに `#[test]` を 1 つ足す。
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -17,7 +20,9 @@ use crate::legacy::{self, ImportOptions};
 use crate::log::TurnLog;
 use crate::model::Island;
 
-use super::{Globals, TurnContext, command::do_command, estimate::estimate, income::income};
+use super::{
+    Globals, TurnContext, command::do_command, estimate::estimate, hex::do_each_hex, income::income,
+};
 
 fn fixture_dir() -> std::path::PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures")
@@ -149,27 +154,36 @@ fn normalize(v: &str) -> &str {
 
 #[test]
 fn phase1_matches_perl_with_rand_0() {
-    check_phase1("phase1-mix.rand0.expected.json", 0);
+    check_fixture("phase1-mix", 0);
 }
 
 #[test]
 fn phase1_matches_perl_with_rand_half() {
-    // rand 0.8 の f64 は上位 53 ビットから作るので、1 << 63 で 0.5 になる
-    check_phase1("phase1-mix.rand50.expected.json", 1 << 63);
+    check_fixture("phase1-mix", RAND_HALF);
 }
 
-fn check_phase1(expected_file: &str, rng_value: u64) {
+/// rand 0.8 の f64 は上位 53 ビットから作るので、1 << 63 で 0.5 になる
+pub(crate) const RAND_HALF: u64 = 1 << 63;
+
+/// `fixture` を Perl 版の期待値と突き合わせる。`rng_value` は 0 か [`RAND_HALF`]
+pub(crate) fn check_fixture(fixture: &str, rng_value: u64) {
     let config = GameConfig::default();
     let import = legacy::import_dir(
-        &fixture_dir().join("phase1-mix"),
+        &fixture_dir().join(fixture),
         &ImportOptions::default(),
         &mut StepRng::new(0, 0),
     )
     .unwrap();
     let mut islands = import.state.world.islands;
-    let expected: Vec<Value> =
-        serde_json::from_str(&std::fs::read_to_string(fixture_dir().join(expected_file)).unwrap())
-            .unwrap();
+    let expected_file = format!(
+        "{fixture}.rand{}.expected.json",
+        if rng_value == 0 { "0" } else { "50" }
+    );
+    let expected: Vec<Value> = serde_json::from_str(
+        &std::fs::read_to_string(fixture_dir().join(&expected_file))
+            .unwrap_or_else(|e| panic!("{expected_file}: {e}")),
+    )
+    .unwrap();
 
     let mut rng = StepRng::new(rng_value, 0);
     let size = config.island_size;
@@ -191,28 +205,23 @@ fn check_phase1(expected_file: &str, rng_value: u64) {
 
     let mut mismatches = Vec::new();
     let mut compared = 0;
-    for (pass, exp) in expected.iter().enumerate() {
-        match exp["name"].as_str().unwrap() {
-            "estimate1" | "estimate2" => {
-                for i in 0..islands.len() {
-                    estimate(&mut ctx, &mut islands, i);
-                }
+    for exp in &expected {
+        let step = exp["name"].as_str().unwrap();
+        for i in 0..islands.len() {
+            match step {
+                "estimate" => estimate(&mut ctx, &mut islands, i),
+                "income" => income(&mut ctx, &mut islands[i]),
+                "commands" => while !do_command(&mut ctx, &mut islands, i) {},
+                "eachhex" => do_each_hex(&mut ctx, &mut islands, i),
+                other => panic!("unknown step {other}"),
             }
-            "income" => {
-                for island in islands.iter_mut() {
-                    income(&mut ctx, island);
-                }
-            }
-            "commands" => {
-                for i in 0..islands.len() {
-                    while !do_command(&mut ctx, &mut islands, i) {}
-                }
-            }
-            other => panic!("unknown pass {other}"),
         }
+        let at = |island: &Island, what: &str| format!("{step}: island {} {what}", island.id);
         let exp_islands = exp["islands"].as_array().unwrap();
+        assert_eq!(exp_islands.len(), islands.len());
         for (island, exp_island) in islands.iter().zip(exp_islands) {
             for (key, value) in exp_island.as_object().unwrap() {
+                compared += 1;
                 if key == "commands" {
                     let got: Vec<String> =
                         island.commands.iter().map(|c| c.kind.to_string()).collect();
@@ -223,106 +232,109 @@ fn check_phase1(expected_file: &str, rng_value: u64) {
                         .map(|v| v.as_str().unwrap())
                         .collect();
                     if got != want {
-                        mismatches.push(format!(
-                            "pass {} island {} commands: rust {got:?} perl {want:?}",
-                            pass + 1,
-                            island.id
-                        ));
+                        mismatches.push(format!("{}: rust {got:?} perl {want:?}", at(island, key)));
                     }
                     continue;
                 }
                 if key == "land_values" {
-                    let got: Vec<String> = island
-                        .map
-                        .cells
-                        .iter()
-                        .map(|c| c.value.to_string())
-                        .collect();
-                    let want: Vec<&str> = value
-                        .as_array()
-                        .unwrap()
-                        .iter()
-                        .map(|v| normalize(v.as_str().unwrap()))
-                        .collect();
-                    for (idx, (g, w)) in got.iter().zip(&want).enumerate() {
-                        if g != w {
+                    let want = value.as_array().unwrap();
+                    for (idx, (cell, w)) in island.map.cells.iter().zip(want).enumerate() {
+                        let w = normalize(w.as_str().unwrap());
+                        let (x, y) = (idx % size, idx / size);
+                        let frac = island
+                            .scratch
+                            .land_frac
+                            .get(&(x, y))
+                            .copied()
+                            .unwrap_or(0.0);
+                        let got = if frac == 0.0 {
+                            cell.value.to_string()
+                        } else {
+                            (cell.value as f64 + frac).to_string()
+                        };
+                        if got != w {
                             mismatches.push(format!(
-                                "pass {} island {} land ({}, {}): rust {g} perl {w}",
-                                pass + 1,
-                                island.id,
-                                idx % size,
-                                idx / size
+                                "{}: rust {got} perl {w}",
+                                at(island, &format!("land ({x}, {y})"))
                             ));
                         }
                     }
                     continue;
                 }
-                compared += 1;
                 let want = normalize(value.as_str().unwrap());
                 let got = field(island, key);
                 if normalize(&got) != want {
-                    mismatches.push(format!(
-                        "pass {} island {} {key}: rust {got:?} perl {want:?}",
-                        pass + 1,
-                        island.id
-                    ));
+                    mismatches.push(format!("{}: rust {got:?} perl {want:?}", at(island, key)));
                 }
             }
         }
-        if let Some(want_logs) = exp.get("logs") {
-            let (entries, history) = std::mem::take(&mut ctx.log).flush();
-            let got: Vec<String> = entries
-                .iter()
-                .map(|e| {
-                    let id = |v: Option<i64>| v.map(|v| v.to_string()).unwrap_or_default();
-                    format!(
-                        "{},{},{},{},{}",
-                        u8::from(e.secret),
-                        e.turn,
-                        id(e.island1),
-                        id(e.island2),
-                        e.message
-                    )
-                })
-                .collect();
-            let want: Vec<&str> = want_logs
-                .as_array()
-                .unwrap()
-                .iter()
-                .map(|v| v.as_str().unwrap())
-                .collect();
-            if got != want {
-                mismatches.push(format!("logs:\n  rust {got:#?}\n  perl {want:#?}"));
-            }
-            let got: Vec<String> = history
-                .iter()
-                .map(|h| format!("{},{}", h.turn, h.message))
-                .collect();
-            let want: Vec<&str> = exp["history"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .map(|v| v.as_str().unwrap())
-                .collect();
-            if got != want {
-                mismatches.push(format!("history: rust {got:?} perl {want:?}"));
-            }
+
+        let (entries, history) = ctx.log.snapshot();
+        let got: Vec<String> = entries
+            .iter()
+            .map(|e| {
+                let id = |v: Option<i64>| v.map(|v| v.to_string()).unwrap_or_default();
+                format!(
+                    "{},{},{},{},{}",
+                    u8::from(e.secret),
+                    e.turn,
+                    id(e.island1),
+                    id(e.island2),
+                    e.message
+                )
+            })
+            .collect();
+        let want: Vec<&str> = exp["logs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap())
+            .collect();
+        if got != want {
+            let first = got.iter().zip(&want).position(|(g, w)| g != w);
+            mismatches.push(format!(
+                "{step}: logs differ (rust {} lines, perl {} lines, first difference at {first:?})\n  rust {got:#?}\n  perl {want:#?}",
+                got.len(),
+                want.len()
+            ));
         }
+        let got: Vec<String> = history
+            .iter()
+            .map(|h| format!("{},{}", h.turn, h.message))
+            .collect();
+        let want: Vec<&str> = exp["history"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_str().unwrap())
+            .collect();
+        if got != want {
+            mismatches.push(format!("{step}: history: rust {got:?} perl {want:?}"));
+        }
+
         let want = normalize(exp["oyasumiritu"].as_str().unwrap());
         if ctx.oyasumiritu.to_string() != want {
             mismatches.push(format!(
-                "pass {} oyasumiritu: rust {} perl {want}",
-                pass + 1,
+                "{step}: oyasumiritu: rust {} perl {want}",
                 ctx.oyasumiritu
             ));
         }
     }
     assert!(
         mismatches.is_empty(),
-        "{} mismatches:\n{}",
+        "{expected_file}: {} mismatches:\n{}",
         mismatches.len(),
         mismatches.join("\n")
     );
-    // 島 3 つ × 4 段階 × 約 100 項目を比べたはず
-    assert!(compared > 500, "only {compared} values compared");
+    assert!(compared > 100, "only {compared} values compared");
+}
+
+#[test]
+fn phase2_town_matches_perl_with_rand_0() {
+    check_fixture("phase2-town", 0);
+}
+
+#[test]
+fn phase2_town_matches_perl_with_rand_half() {
+    check_fixture("phase2-town", RAND_HALF);
 }

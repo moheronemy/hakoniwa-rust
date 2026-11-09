@@ -71,6 +71,19 @@ impl TurnLog {
         self.history.push(TurnMessage { turn, message });
     }
 
+    /// ここまでのログを `flush` と同じ順で複製する (テスト用)
+    pub fn snapshot(&self) -> (Vec<LogEntry>, Vec<TurnMessage>) {
+        let entries = self
+            .secret
+            .iter()
+            .rev()
+            .chain(self.late.iter().rev())
+            .chain(self.normal.iter().rev())
+            .cloned()
+            .collect();
+        (entries, self.history.clone())
+    }
+
     /// `logFlush`: 機密・遅延・通常の順に、それぞれ新しいものから並べる
     pub fn flush(self) -> (Vec<LogEntry>, Vec<TurnMessage>) {
         let entries = self

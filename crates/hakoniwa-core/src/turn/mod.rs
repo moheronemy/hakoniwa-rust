@@ -6,6 +6,7 @@
 
 mod command;
 mod estimate;
+pub(crate) mod hex;
 mod income;
 mod ranking;
 
@@ -144,6 +145,21 @@ pub struct IslandScratch {
     pub old_pop: i64,
     pub old_money: i64,
     pub old_pts: i64,
+    /// アナザーモードで doEachHex の間だけ退避する資金
+    pub amarimoney: i64,
+    /// 誘致活動中 (doCommand の誘致活動が立てる)
+    pub propaganda: i64,
+    pub hcsankaflag: i64,
+    /// このターンに漏電・小彗星が起きた数
+    pub roudenflag: i64,
+    /// 毒消し薬が売り切れた
+    pub urikireflag: i64,
+    /// doEachHex の系統ごとの値
+    pub hex: hex::Scratch,
+    /// 地形の値の小数部分 (座標 → 小数)。Perl 版はコンデンサの充電で値が小数になり、
+    /// ターンの間はそのまま使われる (保存時に切り捨て)。地形の値を書き換えるときは
+    /// `hex::town::set` などを使って消すこと
+    pub land_frac: std::collections::HashMap<(usize, usize), f64>,
 }
 
 /// Perl 版のグローバル変数のうち、島をまたいで値が持ち越されるもの。
@@ -174,6 +190,8 @@ pub(crate) struct Globals {
     pub auc9: Captures<5>,
     /// `$factory1`, `$factory2`, `$co0`, ... (`income` が `factory` を分解する先)
     pub factory: Captures<10>,
+    /// doEachHex で使うグローバル変数
+    pub hex: hex::HexGlobals,
 }
 
 /// ターン処理全体で共有する状態
@@ -303,7 +321,11 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         while !command::do_command(&mut ctx, islands, i) {}
     }
 
-    // TODO(フェーズ2): 成長および単ヘックス災害 (doEachHex)
+    // 成長および単ヘックス災害
+    for &i in &order {
+        hex::do_each_hex(&mut ctx, islands, i);
+    }
+
     // TODO(フェーズ4): 島全体処理 (doIslandProcess, doIslandunemployed)
     // TODO(フェーズ6): Hakoniwa Cup のシード (ターン % 100 == 41)
 
