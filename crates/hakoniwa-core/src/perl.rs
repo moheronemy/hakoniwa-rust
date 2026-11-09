@@ -40,6 +40,66 @@ pub fn random<R: rand::Rng + ?Sized>(rng: &mut R, n: i64) -> i64 {
     (rng.r#gen::<f64>() * n as f64) as i64
 }
 
+/// `$s =~ /^([0-9]*),([0-9]*),...$/` (N 個) 相当。
+///
+/// マッチすれば各欄を数値にして返す (空欄は 0)。欄の数が違う、数字以外が混じるなどで
+/// マッチしなければ `None`。Perl 版はマッチ失敗時に前回の `$1`.. や代入先の変数を
+/// そのまま使うので、呼び出し側は [`Captures::update`] で「前回値」を保持する。
+pub fn fields<const N: usize>(s: &str) -> Option<[i64; N]> {
+    // Perl の `$` は末尾の改行の直前にもマッチする
+    let s = s.strip_suffix('\n').unwrap_or(s);
+    let mut out = [0i64; N];
+    let mut parts = s.split(',');
+    for slot in out.iter_mut() {
+        let p = parts.next()?;
+        if !p.bytes().all(|b| b.is_ascii_digit()) {
+            return None;
+        }
+        *slot = int(p);
+    }
+    if parts.next().is_some() {
+        return None;
+    }
+    Some(out)
+}
+
+/// 数値をカンマでつないで複合値の文字列にする (`"$a,$b,$c"` 相当)。
+pub fn join(values: &[i64]) -> String {
+    values
+        .iter()
+        .map(i64::to_string)
+        .collect::<Vec<_>>()
+        .join(",")
+}
+
+/// Perl のグローバル変数に正規表現の結果を代入する箇所の再現。
+///
+/// `($a, $b, ...) = ($1, $2, ...)` は、マッチに失敗すると前回の値が残る。
+/// 同じ変数名の組を複数の関数・複数の島で使い回しているので、ターン処理の間は値を持ち越す。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Captures<const N: usize>(pub [i64; N]);
+
+impl<const N: usize> Default for Captures<N> {
+    fn default() -> Self {
+        Self([0; N])
+    }
+}
+
+impl<const N: usize> Captures<N> {
+    /// `s` がマッチすれば値を更新する。更新後 (失敗時は前回) の値を返す
+    pub fn update(&mut self, s: &str) -> [i64; N] {
+        if let Some(v) = fields::<N>(s) {
+            self.0 = v;
+        }
+        self.0
+    }
+}
+
+/// Perl の `int()` を浮動小数点の式に適用する (0 方向への切り捨て)
+pub fn trunc(x: f64) -> i64 {
+    if x.is_nan() { 0 } else { x.trunc() as i64 }
+}
+
 /// `htmlEscape` 相当。
 pub fn html_escape(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
@@ -77,6 +137,25 @@ mod tests {
         assert!(num_eq_empty(""));
         assert!(num_eq_empty("0,0,0,0,0"));
         assert!(!num_eq_empty("5,0,0,0,0"));
+    }
+
+    #[test]
+    fn fields_match_perl_regex() {
+        assert_eq!(fields::<3>("1,22,333"), Some([1, 22, 333]));
+        assert_eq!(fields::<3>("1,,3"), Some([1, 0, 3]));
+        assert_eq!(fields::<3>("1,2"), None);
+        assert_eq!(fields::<3>("1,2,3,4"), None);
+        assert_eq!(fields::<3>("1,-2,3"), None);
+        assert_eq!(fields::<1>(""), Some([0]));
+        assert_eq!(join(&[1, 0, 3]), "1,0,3");
+    }
+
+    #[test]
+    fn captures_keep_previous_on_failure() {
+        let mut c = Captures::<2>::default();
+        assert_eq!(c.update("bad"), [0, 0]);
+        assert_eq!(c.update("4,5"), [4, 5]);
+        assert_eq!(c.update("bad"), [4, 5]);
     }
 
     #[test]

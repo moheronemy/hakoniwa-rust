@@ -344,6 +344,7 @@ fn read_island(
         map: IslandMap::new_sea(0),
         commands: Vec::new(),
         lbbs: Vec::new(),
+        scratch: Default::default(),
     }
 }
 
@@ -364,7 +365,7 @@ fn read_island_file(island: &mut Island, mut lines: Lines, opts: &ImportOptions)
             };
             *map.get_mut(x, y).expect("in range") = LandCell {
                 kind: hex(cell.get(..2).unwrap_or(&[])) as u8,
-                value: hex(cell.get(2..).unwrap_or(&[])) as u16,
+                value: i64::from(hex(cell.get(2..).unwrap_or(&[]))),
             };
         }
     }

@@ -318,6 +318,7 @@ dependencies = [
  "clap",
  "hakoniwa-core",
  "http-body-util",
+ "rand",
  "serde",
  "tempfile",
  "tokio",

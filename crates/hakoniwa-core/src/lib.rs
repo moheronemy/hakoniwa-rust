@@ -5,17 +5,20 @@
 //! - [`model`] — セーブデータのモデル
 //! - [`storage`] — 移植版のセーブデータ (JSON) の読み書き
 //! - [`legacy`] — Perl 版のセーブデータの読み込み
+//! - [`turn`] — ターン処理
+//! - [`log`] — ターン処理のログ
 //! - [`perl`] — Perl の挙動を再現するヘルパー
 //!
-//! ゲームのルール (ターン処理・計画の実行など) はまだ移植していない。
-//! 進め方は `docs/PORTING.md` を参照。
+//! ゲームのルールは移植の途中。進み具合は `docs/PORTING.md` を参照。
 
 pub mod config;
 pub mod legacy;
+pub mod log;
 pub mod model;
 pub mod perl;
 pub mod storage;
 pub mod tables;
+pub mod turn;
 
 pub use config::GameConfig;
 pub use model::GameState;

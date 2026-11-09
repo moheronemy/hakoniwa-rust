@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::config::{GameConfig, HideMoneyMode};
 use crate::tables::{CommandKind, LandKind};
+use crate::turn::IslandScratch;
 
 /// 保存データの形式バージョン
 pub const FORMAT_VERSION: u32 = 1;
@@ -172,6 +173,84 @@ pub struct Island {
     pub commands: Vec<PlannedCommand>,
     /// ローカル掲示板 (Perl 版の形式 `種別<発言島<ID>名前>本文` のまま)
     pub lbbs: Vec<String>,
+
+    /// ターン処理中だけ使う値 (Perl 版で島のハッシュに一時的に入れていたもの)。保存しない
+    #[serde(skip)]
+    pub scratch: Box<IslandScratch>,
+}
+
+impl Island {
+    /// 値がすべて空の島 (海だけの地図、計画はすべて「資金繰り」)。
+    /// 複合値の欄は、Perl 版が読み込み時に補う既定値にしておく
+    pub fn blank(id: i64, name: &str, config: &GameConfig) -> Self {
+        Self {
+            name: name.to_string(),
+            id,
+            score: 0,
+            prize: String::new(),
+            absent: 0,
+            comment: String::new(),
+            password: String::new(),
+            money: 0,
+            food: 0,
+            pop: 0,
+            area: 0,
+            farm: 0,
+            factory: "0,0,0,0,0,0,0,0,0,0".into(),
+            mountain: 0,
+            pts: 0,
+            eis: [0; 7],
+            eis8: String::new(),
+            taiji: 0,
+            onm: String::new(),
+            monster_live: 0,
+            monster_live_type: 0,
+            eisei: [0; 2],
+            eisei_raw: [
+                "0,0,0,0,0".into(),
+                "0,0,0,0,0,0,0,0,0,0,0".into(),
+                "0,0,0,0,0,0,0".into(),
+                "0,0,0,0,0,0,0,0,0,0,0,0".into(),
+            ],
+            id1: 0,
+            owner_name: String::new(),
+            totoyoso: String::new(),
+            totoyoso2: String::new(),
+            owner_stats: OwnerStats::default(),
+            ip_name: name.to_string(),
+            ip: Default::default(),
+            ip_counters: [0; 2],
+            etc_num: [0; 5],
+            etc_raw: [
+                vec!["0"; 31].join(","),
+                vec!["0"; 31].join(","),
+                "0,0,0".into(),
+                "0,0,0,0,0,0,0".into(),
+                "0,0,0,0,0,0,0".into(),
+            ],
+            auction: AuctionState {
+                auc0: "0,0,0,0,0".into(),
+                auc4: "0,0,0".into(),
+                auc5: "0,0,0,0,0".into(),
+                auc6: "0,0,0".into(),
+                auc7: "0".into(),
+                auc8: "0".into(),
+                auc9: "0,0,0,0,0".into(),
+                ..Default::default()
+            },
+            survey_flag: 1,
+            map: IslandMap::new_sea(config.island_size),
+            commands: vec![
+                PlannedCommand {
+                    kind: CommandKind::DoNothing as u16,
+                    ..Default::default()
+                };
+                config.command_max
+            ],
+            lbbs: vec!["0<<0>>".to_string(); config.lbbs.max],
+            scratch: Default::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
@@ -207,8 +286,9 @@ pub struct AuctionState {
 pub struct LandCell {
     /// 地形番号 ([`LandKind`] の値)
     pub kind: u8,
-    /// 地形ごとの値 (人口、規模、怪獣の種類と体力など)
-    pub value: u16,
+    /// 地形ごとの値 (人口、規模、怪獣の種類と体力など)。
+    /// Perl 版では 3 桁の 16 進で保存されるが、ターン処理中は 4095 を超えることがある
+    pub value: i64,
 }
 
 impl LandCell {

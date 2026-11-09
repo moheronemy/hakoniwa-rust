@@ -78,8 +78,64 @@ pub fn save(path: &Path, state: &GameState) -> Result<(), StorageError> {
     Ok(())
 }
 
+/// `n` 番目のバックアップのパス (`state.json` → `state.bak0.json`)
+pub fn backup_path(path: &Path, n: usize) -> PathBuf {
+    let stem = path.file_stem().unwrap_or_default().to_string_lossy();
+    let name = match path.extension() {
+        Some(ext) => format!("{stem}.bak{n}.{}", ext.to_string_lossy()),
+        None => format!("{stem}.bak{n}"),
+    };
+    path.with_file_name(name)
+}
+
+/// 今の保存データをバックアップに回す (ターン処理の書き込みの前に呼ぶ)。
+///
+/// Perl 版は `data` を `data.bak0` に名前を変えてから新しいデータを書いていた。
+/// 移植版は `state.bak0.json` に複製し、古いものは `bak1`, `bak2`, ... とずらして
+/// `keep` 個まで残す。保存データがまだ無ければ何もしない
+pub fn rotate_backups(path: &Path, keep: usize) -> Result<(), StorageError> {
+    if keep == 0 || !path.exists() {
+        return Ok(());
+    }
+    let io = |p: &Path| {
+        let p = p.to_path_buf();
+        move |source| StorageError::Io { path: p, source }
+    };
+    let oldest = backup_path(path, keep - 1);
+    if oldest.exists() {
+        fs::remove_file(&oldest).map_err(io(&oldest))?;
+    }
+    for i in (1..keep).rev() {
+        let from = backup_path(path, i - 1);
+        if from.exists() {
+            fs::rename(&from, backup_path(path, i)).map_err(io(&from))?;
+        }
+    }
+    fs::copy(path, backup_path(path, 0)).map_err(io(path))?;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn backups_rotate() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("state.json");
+        assert_eq!(backup_path(&path, 1), dir.path().join("state.bak1.json"));
+        rotate_backups(&path, 2).unwrap(); // まだ無いので何もしない
+        for turn in 1..=3 {
+            let mut state = GameState::new_game(0, &GameConfig::default());
+            state.world.turn = turn;
+            rotate_backups(&path, 2).unwrap();
+            save(&path, &state).unwrap();
+        }
+        let turn = |p: &Path| load(p).unwrap().unwrap().world.turn;
+        assert_eq!(turn(&path), 3);
+        assert_eq!(turn(&backup_path(&path, 0)), 2);
+        assert_eq!(turn(&backup_path(&path, 1)), 1);
+        assert!(!backup_path(&path, 2).exists());
+    }
+
     use super::*;
     use crate::config::GameConfig;
 

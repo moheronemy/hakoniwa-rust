@@ -60,9 +60,14 @@ td.num {{ text-align: right; white-space: nowrap; }}
 <h1>{title}</h1>
 <h2>ターン{turn}</h2>
 <p>{remain}</p>
-"#,
+{debug}"#,
         turn = world.turn,
         remain = remaining(world.next_turn_time(config) - now),
+        debug = if config.debug {
+            "<form method=\"post\" action=\"/debug/turn\"><button>ターンを進める</button></form>\n"
+        } else {
+            ""
+        },
     );
 
     let _ = writeln!(h, "<h2>諸島の状況</h2>");

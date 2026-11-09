@@ -2,7 +2,8 @@
 
 Hakoniwa R.A. Final Edition (箱庭諸島2 ver2.30 をもとにした Perl CGI ゲーム) の Rust 移植。
 
-まだ土台の段階で、ターン処理や開発画面は移植していない。計画と進み具合は [docs/PORTING.md](docs/PORTING.md) を参照。
+移植の途中。ターン処理の骨格 (集計・収入・資金繰りと自動放棄・部門賞・ターン杯・定時実行) までできていて、
+地形ごとの処理、ほとんどの計画、開発画面はまだ無い。計画と進み具合は [docs/PORTING.md](docs/PORTING.md) を参照。
 
 ## 構成
 
@@ -29,11 +30,13 @@ cargo run -p hakoniwa-server -- --config hakoniwa.toml
 ```toml
 bind = "127.0.0.1:8080"
 state_path = "data/state.json"
+tick_secs = 10                # ターンの時刻を確かめる間隔
 
 [game]
 title = "☆Hakoniwa R.A.☆"
 unit_time = 21600
 hide_money_mode = "rounded"   # hidden / visible / rounded
+debug = false                 # true でトップページに「ターンを進める」ボタンが出る
 
 [game.passwords]
 master = "..."
