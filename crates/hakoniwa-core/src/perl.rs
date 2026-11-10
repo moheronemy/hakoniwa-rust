@@ -32,12 +32,12 @@ pub fn num_eq_empty(s: &str) -> bool {
     int(s) == 0
 }
 
-/// Perl の `random($n)` (`int(rand(1) * $n)`) 相当。0 以上 `n` 未満を返す。
+/// Perl の `random($n)` (`int(rand(1) * $n)`) 相当。`n` が正なら 0 以上 `n` 未満。
+///
+/// Perl 版は `n` が 0 以下でも乱数を 1 つ使う (負なら 0 以下の値を返す) ので、
+/// 乱数の並びをそろえるため移植版も必ず 1 つ使う
 pub fn random<R: rand::Rng + ?Sized>(rng: &mut R, n: i64) -> i64 {
-    if n <= 0 {
-        return 0;
-    }
-    (rng.r#gen::<f64>() * n as f64) as i64
+    trunc(rng.r#gen::<f64>() * n as f64)
 }
 
 /// `$s =~ /^([0-9]*),([0-9]*),...$/` (N 個) 相当。
@@ -166,5 +166,8 @@ mod tests {
             assert!((0..27).contains(&v));
         }
         assert_eq!(random(&mut rng, 0), 0);
+        for _ in 0..100 {
+            assert!((-4..=0).contains(&random(&mut rng, -5)));
+        }
     }
 }
