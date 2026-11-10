@@ -1,0 +1,14 @@
+{
+ "fixture": "phase6-screens-t90",
+ "rand": "015625",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "1",
+    "AMOUNT": "3",
+    "AuctionButton1": "1"
+   }
+  }
+ ]
+}

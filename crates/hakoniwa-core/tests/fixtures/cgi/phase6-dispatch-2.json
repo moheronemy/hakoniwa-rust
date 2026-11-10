@@ -1,0 +1,42 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass3",
+    "TARGETID": "9",
+    "AMOUNT": "abc",
+    "MsButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass2",
+    "TARGETID": "",
+    "AMOUNT": "",
+    "MsButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass1",
+    "TARGETID": "2",
+    "AMOUNT": " 7",
+    "MsButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass2",
+    "TARGETID": "1",
+    "AMOUNT": "3",
+    "Ms2Button2": "1"
+   }
+  }
+ ]
+}

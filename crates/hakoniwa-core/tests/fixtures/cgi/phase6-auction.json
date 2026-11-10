@@ -1,0 +1,110 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "5",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "AUCNUMBER": "1",
+    "AMOUNT": "3",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "4",
+    "AMOUNT": "3",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AUCNUMBER": "1",
+    "AMOUNT": "1",
+    "AuctionButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "2",
+    "AMOUNT": "1",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "1",
+    "AMOUNT": "99",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "1",
+    "AMOUNT": "3",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "3",
+    "AMOUNT": "1",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "2",
+    "AMOUNT": "1",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "AUCNUMBER": "3",
+    "AMOUNT": "9",
+    "AuctionButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AUCNUMBER": "1",
+    "AMOUNT": "-8",
+    "AuctionButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "1",
+    "AMOUNT": "1.5",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AUCNUMBER": "1",
+    "AMOUNT": "-3",
+    "AuctionButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AUCNUMBER": "3",
+    "AMOUNT": "1",
+    "AuctionButton2": "1"
+   }
+  }
+ ]
+}

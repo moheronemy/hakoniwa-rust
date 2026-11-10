@@ -1,0 +1,21 @@
+{
+ "fixture": "phase6-screens-t89",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AUCNUMBER": "1",
+    "AMOUNT": "3",
+    "AuctionButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "t89",
+    "PASSWORD": "pass1",
+    "TotoButton1": "1"
+   }
+  }
+ ]
+}

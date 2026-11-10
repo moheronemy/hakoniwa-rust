@@ -1,0 +1,41 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "MESSAGE": "予想<b>は\"ABC\",1-2-3x、あいうえおかきくけこさしすせそたちつてとなにぬねの",
+    "PASSWORD": "pass1",
+    "TotoButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "no",
+    "PASSWORD": "wrong",
+    "TotoButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "首都<東京>,abcdefghijklmnopqrstuvwxyz",
+    "PASSWORD": "pass1",
+    "TotosButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "新しい首都の名前はとても長いのです",
+    "PASSWORD": "pass2",
+    "TotosButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "no",
+    "PASSWORD": "wrong",
+    "TotosButton3": "1"
+   }
+  }
+ ]
+}
