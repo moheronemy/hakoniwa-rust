@@ -11,7 +11,9 @@ CASE.json (tests/fixtures/cgi/ に置く):
     {
       "fixture": "legacy-turn3",          # 元にするデータ (tests/fixtures/ の下)
       "time": 1794290500,                  # time() の値 (省略時はデータの最終更新時刻 + 1)
-      "rand": "50",                        # rand() を 0.50 に固定 (省略時は 0)
+      "rand": "50",                        # rand() を 0.50 に固定 (省略時は 0)。
+                                           # ["5", "25", ...] のように並べると、各操作で
+                                           # rand() が先頭から順にその値を返す (最後まで行けば先頭へ)
       "requests": [
         {"form": {"ISLANDID": "1", "PASSWORD": "p", "MESSAGE": "やあ", "CommentButton1": "1"},
          "addr": "10.0.0.1", "query": "", "cookie": ""}
@@ -43,8 +45,9 @@ PERL_SRC = ROOT / "hako-r-a_FE"
 # rand と time を固定する (CORE::GLOBAL は読み込む前に差し替える必要がある)
 PRELUDE = r"""
 BEGIN {
-    my $r = $ENV{HAKO_RAND} // 0;
-    *CORE::GLOBAL::rand = sub { my $n = @_ ? $_[0] : 1; $n = 1 if !$n; $r * $n };
+    my @r = split /,/, ($ENV{HAKO_RAND} // 0);
+    my $i = 0;
+    *CORE::GLOBAL::rand = sub { my $n = @_ ? $_[0] : 1; $n = 1 if !$n; $r[$i++ % @r] * $n };
     my $t = $ENV{HAKO_TIME};
     *CORE::GLOBAL::time = sub { $t };
 }
@@ -64,6 +67,11 @@ def encode_form(form: dict) -> bytes:
         parts.append(urllib.parse.quote_from_bytes(str(k).encode("euc-jp"))
                      + "=" + urllib.parse.quote_from_bytes(str(v).encode("euc-jp")) + "&")
     return "".join(parts).encode("ascii")
+
+
+def rand_env(rand) -> str:
+    values = rand if isinstance(rand, list) else [rand]
+    return ",".join("0." + str(v) for v in values)
 
 
 def last_time(data: pathlib.Path) -> int:
@@ -96,7 +104,7 @@ def run(case_path: pathlib.Path) -> pathlib.Path:
                 "REMOTE_ADDR": req.get("addr", "10.0.0.1"),
                 "QUERY_STRING": req.get("query", ""),
                 "HTTP_COOKIE": req.get("cookie", ""),
-                "HAKO_RAND": "0." + str(case.get("rand", "0")),
+                "HAKO_RAND": rand_env(case.get("rand", "0")),
                 "HAKO_TIME": str(req.get("time", t)),
             }
             res = subprocess.run(

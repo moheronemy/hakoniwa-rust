@@ -1,0 +1,53 @@
+{
+ "fixture": "legacy-turn3",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "1",
+    "OWNERNAME": "x",
+    "OLDPASS": "wrong",
+    "ChangeOwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "OWNERNAME": "<o>\"wn\"",
+    "OLDPASS": "pass1",
+    "ChangeOwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "ChangeOwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "99",
+    "OWNERNAME": "とても長いオーナーの名前ですよ本当に",
+    "OLDPASS": "pass3",
+    "ChangeOwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "OWNERNAME": "m",
+    "OLDPASS": "uhusnuvnurkanjhfh",
+    "ChangeOwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "OWNERNAME": "s",
+    "OLDPASS": "uhusnuvnurkanjhfhmax",
+    "ChangeOwnerButton": "1"
+   }
+  }
+ ]
+}

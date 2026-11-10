@@ -1,0 +1,16 @@
+{
+ "fixture": "legacy-turn3",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "abc",
+    "OWNERNAME": "id",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  }
+ ]
+}

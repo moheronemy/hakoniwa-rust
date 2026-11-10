@@ -1,0 +1,236 @@
+{
+ "fixture": "legacy-turn3",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "wrong",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "a",
+    "PASSWORD2": "b",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "a(b",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "a$b",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "Alpha",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "a$b",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "<x>\"y\"",
+    "OLDPASS": "pass1",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "pass1",
+    "PASSWORD": "newpassword",
+    "PASSWORD2": "newpassword",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "B2",
+    "OWNERNAME": "",
+    "OLDPASS": "newpassword",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "B3",
+    "OWNERNAME": "",
+    "OLDPASS": "newpassword",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "B4",
+    "OWNERNAME": "",
+    "OLDPASS": "newpassword",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "B5",
+    "OWNERNAME": "",
+    "OLDPASS": "newpassword",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "99",
+    "ISLANDNAME": "とても長い名前の島ですよ本当にabc",
+    "OWNERNAME": "とても長いオーナーの名前ですよ本当に",
+    "OLDPASS": "pass3",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "m",
+    "OLDPASS": "uhusnuvnurkanjhfh",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhmax",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Sp",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhmax",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Sp2",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhmax",
+    "PASSWORD": "a",
+    "PASSWORD2": "b",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "首都<名>",
+    "OLDPASS": "uhusnuvnurkanjhfhshuto",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Om",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhomiya",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhip",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  }
+ ]
+}
