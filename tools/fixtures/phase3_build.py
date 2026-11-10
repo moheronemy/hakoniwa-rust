@@ -5,6 +5,7 @@
     STEPS=estimate,income,$(printf 'commands,%.0s' $(seq 34))estimate
     RANDS="0 03125 50 96875" tools/perl-harness/run-harness.sh phase3-build-1 $STEPS
     RANDS="0 03125 50 96875" tools/perl-harness/run-harness.sh phase3-build-2 $STEPS
+    RANDS="0 50" tools/perl-harness/run-harness.sh phase3-build-3 estimate,income,commands,commands,estimate
     RANDS="0 03125" tools/perl-harness/run-harness.sh phase3-build-zoo $STEPS
     RANDS="0 03125" tools/perl-harness/run-harness.sh phase3-build-zoo2 commands,commands,commands
 
@@ -271,6 +272,35 @@ f.commands(3, [
     c("Farmcpc", 5, 2, 3),
     c("Monbuy", 6, 2, 3),
     c("Monbuyt", 7, 2),
+])
+f.save()
+
+# ---------------------------------------------------------------- phase3-build-3
+# 建設できない地形 (それぞれの計画だけが建設できる地形に、別の計画を置く)。どれも 0 を返す
+rich3 = dict(RICH)
+rich3[(9, 8)] = ("Farmpic", 10)
+rich3[(10, 8)] = ("Farmcow", 10)
+rich3[(5, 4)] = ("Plains2", 0)
+f = setup("phase3-build-3", rich1=rich3)
+f.commands(1, [
+    c("Plant", 7, 5), c("Plant", 9, 5), c("Plant", 8, 5), c("Plant", 7, 8),
+    c("Plant", 8, 8), c("Plant", 5, 8), c("Plant", 10, 1), c("Plant", 10, 5),
+    c("Plant", 9, 1), c("Plant", 8, 2), c("Plant", 7, 2), c("Plant", 10, 2),
+    c("Plant", 9, 2), c("Plant", 7, 3), c("Plant", 9, 8), c("Plant", 10, 8),
+    c("Plant", 6, 2), c("Plant", 4, 9), c("Plant", 4, 10), c("Plant", 9, 7),
+    c("Plant", 10, 4), c("Plant", 5, 7), c("Plant", 6, 10), c("Plant", 0, 3),
+    c("Plant", 7, 6),
+    c("Yakusho", 1, 3),                # 大学 4 には役所を建てられない
+    c("Kuraf", 10, 4),                 # 倉庫に食料倉庫
+    c("Kura", 5, 7),                   # 食料倉庫に倉庫
+    c("Umiamu", 0, 3),                 # 浅瀬
+    c("Nursery", 0, 4),                # 深い海
+    c("Park", 9, 5),
+    c("Zoo", 7, 5),
+    c("Farmcpc", 9, 8, 1),             # 豚を売る (0)
+    c("Farmcpc", 10, 8, 2),            # 牛を売る (0)
+    c("Plant", 5, 4),                  # 平地 2 には建てられる
+    c("College", 6, 2),                # 大学 77 に大学 (新設になる)
 ])
 f.save()
 
