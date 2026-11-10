@@ -18,7 +18,11 @@
 //! - 読み込むときは、スナップショットに同じ世代の差分を順に当てる。最後の 1 件が書きかけなら捨てる
 //! - スナップショットを書き直したら世代を 1 つ進め、古い差分と、どこからも指されないログを消す
 //!
-//! 形式は bincode なので、データモデルを変えたら [`FORMAT`] を上げる (古いデータは JSON で書き出して読み直す)。
+//! 状態と差分は項目名付きの MessagePack で書く (形式の版 2)。データモデルに項目を足しても、
+//! 足す前のデータは無い項目を既定値にして読める (消した項目は読み飛ばす)。項目の意味を変えるときは
+//! データモデルの版 ([`crate::model::FORMAT_VERSION`]) を上げ、[`crate::model::upgrade`] に直す手順を足す。
+//! 形式の版 1 (bincode) のデータも読め、開いたときに版 2 のスナップショットに書き直す。
+//! ターンのログ (`logs/`) は bincode のまま ([`TurnLog`] の中身はほとんど変わらないので)。
 
 use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
@@ -34,8 +38,27 @@ use crate::turn_log::TurnLog;
 
 /// スナップショットのファイルの先頭
 const MAGIC: &[u8; 8] = b"HAKOSNAP";
-/// 形式の版。データモデル (bincode にする型) を変えたら上げる
-pub const FORMAT: u32 = 1;
+/// 形式の版 (いま書くもの)。2: 項目名付きの MessagePack
+pub const FORMAT: u32 = 2;
+/// 形式の版 1: bincode (読むだけ)
+const FORMAT_BINCODE: u32 = 1;
+
+/// 書く: 項目名付きの MessagePack
+fn encode<T: Serialize>(v: &T) -> std::result::Result<Vec<u8>, String> {
+    rmp_serde::to_vec_named(v).map_err(|e| e.to_string())
+}
+
+/// 読む: 形式の版で読み方を変える
+fn decode<T: serde::de::DeserializeOwned>(
+    bytes: &[u8],
+    format: u32,
+) -> std::result::Result<T, String> {
+    if format == FORMAT_BINCODE {
+        bincode::deserialize(bytes).map_err(|e| e.to_string())
+    } else {
+        rmp_serde::from_slice(bytes).map_err(|e| e.to_string())
+    }
+}
 /// スナップショット・差分の圧縮の強さ (zstd)
 const LEVEL: i32 = 1;
 
@@ -75,7 +98,8 @@ fn format_err(path: &Path, message: impl ToString) -> PersistError {
 }
 
 /// スナップショットの見出し (状態を展開しなくても読める)
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Header {
     /// 世代 (スナップショットを書き直すたびに 1 つ進む。差分のファイルの名前に使う)
     pub generation: u64,
@@ -196,6 +220,8 @@ pub struct DataDir {
     logs_on_disk: LogsOnDisk,
     /// 今の世代の差分のファイル
     journal: File,
+    /// 開いたときに前の形式の版から書き直したなら、その版
+    migrated_from: Option<u32>,
 }
 
 impl DataDir {
@@ -205,7 +231,7 @@ impl DataDir {
         if !path.exists() {
             return Ok(None);
         }
-        let (header, mut state) = read_snapshot(dir)?;
+        let (header, mut state, format) = read_snapshot(dir)?;
         let logs_on_disk = state
             .logs
             .turns
@@ -214,18 +240,25 @@ impl DataDir {
             .zip(header.log_ids.iter().copied())
             .collect();
         let journal_path = journal_path(dir, header.generation);
-        replay(&journal_path, &mut state)?;
+        replay(&journal_path, &mut state, format)?;
         let journal = OpenOptions::new()
             .create(true)
             .append(true)
             .open(&journal_path)
             .map_err(io(&journal_path))?;
-        let me = Self {
+        let mut me = Self {
             dir: dir.to_path_buf(),
             header,
             logs_on_disk,
             journal,
+            migrated_from: None,
         };
+        if format != FORMAT {
+            // 前の形式の版: いまの形式でスナップショットを書き直す (世代が進み、前の形式の差分は消える。
+            // 同じ差分のファイルに 2 つの形式が混ざらないように)
+            me.snapshot(&state)?;
+            me.migrated_from = Some(format);
+        }
         me.remove_stale()?;
         Ok(Some((me, state)))
     }
@@ -246,6 +279,7 @@ impl DataDir {
             header,
             logs_on_disk,
             journal,
+            migrated_from: None,
         };
         me.remove_stale()?;
         Ok(me)
@@ -255,6 +289,11 @@ impl DataDir {
         &self.header
     }
 
+    /// 開いたときに前の形式の版から書き直したなら、その版
+    pub fn migrated_from(&self) -> Option<u32> {
+        self.migrated_from
+    }
+
     /// 画面の操作を記録する (`prev` から `next` への差分を追記する)。
     /// ターンのログが変わっていればスナップショットを書き直す
     pub fn record(&mut self, prev: &GameState, next: &GameState) -> Result<()> {
@@ -262,7 +301,7 @@ impl DataDir {
             return self.snapshot(next);
         };
         let path = journal_path(&self.dir, self.header.generation);
-        let raw = bincode::serialize(&delta).map_err(|e| format_err(&path, e))?;
+        let raw = encode(&delta).map_err(|e| format_err(&path, e))?;
         let packed = compress(&raw).map_err(io(&path))?;
         let mut record = Vec::with_capacity(packed.len() + 4);
         record.extend_from_slice(&(packed.len() as u32).to_le_bytes());
@@ -366,7 +405,7 @@ pub fn read_backup_header(dir: &Path) -> Result<Option<Header>> {
 
 /// バックアップ (やデータディレクトリ) のスナップショットを読む (差分は当てない)
 pub fn read_backup(dir: &Path) -> Result<GameState> {
-    read_snapshot(dir).map(|(_, state)| state)
+    read_snapshot(dir).map(|(_, state, _)| state)
 }
 
 fn journal_path(dir: &Path, generation: u64) -> PathBuf {
@@ -465,9 +504,9 @@ fn write_snapshot(
             ..state.logs.clone()
         },
     };
-    let raw = bincode::serialize(&body).map_err(|e| format_err(&path, e))?;
+    let raw = encode(&body).map_err(|e| format_err(&path, e))?;
     let packed = compress(&raw).map_err(io(&path))?;
-    let head = bincode::serialize(&header).map_err(|e| format_err(&path, e))?;
+    let head = encode(&header).map_err(|e| format_err(&path, e))?;
     let mut w = BufWriter::new(File::create(&tmp).map_err(io(&tmp))?);
     w.write_all(MAGIC).map_err(io(&tmp))?;
     w.write_all(&FORMAT.to_le_bytes()).map_err(io(&tmp))?;
@@ -482,7 +521,8 @@ fn write_snapshot(
     Ok((header, logs))
 }
 
-fn read_header_from(r: &mut impl Read, path: &Path) -> Result<Header> {
+/// 見出しと形式の版を読む。読めない版 (新しすぎる・0) ならエラー
+fn read_header_from(r: &mut impl Read, path: &Path) -> Result<(Header, u32)> {
     let mut magic = [0u8; 8];
     r.read_exact(&mut magic).map_err(io(path))?;
     if &magic != MAGIC {
@@ -491,7 +531,7 @@ fn read_header_from(r: &mut impl Read, path: &Path) -> Result<Header> {
     let mut n = [0u8; 4];
     r.read_exact(&mut n).map_err(io(path))?;
     let found = u32::from_le_bytes(n);
-    if found != FORMAT {
+    if found == 0 || found > FORMAT {
         return Err(PersistError::Version {
             path: path.to_path_buf(),
             found,
@@ -500,33 +540,36 @@ fn read_header_from(r: &mut impl Read, path: &Path) -> Result<Header> {
     r.read_exact(&mut n).map_err(io(path))?;
     let mut head = vec![0u8; u32::from_le_bytes(n) as usize];
     r.read_exact(&mut head).map_err(io(path))?;
-    bincode::deserialize(&head).map_err(|e| format_err(path, e))
+    let header = decode(&head, found).map_err(|e| format_err(path, e))?;
+    Ok((header, found))
 }
 
 fn read_header(path: &Path) -> Result<Header> {
     let mut r = BufReader::new(File::open(path).map_err(io(path))?);
-    read_header_from(&mut r, path)
+    read_header_from(&mut r, path).map(|(h, _)| h)
 }
 
-fn read_snapshot(dir: &Path) -> Result<(Header, GameState)> {
+/// スナップショットを読む (見出し・状態・形式の版)。状態はいまのデータモデルの版にそろえる
+fn read_snapshot(dir: &Path) -> Result<(Header, GameState, u32)> {
     let path = dir.join(SNAPSHOT);
     let mut r = BufReader::new(File::open(&path).map_err(io(&path))?);
-    let header = read_header_from(&mut r, &path)?;
+    let (header, format) = read_header_from(&mut r, &path)?;
     let mut packed = Vec::new();
     r.read_to_end(&mut packed).map_err(io(&path))?;
     let raw = decompress(&packed).map_err(io(&path))?;
-    let mut state: GameState = bincode::deserialize(&raw).map_err(|e| format_err(&path, e))?;
+    let mut state: GameState = decode(&raw, format).map_err(|e| format_err(&path, e))?;
+    crate::model::upgrade(&mut state).map_err(|e| format_err(&path, e))?;
     for id in &header.log_ids {
         let p = dir.join(LOGS).join(format!("{id}.bin"));
         let bytes = fs::read(&p).map_err(io(&p))?;
         let log: TurnLog = bincode::deserialize(&bytes).map_err(|e| format_err(&p, e))?;
         state.logs.turns.push(Arc::new(log));
     }
-    Ok((header, state))
+    Ok((header, state, format))
 }
 
 /// 差分を順に当てる。最後の 1 件が書きかけ (途中で止まった) なら、そこで切り詰める
-fn replay(path: &Path, state: &mut GameState) -> Result<usize> {
+fn replay(path: &Path, state: &mut GameState, format: u32) -> Result<usize> {
     let mut file = match OpenOptions::new().read(true).write(true).open(path) {
         Ok(f) => f,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(0),
@@ -546,7 +589,7 @@ fn replay(path: &Path, state: &mut GameState) -> Result<usize> {
         };
         let delta: Delta = match decompress(record)
             .ok()
-            .and_then(|raw| bincode::deserialize(&raw).ok())
+            .and_then(|raw| decode(&raw, format).ok())
         {
             Some(d) => d,
             None if pos + 4 + record.len() == bytes.len() => break, // 最後の 1 件が壊れている
@@ -672,6 +715,87 @@ mod tests {
         let want: serde_json::Value =
             serde_json::from_reader(flate2::read::GzDecoder::new(file)).unwrap();
         assert_eq!(json(&state), want);
+    }
+
+    fn snapshot_format(dir: &Path) -> u32 {
+        let bytes = fs::read(dir.join(SNAPSHOT)).unwrap();
+        u32::from_le_bytes(bytes[8..12].try_into().unwrap())
+    }
+
+    /// 形式の版 1 のデータを開くと版 2 に書き直し、前の形式の差分は消える。開き直しても同じ状態
+    #[test]
+    fn format_1_data_is_rewritten_as_format_2() {
+        let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+        let tmp = tempfile::tempdir().unwrap();
+        copy_dir(&fixtures.join("persist-v1"), tmp.path());
+        assert_eq!(snapshot_format(tmp.path()), 1);
+        let (data, state) = DataDir::open(tmp.path()).unwrap().unwrap();
+        assert_eq!(data.migrated_from(), Some(1));
+        assert_eq!(snapshot_format(tmp.path()), FORMAT);
+        assert!(!journal_path(tmp.path(), 2).exists());
+        drop(data);
+        let (data, again) = DataDir::open(tmp.path()).unwrap().unwrap();
+        assert_eq!(data.migrated_from(), None);
+        assert_eq!(json(&again), json(&state));
+    }
+
+    /// 状態を JSON の値にして `edit` で書き換え、スナップショットに書き戻す
+    /// (データモデルに項目が足された・消されたときを作る)
+    fn edit_snapshot(dir: &Path, edit: impl FnOnce(&mut serde_json::Value)) {
+        let path = dir.join(SNAPSHOT);
+        let bytes = fs::read(&path).unwrap();
+        let head_len = u32::from_le_bytes(bytes[12..16].try_into().unwrap()) as usize;
+        let (prefix, body) = bytes.split_at(16 + head_len);
+        let mut value: serde_json::Value =
+            rmp_serde::from_slice(&decompress(body).unwrap()).unwrap();
+        edit(&mut value);
+        let mut out = prefix.to_vec();
+        out.extend(compress(&rmp_serde::to_vec_named(&value).unwrap()).unwrap());
+        fs::write(&path, out).unwrap();
+    }
+
+    /// 無い項目は既定値、知らない項目は読み飛ばす (項目を足した版・消した版のデータ)
+    #[test]
+    fn missing_and_unknown_fields_are_tolerated() {
+        let tmp = tempfile::tempdir().unwrap();
+        let state = legacy_state();
+        DataDir::create(tmp.path(), &state).unwrap();
+        edit_snapshot(tmp.path(), |v| {
+            let island = &mut v["world"]["islands"][0];
+            island.as_object_mut().unwrap().remove("comment");
+            island.as_object_mut().unwrap().remove("owner_stats");
+            island["未来の項目"] = serde_json::json!({"a": 1});
+            v["world"]["未来の全体の値"] = serde_json::json!(5);
+        });
+        let (_, back) = DataDir::open(tmp.path()).unwrap().unwrap();
+        let mut want = state.clone();
+        want.world.islands[0].comment = String::new();
+        want.world.islands[0].owner_stats = Default::default();
+        assert_eq!(json(&back), json(&want));
+    }
+
+    /// 新しすぎる形式の版・データモデルの版のデータは読まない
+    #[test]
+    fn newer_data_is_refused() {
+        let tmp = tempfile::tempdir().unwrap();
+        DataDir::create(tmp.path(), &legacy_state()).unwrap();
+        let path = tmp.path().join(SNAPSHOT);
+        let mut bytes = fs::read(&path).unwrap();
+        bytes[8..12].copy_from_slice(&(FORMAT + 1).to_le_bytes());
+        fs::write(&path, &bytes).unwrap();
+        let e = DataDir::open(tmp.path()).err().unwrap();
+        assert!(
+            matches!(e, PersistError::Version { found, .. } if found == FORMAT + 1),
+            "{e}"
+        );
+
+        let tmp = tempfile::tempdir().unwrap();
+        DataDir::create(tmp.path(), &legacy_state()).unwrap();
+        edit_snapshot(tmp.path(), |v| {
+            v["format_version"] = serde_json::json!(crate::model::FORMAT_VERSION + 1);
+        });
+        let e = DataDir::open(tmp.path()).err().unwrap().to_string();
+        assert!(e.contains("新しい"), "{e}");
     }
 
     #[test]

@@ -17,11 +17,43 @@ use crate::tables::{CommandKind, LandKind};
 use crate::turn::IslandScratch;
 use crate::turn_log::TurnLog;
 
-/// 保存データの形式バージョン
+/// データモデルの版 ([`GameState::format_version`])。
+///
+/// 項目を足すだけなら上げなくてよい (読み込むときに無い項目は既定値になる。既定値が 0 や空で困るなら
+/// `#[serde(default = "...")]` を付ける)。項目の意味や単位を変えるときは上げて、[`upgrade`] に
+/// 前の版から直す手順を足す
 pub const FORMAT_VERSION: u32 = 1;
 
+/// [`upgrade`] の失敗
+#[derive(Debug, thiserror::Error)]
+pub enum UpgradeError {
+    #[error(
+        "データモデルの版 {found} は、このプログラム (版 {FORMAT_VERSION}) より新しいので読めません"
+    )]
+    Newer { found: u32 },
+    #[error("データモデルの版 {found} は読めません")]
+    Unknown { found: u32 },
+}
+
+/// 読み込んだ状態を、いまのデータモデルの版にそろえる。
+/// 前の版のデータは手順に沿って直し、新しすぎる版のデータは読まない
+pub fn upgrade(state: &mut GameState) -> Result<(), UpgradeError> {
+    let found = state.format_version;
+    if found > FORMAT_VERSION {
+        return Err(UpgradeError::Newer { found });
+    }
+    if found == 0 {
+        return Err(UpgradeError::Unknown { found });
+    }
+    // 版を上げたら、ここに「版 n から n + 1 へ直す」手順を足す:
+    // if state.format_version == 1 { ...; state.format_version = 2; }
+    debug_assert_eq!(state.format_version, FORMAT_VERSION);
+    Ok(())
+}
+
 /// 保存・読み込みの単位になる、ゲーム全体の状態
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct GameState {
     pub format_version: u32,
     pub world: World,
@@ -49,7 +81,8 @@ impl GameState {
 }
 
 /// 全島に共通の情報 (`hakojima.dat` の先頭 4 行など)
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct World {
     /// ターン数 (`$HislandTurn`)
     pub turn: i64,
@@ -86,7 +119,8 @@ impl World {
 }
 
 /// 島ひとつ分のデータ
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Island {
     // ---- hakojima.dat ---------------------------------------------------
     /// 島の名前 (「島」は付かない)
@@ -257,6 +291,7 @@ impl Island {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct OwnerStats {
     pub kei: i64,
     pub rena: i64,
@@ -271,6 +306,7 @@ pub struct OwnerStats {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct AuctionState {
     pub auc0: String,
     pub auc1: i64,
@@ -284,8 +320,12 @@ pub struct AuctionState {
     pub auc9: String,
 }
 
-/// 地図の 1 マス。Perl 版では `%02x%03x` (種類 2 桁 + 値 3 桁の 16 進) で保存されていた
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+/// 地図の 1 マス。Perl 版では `%02x%03x` (種類 2 桁 + 値 3 桁の 16 進) で保存されていた。
+///
+/// JSON では `{"kind": .., "value": ..}`、バイナリの形式 (bincode・MessagePack) では `(kind, value)` の組で書く
+/// (マスは数百万個あるので、MessagePack でも項目名を付けない)。bincode では構造体と組のバイト列は同じなので、
+/// 形式の版 1 のデータもそのまま読める。読むときは組と項目名付きのどちらも受け付ける
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct LandCell {
     /// 地形番号 ([`LandKind`] の値)
     pub kind: u8,
@@ -300,12 +340,69 @@ impl LandCell {
     }
 }
 
+impl Serialize for LandCell {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeStruct;
+        if s.is_human_readable() {
+            let mut st = s.serialize_struct("LandCell", 2)?;
+            st.serialize_field("kind", &self.kind)?;
+            st.serialize_field("value", &self.value)?;
+            st.end()
+        } else {
+            (self.kind, self.value).serialize(s)
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for LandCell {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        struct V;
+        impl<'de> serde::de::Visitor<'de> for V {
+            type Value = LandCell;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("(kind, value) か {kind, value}")
+            }
+            fn visit_seq<A: serde::de::SeqAccess<'de>>(
+                self,
+                mut a: A,
+            ) -> Result<LandCell, A::Error> {
+                let kind = a.next_element()?.unwrap_or_default();
+                let value = a.next_element()?.unwrap_or_default();
+                Ok(LandCell { kind, value })
+            }
+            fn visit_map<A: serde::de::MapAccess<'de>>(
+                self,
+                mut a: A,
+            ) -> Result<LandCell, A::Error> {
+                let mut cell = LandCell::default();
+                while let Some(k) = a.next_key::<String>()? {
+                    match k.as_str() {
+                        "kind" => cell.kind = a.next_value()?,
+                        "value" => cell.value = a.next_value()?,
+                        _ => {
+                            a.next_value::<serde::de::IgnoredAny>()?;
+                        }
+                    }
+                }
+                Ok(cell)
+            }
+        }
+        if d.is_human_readable() {
+            d.deserialize_any(V)
+        } else {
+            // bincode は型を書かないので、組として読む (MessagePack は組でも項目名付きでも読める)
+            d.deserialize_tuple(2, V)
+        }
+    }
+}
+
 /// 島の地図。`cells[y * size + x]`
 ///
 /// マスの並びは複製のあいだで共有し、書き換えるときに初めて写す (`Arc::make_mut`)。
 /// 状態のスナップショット ([`GameState`] の複製) を安くするため (docs/SCALING.md)。
 /// 保存の形は `Vec` と同じ
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct IslandMap {
     pub size: usize,
     pub cells: Arc<Vec<LandCell>>,
@@ -340,6 +437,7 @@ impl IslandMap {
 
 /// 開発計画 1 件 (`kind,target,x,y,arg`)
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct PlannedCommand {
     /// 計画番号 ([`CommandKind`] の値)
     pub kind: u16,
@@ -359,6 +457,7 @@ impl PlannedCommand {
 
 /// ログ類
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Logs {
     /// ターンごとのログ。`turns[0]` が最新 (`hakojima.log0`)。
     /// 1 ターン分は圧縮して持ち ([`TurnLog`])、済んだターンのログは変わらないので複製のあいだで共有する
@@ -372,7 +471,8 @@ pub struct Logs {
 }
 
 /// ターンログ 1 行 (`機密,ターン,島ID1,島ID2,本文`)
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct LogEntry {
     /// 機密ログ (関係する島の持ち主にだけ見える)
     pub secret: bool,
@@ -384,7 +484,8 @@ pub struct LogEntry {
 }
 
 /// `ターン,本文` 形式のログ 1 行
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct TurnMessage {
     pub turn: i64,
     pub message: String,

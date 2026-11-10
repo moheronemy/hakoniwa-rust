@@ -369,6 +369,14 @@ fn open_data(
 ) -> Result<(DataDir, GameState)> {
     let started = std::time::Instant::now();
     if let Some((data, game)) = DataDir::open(data_dir)? {
+        if let Some(from) = data.migrated_from() {
+            tracing::info!(
+                path = %data_dir.display(),
+                from,
+                to = hakoniwa_core::persist::FORMAT,
+                "セーブデータを新しい形式の版に書き直しました"
+            );
+        }
         tracing::info!(
             path = %data_dir.display(),
             turn = game.world.turn,

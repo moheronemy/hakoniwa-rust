@@ -43,7 +43,9 @@ pub fn load(path: &Path) -> Result<Option<GameState>, StorageError> {
         path: path.into(),
         source,
     })?;
-    if state.format_version != FORMAT_VERSION {
+    // 前のデータモデルの版なら直し、新しすぎる版なら読まない (無い項目は既定値で読める)
+    let mut state = state;
+    if crate::model::upgrade(&mut state).is_err() {
         return Err(StorageError::Version {
             path: path.into(),
             found: state.format_version,
@@ -117,6 +119,35 @@ pub fn rotate_backups(path: &Path, keep: usize) -> Result<(), StorageError> {
 
 #[cfg(test)]
 mod tests {
+    /// JSON でも、無い項目は既定値、知らない項目は読み飛ばし、新しすぎるデータモデルの版は読まない
+    #[test]
+    fn json_tolerates_missing_fields_and_refuses_newer_versions() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("state.json");
+        let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/legacy-turn3");
+        let state = crate::legacy::import_dir(
+            &src,
+            &crate::legacy::ImportOptions::default(),
+            &mut <rand::rngs::StdRng as rand::SeedableRng>::seed_from_u64(0),
+        )
+        .unwrap()
+        .state;
+        let mut v = serde_json::to_value(&state).unwrap();
+        v["world"]["islands"][0]
+            .as_object_mut()
+            .unwrap()
+            .remove("comment");
+        v["world"]["islands"][0]["未来の項目"] = serde_json::json!(1);
+        std::fs::write(&path, serde_json::to_vec(&v).unwrap()).unwrap();
+        let back = load(&path).unwrap().unwrap();
+        assert_eq!(back.world.islands[0].comment, "");
+        assert_eq!(back.world.islands[1], state.world.islands[1]);
+
+        v["format_version"] = serde_json::json!(FORMAT_VERSION + 1);
+        std::fs::write(&path, serde_json::to_vec(&v).unwrap()).unwrap();
+        assert!(matches!(load(&path), Err(StorageError::Version { .. })));
+    }
+
     #[test]
     fn backups_rotate() {
         let dir = tempfile::tempdir().unwrap();
