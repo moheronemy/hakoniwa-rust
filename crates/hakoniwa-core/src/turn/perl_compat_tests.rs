@@ -68,6 +68,8 @@ fn field(island: &Island, name: &str) -> String {
         "auc5" => island.auction.auc5.clone(),
         "auc6" => island.auction.auc6.clone(),
         "auc9" => island.auction.auc9.clone(),
+        "prize" => island.prize.clone(),
+        "taiji" => n(island.taiji),
         "shouhi" => n(sc.shouhi),
         "ene" => n(sc.ene),
         "sabun" => {
@@ -247,7 +249,10 @@ pub(crate) fn check_fixture(fixture: &str, rng_value: u64) {
                         if cell.kind.to_string() != w {
                             mismatches.push(format!(
                                 "{}: rust {} perl {w}",
-                                at(island, &format!("land kind ({}, {})", idx % size, idx / size)),
+                                at(
+                                    island,
+                                    &format!("land kind ({}, {})", idx % size, idx / size)
+                                ),
                                 cell.kind
                             ));
                         }
@@ -559,4 +564,54 @@ fn phase2_city3_matches_perl_with_rand_0() {
 #[test]
 fn phase2_city3_matches_perl_with_rand_half() {
     check_fixture("phase2-city3", RAND_HALF);
+}
+
+#[test]
+fn phase2_monster_matches_perl_with_rand_0() {
+    check_fixture("phase2-monster", 0);
+}
+
+#[test]
+fn phase2_monster_matches_perl_with_rand_half() {
+    check_fixture("phase2-monster", RAND_HALF);
+}
+
+#[test]
+fn phase2_monster_even_matches_perl_with_rand_0() {
+    check_fixture("phase2-monster-even", 0);
+}
+
+#[test]
+fn phase2_monster_even_matches_perl_with_rand_half() {
+    check_fixture("phase2-monster-even", RAND_HALF);
+}
+
+#[test]
+fn phase2_monster_lords_matches_perl_with_rand_0() {
+    check_fixture("phase2-monster-lords", 0);
+}
+
+#[test]
+fn phase2_monster_lords_matches_perl_with_rand_half() {
+    check_fixture("phase2-monster-lords", RAND_HALF);
+}
+
+#[test]
+fn phase2_monster_mascot_matches_perl_with_rand_0() {
+    check_fixture("phase2-monster-mascot", 0);
+}
+
+#[test]
+fn phase2_monster_mascot_matches_perl_with_rand_half() {
+    check_fixture("phase2-monster-mascot", RAND_HALF);
+}
+
+#[test]
+fn phase2_monster_misc_matches_perl_with_rand_0() {
+    check_fixture("phase2-monster-misc", 0);
+}
+
+#[test]
+fn phase2_monster_misc_matches_perl_with_rand_half() {
+    check_fixture("phase2-monster-misc", RAND_HALF);
 }
