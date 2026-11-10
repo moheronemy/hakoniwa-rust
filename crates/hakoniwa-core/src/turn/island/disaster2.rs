@@ -331,13 +331,7 @@ fn meteo(ctx: &mut TurnContext, island: &mut Island) {
                 continue;
             }
             Some(
-                L::Sbase
-                | L::Seacity
-                | L::Umishuto
-                | L::Seatown
-                | L::Fune
-                | L::Frocity
-                | L::Umiamu,
+                L::Sbase | L::Seacity | L::Umishuto | L::Seatown | L::Fune | L::Frocity | L::Umiamu,
             ) => mm::meteo_sbase(name, &l_name, &p),
             Some(L::Monster) => mm::meteo_monster(name, &l_name, &p),
             // 浅瀬
