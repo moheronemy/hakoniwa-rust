@@ -95,5 +95,35 @@ pub fn island_view(world: &World, config: &GameConfig, index: usize, viewer: Vie
     }
 }
 
+/// 島の近況の 1 行 (`logFilePrint`)
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RecentLog {
+    pub turn: i64,
+    /// 機密のログ (持ち主にだけ見える。Perl 版は「(機密)」と付ける)
+    pub secret: bool,
+    /// ログの文面 (Perl 版と同じ HTML)
+    pub message: String,
+}
+
+/// `tempRecent` → `logPrintLocal`: 島 `id` が関わるログ (新しいターンから、`$HlogMax` ターン分)。
+/// 機密のログは、持ち主 (`owner`) が見ていて、その島が 1 番目の島のときだけ出す
+pub fn recent_logs(game: &GameState, config: &GameConfig, id: i64, owner: bool) -> Vec<RecentLog> {
+    let mut out = Vec::new();
+    for entry in game.logs.turns.iter().take(config.log_max).flatten() {
+        if entry.secret && (!owner || entry.island1 != Some(id)) {
+            continue;
+        }
+        if id != 0 && entry.island1 != Some(id) && entry.island2 != Some(id) {
+            continue;
+        }
+        out.push(RecentLog {
+            turn: entry.turn,
+            secret: entry.secret,
+            message: entry.message.clone(),
+        });
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests;

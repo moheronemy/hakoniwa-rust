@@ -154,6 +154,10 @@ pub async fn island_page(
             info = crate::render::info_html(&view.info),
             map = crate::render::map_html(&view, app.options.image_dir.is_some(), false),
         );
+        let recent = crate::render::recent_html(
+            &island.name,
+            &hakoniwa_core::view::recent_logs(&game, &app.config, id, false),
+        );
         if app.config.lbbs.enabled {
             h.push_str(&visitor_lbbs(
                 &app.config,
@@ -161,6 +165,7 @@ pub async fn island_page(
                 login.as_ref().map(|l| l.session.csrf.as_str()),
             ));
         }
+        h.push_str(&recent);
         h
     };
     render(&app, login.as_ref(), "観光", &body)

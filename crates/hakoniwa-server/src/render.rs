@@ -273,6 +273,25 @@ pub fn info_html(info: &IslandInfo) -> String {
     h
 }
 
+/// 島の近況 (Perl 版の `tempRecent`)。ログの HTML はタグを取り除いて出す
+pub fn recent_html(name: &str, logs: &[hakoniwa_core::view::RecentLog]) -> String {
+    let mut h = format!("<h2>{}島の近況</h2>\n<div class=\"log\">\n", esc(name));
+    if logs.is_empty() {
+        h.push_str("<p class=\"muted\">まだ何も起きていません。</p>\n");
+    }
+    for l in logs {
+        let _ = writeln!(
+            h,
+            "<p>ターン{}{}：{}</p>",
+            l.turn,
+            if l.secret { " <b>(機密)</b>" } else { "" },
+            esc(&plain(&l.message))
+        );
+    }
+    h.push_str("</div>\n");
+    h
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

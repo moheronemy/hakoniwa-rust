@@ -188,7 +188,11 @@ pub async fn owner_page(
              <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf_f}\n\
              <label for=\"message\">島のコメント</label>\n\
              <input id=\"message\" type=\"text\" name=\"message\" value=\"{comment}\" maxlength=\"80\" size=\"60\">\n\
-             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{change}{script}",
+             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{recent}{change}{script}",
+            recent = crate::render::recent_html(
+                &island.name,
+                &view::recent_logs(&game, &app.config, island.id, true)
+            ),
             name = esc(&island.name),
             map = crate::render::map_html(&iv, app.options.image_dir.is_some(), true),
             form = command_form(&screen, csrf, q.n),
