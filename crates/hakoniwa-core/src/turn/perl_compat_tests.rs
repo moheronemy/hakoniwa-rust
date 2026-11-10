@@ -1461,3 +1461,29 @@ fn phase4_ending_matches_perl_with_rand_3_4() {
 fn phase4_ending_matches_perl_with_rand_31_32() {
     check_fixture_at("phase4-ending", "96875");
 }
+
+#[test]
+fn phase4_upkeep_matches_perl_with_rand_3_4() {
+    check_fixture_at("phase4-upkeep", "75");
+}
+
+#[test]
+fn phase4_upkeep_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase4-upkeep", "96875");
+}
+
+/// random(2) が 0 になる (衛星が減らない)
+#[test]
+fn phase4_upkeep_matches_perl_with_rand_1_4() {
+    check_fixture_at("phase4-upkeep", "25");
+}
+
+#[test]
+fn phase4_upkeep_2_matches_perl_with_rand_3_4() {
+    check_fixture_at("phase4-upkeep-2", "75");
+}
+
+#[test]
+fn phase4_upkeep_2_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase4-upkeep-2", "96875");
+}
