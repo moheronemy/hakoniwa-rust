@@ -60,6 +60,8 @@ class Fixture:
         if self.dir.exists():
             shutil.rmtree(self.dir)
         shutil.copytree(TEMPLATE, self.dir)
+        # 島 ID → hakojima.dat の何番目か (add_islands で増える)
+        self.pos = dict(POS)
 
     def _lines(self, file):
         return (self.dir / file).read_bytes().split(b"\n")
@@ -110,7 +112,7 @@ class Fixture:
         head, per, offset = layout
         lines = self._lines(file)
         for k, v in values.items():
-            lines[head + POS[island_id] * per + offset[k]] = str(v).encode("euc_jp")
+            lines[head + self.pos[island_id] * per + offset[k]] = str(v).encode("euc_jp")
         self._write(file, lines)
 
     def main(self, island_id, **values):
@@ -128,6 +130,53 @@ class Fixture:
     def auction(self, island_id, **values):
         """auction.dat の値 (auc0..auc9)"""
         self._set("auction.dat", AUCTION, island_id, values)
+
+    def turn(self, turn):
+        """hakojima.dat の 1 行目 (ターン数)。次にターンが進むと turn + 1 のターンになる"""
+        lines = self._lines("hakojima.dat")
+        lines[0] = str(turn).encode()
+        self._write("hakojima.dat", lines)
+
+    def add_islands(self, count, source=1):
+        """島 source を複製して count 島を末尾に足す (ID は次の ID から順に、名前は「複製ID」)。
+        hakojima.dat・howner.dat・ips.dat・auction.dat の島の部分と island.N を写す。
+        足した島の ID の一覧を返す"""
+        main = self._lines("hakojima.dat")
+        number, next_id = int(main[2]), int(main[3])
+        ids = list(range(next_id, next_id + count))
+        for file, (head, per, offset), id_key in (
+                ("hakojima.dat", MAIN, "id"), ("howner.dat", OWNER, "id1"),
+                ("ips.dat", IPS, None), ("auction.dat", AUCTION, None)):
+            lines = self._lines(file)
+            trailing = lines[-1] == b""
+            if trailing:
+                lines = lines[:-1]
+            start = head + self.pos[source] * per
+            block = lines[start:start + per]
+            end = head + number * per
+            new = []
+            for iid in ids:
+                b = list(block)
+                if id_key:
+                    b[offset[id_key]] = str(iid).encode()
+                if file == "hakojima.dat":
+                    b[offset["name"]] = f"複製{iid},0".encode("euc_jp")
+                if file == "ips.dat":
+                    # Perl 版は保存のたびに島の名前を書く
+                    b[offset["ipname"]] = f"複製{iid}".encode("euc_jp")
+                new += b
+            lines = lines[:end] + new + lines[end:]
+            if trailing:
+                lines.append(b"")
+            self._write(file, lines)
+        main = self._lines("hakojima.dat")
+        main[2] = str(number + count).encode()
+        main[3] = str(next_id + count).encode()
+        self._write("hakojima.dat", main)
+        for k, iid in enumerate(ids):
+            shutil.copy(self.dir / f"island.{source}", self.dir / f"island.{iid}")
+            self.pos[iid] = number + k
+        return ids
 
     def save(self):
         print("wrote", self.dir.relative_to(ROOT))
