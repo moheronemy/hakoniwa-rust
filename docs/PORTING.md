@@ -87,7 +87,7 @@ tools/
 | `random`, `int`, `htmlEscape`, `aboutMoney` | `core::perl`, `core::model::money_for_others` | 済 |
 | `cgiInput`, `cookieInput`, `cookieOutput` | サーバーのフォームとセッション (`pages/`, `session.rs`)、入力の加工は `perl::cgi_text` / `cut_column` | 済 (クッキーにパスワードは入れない) |
 | `encode`, `checkPassword` | `core::actions::password` | 済 (下記「パスワード」) |
-| `turnMain` | `core::turn::run_turn` | 一部 (下記「フェーズ 1」) |
+| `turnMain` | `core::turn::run_turn` (+ `turn::{cup, auction, lottery}`) | 済 (ターン全体を Perl 版と突き合わせ済み) |
 | `estimate`, `income` | `core::turn::estimate`, `core::turn::income` | 済 (Perl 版と突き合わせ済み) |
 | `doIslandunemployed` | `core::turn::island::migrate` | 済 (Perl 版と突き合わせ済み) |
 | `doEachHex` | `core::turn::hex` (地形の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
@@ -107,8 +107,10 @@ tools/
 | `tempTopPage`, ランキング表示の `islandSort*` | `core::view::top` + サーバーのトップページ | 済 (Perl 版と突き合わせ済み) |
 | `islandInfo`, `islandMap`, `landString`, `tempOwner`, `tempCommand`, `tempRecent` | `core::view::{info, map, owner}` + サーバーの開発画面・観光画面 | 済 (Perl 版と突き合わせ済み) |
 | `tempLbbsContents` ほか掲示板の表示 | `core::actions::lbbs::lbbs_posts` + サーバー | 済 |
-| `auctionMain`, `totoMain`, `changeAnkeito`, `msMain` ほか | サーバーの各機能 | 未 |
-| `hako-mente.cgi` | 管理画面または CLI | 未 (新規ゲームはサーバー起動時に自動作成) |
+| `auctionMain`, `totoMain`, `totosMain`, `changeAnkeito`, `msMain`, `ms2Main` | `core::actions::{auction, toto, survey, dispatch}` + サーバー | 済 (Perl 版と突き合わせ済み) |
+| `hako-top2.cgi` (IP 情報の裏ランキング) | `core::view::ipinfo` + 管理画面 | 済 (Perl 版と突き合わせ済み) |
+| `history.cgi` | サーバーの「最近の出来事」 | 済 |
+| `hako-mente.cgi` | サーバーの管理画面 (`/admin`) | 済 (データの状態・最終更新時刻・バックアップの復元と削除・やり直し) |
 
 ## 移植で気をつける点
 
@@ -207,7 +209,7 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
 - [x] **3. 計画の実行** — `doCommand` を計画の種類ごとに分けて移植 (詳細は下記)
 - [x] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)、`doIslandunemployed` (詳細は下記)
 - [x] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング (詳細は下記)
-- [ ] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能
+- [x] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能 (詳細は下記)
 - [ ] **7. 移行** — パスワードの互換、本番データの変換手順、Perl 版との比較テスト
 
 ## フェーズ 1 (ターン処理の骨格) の内容
@@ -461,3 +463,39 @@ Perl コードとの突き合わせで一致し、全地形・全計画を入れ
 IP 情報の裏ランキング (`hako-top2.cgi`)、管理画面 (`hako-mente.cgi`) はフェーズ 6。
 `view::owner::OwnerScreen` の `auction`・`comment` (toto・首都名・ミサイルの申請) と
 `view::top::TopPage` の `survey`・`auction` はすでにあるので、画面を作るときに使う。
+
+## フェーズ 6 (付加機能) の内容
+
+### ターン処理の残り
+
+`turnMain` のうち残っていた部分を移植し、`run_turn` が `turnMain` をすべて再現するようになった。
+
+| ファイル | 内容 |
+|---|---|
+| `turn/cup.rs` | Hakoniwa Cup の決勝トーナメントの進出 (ターン % 100 == 41) と開催の記録 (ターン % 100 == 0) |
+| `turn/auction.rs` | ハコオクの順位と賞品 (ターン杯のターン)、出品の入れ替えと残りターンの更新、読み込み時の既定値 |
+| `turn/lottery.rs` | toto、Hakoniwa Cup toto、Numbers3、Numbers4 |
+
+**ターン全体の突き合わせ**: 時刻を最終更新から 1 ターン以上あとにして元の CGI にリクエストを送ると、
+Perl 版は `turnMain` をまるごと実行する。`turn/full_turn_tests.rs` はその前後のデータを読み込み、
+移植版の `run_turn` の結果と比べる (`tests/fixtures/cgi/turn-*`)。補正は 2 つだけ:
+Perl 版の負荷計測のログ (移植版は出さない) と、Hakoniwa Cup の試合のログの「−」の文字
+(Perl 版のデータを読み込むと U+FF0D になる)。
+
+Perl 版が保存して次に読み込むときに値を直すもの (`anflag` の 0 → 1、数値として 0 の `auc0`/`auc4`〜`auc6`/`auc9`
+を既定値に、空の出品の品物を振り直す) は、移植版はターンの終わり (と画面の操作の保存の前) にそろえる。
+
+### 画面
+
+- ハコオクの入札、各種予想 (toto・Numbers の予想を `eis8` に書く)、首都名、援助射撃の許可の申請と許可、
+  アンケートの投票 (`core::actions::{auction, toto, dispatch, survey}`)
+- 管理画面 (`/admin`、マスターパスワードを設定したときだけ): データの状態、最終更新時刻の変更、
+  バックアップの復元と削除、やり直し、IP 情報の裏ランキング (`hako-top2.cgi`)
+- 最近の出来事 (`/history`、`history.cgi`)
+
+### 移植版で変えたもの
+
+- 援助射撃の許可 (`ms2Main`) は、Perl 版はパスワードを確かめずボタンの島として動くが、移植版はログイン中の島で動く
+- 入札の品番が範囲外のとき、Perl 版は空の画面を出すが、移植版はエラーにする
+- 管理画面はデータのディレクトリではなく `state.json` と `state.bak<N>.json` を扱う。やり直しや復元の前の
+  データはバックアップに回す
