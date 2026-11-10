@@ -5,7 +5,8 @@ Hakoniwa R.A. Final Edition (箱庭諸島2 ver2.30 をもとにした Perl CGI �
 ゲームのルール (ターン処理・計画・災害・ハコオク・toto・Hakoniwa Cup など) は Perl 版のとおりに移植し、
 元の Perl コードと同じ入力で動かした結果と突き合わせてある。画面は作り直した。
 移植の内容と検証の方法は [docs/PORTING.md](docs/PORTING.md)、運営中の Perl 版からの移行は
-[docs/MIGRATION.md](docs/MIGRATION.md) を参照。
+[docs/MIGRATION.md](docs/MIGRATION.md)、大規模化 (1000 島・128×128・数十秒ごとのターン) の設計は
+[docs/SCALING.md](docs/SCALING.md) を参照。
 
 ## 構成
 
