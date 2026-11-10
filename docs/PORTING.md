@@ -37,13 +37,13 @@ crates/
       perl_compat_tests.rs  Perl 版との突き合わせテスト
     src/land.rs     地形の名前 (landName)・周囲の数え上げ (countAround)
     tests/fixtures/legacy-turn3/  Perl 版で作った実データ
-    tests/fixtures/phase1-mix/    突き合わせ用データ (+ *.expected.json)。ほかに phase2-* など
+    tests/fixtures/phase1-mix/    突き合わせ用データ (+ *.expected.json.gz)。ほかに phase2-* など
   hakoniwa-server/  Web サーバー (トップページ、ターンの定時実行、デバッグ用のターン進行)
   hako-convert/     Perl 版データ → state.json の変換ツール
 tools/
   gen-tables.sh     hako-main.cgi から tables.rs を再生成する
   fixtures/                   突き合わせ用データを作るスクリプト (fixturelib.py と各データ)
-  perl-harness/run-harness.sh 元の Perl コードで期待値 (*.expected.json) を作る
+  perl-harness/run-harness.sh 元の Perl コードで期待値 (*.expected.json.gz) を作る
 ```
 
 `tables.rs` は手で書き写さず、Perl に設定部分を実行させて値を取り出している
