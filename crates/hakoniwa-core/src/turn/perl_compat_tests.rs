@@ -462,3 +462,37 @@ fn phase2_leisure_matches_perl_with_rand_0() {
 fn phase2_leisure_matches_perl_with_rand_half() {
     check_fixture("phase2-leisure", RAND_HALF);
 }
+
+#[test]
+fn phase2_special_matches_perl_with_rand_0() {
+    check_fixture("phase2-special", 0);
+}
+
+#[test]
+fn phase2_special_matches_perl_with_rand_half() {
+    check_fixture("phase2-special", RAND_HALF);
+}
+
+#[test]
+fn phase2_special_egg_matches_perl_with_rand_0() {
+    check_fixture("phase2-special-egg", 0);
+    check_fixture("phase2-special-egg2", 0);
+}
+
+#[test]
+fn phase2_special_egg_matches_perl_with_rand_half() {
+    check_fixture("phase2-special-egg", RAND_HALF);
+    check_fixture("phase2-special-egg2", RAND_HALF);
+}
+
+#[test]
+fn phase2_special_mons_matches_perl_with_rand_0() {
+    check_fixture("phase2-special-mons", 0);
+    check_fixture("phase2-special-mons2", 0);
+}
+
+#[test]
+fn phase2_special_mons_matches_perl_with_rand_half() {
+    check_fixture("phase2-special-mons", RAND_HALF);
+    check_fixture("phase2-special-mons2", RAND_HALF);
+}
