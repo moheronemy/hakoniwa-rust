@@ -103,7 +103,10 @@ fn turn_prize_goes_to_top_island() {
         .logs
         .history
         .iter()
-        .filter(|h| h.turn == 100)
+        // toto と Numbers3 の正解の記録は除く
+        .filter(|h| {
+            h.turn == 100 && !h.message.contains("ｔｏｔｏ") && !h.message.contains("Numbers3")
+        })
         .collect();
     assert_eq!(history.len(), 1);
     assert!(history[0].message.contains(&winners[0].name));
