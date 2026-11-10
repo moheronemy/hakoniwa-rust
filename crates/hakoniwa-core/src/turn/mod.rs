@@ -4,7 +4,7 @@
 //! 計画の大半、島全体の処理、ハコオク・toto など) は、該当する場所にコメントで
 //! 印を付けてある。詳しくは docs/PORTING.md を参照。
 
-mod command;
+pub(crate) mod command;
 mod estimate;
 pub(crate) mod hex;
 mod income;
@@ -156,6 +156,8 @@ pub struct IslandScratch {
     pub urikireflag: i64,
     /// doEachHex の系統ごとの値
     pub hex: hex::Scratch,
+    /// doCommand の系統ごとの値
+    pub command: command::Scratch,
     /// 地形の値の小数部分 (座標 → 小数)。Perl 版はコンデンサの充電で値が小数になり、
     /// ターンの間はそのまま使われる (保存時に切り捨て)。地形の値を書き換えるときは
     /// `hex::town::set` などを使って消すこと
@@ -192,6 +194,8 @@ pub(crate) struct Globals {
     pub factory: Captures<10>,
     /// doEachHex で使うグローバル変数
     pub hex: hex::HexGlobals,
+    /// doCommand だけで使うグローバル変数
+    pub command: command::CommandGlobals,
 }
 
 /// ターン処理全体で共有する状態
