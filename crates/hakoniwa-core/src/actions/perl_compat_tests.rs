@@ -6,6 +6,7 @@
 
 use std::path::{Path, PathBuf};
 
+use rand::RngCore;
 use rand::rngs::mock::StepRng;
 use serde_json::Value;
 
@@ -45,7 +46,7 @@ impl Case {
     }
 }
 
-fn import(dir: &Path) -> GameState {
+pub(crate) fn import(dir: &Path) -> GameState {
     legacy::import_dir(dir, &ImportOptions::default(), &mut StepRng::new(0, 0))
         .unwrap_or_else(|e| panic!("{}: {e}", dir.display()))
         .state
@@ -57,6 +58,63 @@ pub(crate) fn pinned_rng(digits: &str) -> StepRng {
     let mantissa = r * (1u64 << 53) as f64;
     assert_eq!(mantissa.fract(), 0.0, "0.{digits} is not representable");
     StepRng::new((mantissa as u64) << 11, 0)
+}
+
+/// `rand()` を JSON の `"rand"` の値 (`"5"` か `["5", "25", ...]`) の順に返す乱数
+/// (Perl 側と同じく、最後まで行けば先頭へ戻る)
+pub(crate) struct SeqRng {
+    values: Vec<u64>,
+    pos: usize,
+}
+
+impl SeqRng {
+    /// ケース `<name>.json` の `"rand"` の並び
+    pub(crate) fn for_case(name: &str) -> Self {
+        let json: Value = serde_json::from_str(
+            &std::fs::read_to_string(cgi_dir().join(format!("{name}.json"))).unwrap(),
+        )
+        .unwrap();
+        Self::new(&json["rand"])
+    }
+
+    /// `"5"` か `["5", "25", ...]` (`0.` の後ろの数字) から作る
+    pub(crate) fn new(rand: &Value) -> Self {
+        let digits: Vec<&str> = match rand {
+            Value::Array(a) => a.iter().map(|v| v.as_str().unwrap()).collect(),
+            v => vec![v.as_str().unwrap_or("0")],
+        };
+        let values = digits
+            .into_iter()
+            .map(|d| {
+                let r: f64 = format!("0.{d}").parse().unwrap();
+                let m = r * (1u64 << 53) as f64;
+                assert_eq!(m.fract(), 0.0, "0.{d} is not representable");
+                (m as u64) << 11
+            })
+            .collect();
+        Self { values, pos: 0 }
+    }
+}
+
+impl RngCore for SeqRng {
+    fn next_u64(&mut self) -> u64 {
+        let v = self.values[self.pos % self.values.len()];
+        self.pos += 1;
+        v
+    }
+    fn next_u32(&mut self) -> u32 {
+        (self.next_u64() >> 32) as u32
+    }
+    fn fill_bytes(&mut self, dest: &mut [u8]) {
+        for chunk in dest.chunks_mut(8) {
+            let b = self.next_u64().to_le_bytes();
+            chunk.copy_from_slice(&b[..chunk.len()]);
+        }
+    }
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand::Error> {
+        self.fill_bytes(dest);
+        Ok(())
+    }
 }
 
 /// `name` の操作を移植版で `apply` して、Perl 版の結果と比べる。
