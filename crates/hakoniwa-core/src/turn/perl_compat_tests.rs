@@ -776,6 +776,16 @@ fn phase3_attack_matches_perl_with_rand_half() {
 }
 
 #[test]
+fn phase3_attack_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack", "03125");
+}
+
+#[test]
+fn phase3_attack_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack", "96875");
+}
+
+#[test]
 fn phase3_attack_lr_matches_perl_with_rand_0() {
     check_fixture("phase3-attack-lr", 0);
 }
@@ -786,6 +796,16 @@ fn phase3_attack_lr_matches_perl_with_rand_half() {
 }
 
 #[test]
+fn phase3_attack_lr_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-lr", "03125");
+}
+
+#[test]
+fn phase3_attack_lr_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-lr", "96875");
+}
+
+#[test]
 fn phase3_attack_ld_matches_perl_with_rand_0() {
     check_fixture("phase3-attack-ld", 0);
 }
@@ -793,6 +813,16 @@ fn phase3_attack_ld_matches_perl_with_rand_0() {
 #[test]
 fn phase3_attack_ld_matches_perl_with_rand_half() {
     check_fixture("phase3-attack-ld", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_ld_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-ld", "03125");
+}
+
+#[test]
+fn phase3_attack_ld_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-ld", "96875");
 }
 
 #[test]
@@ -808,4 +838,49 @@ fn phase3_attack_guard_matches_perl_with_rand_half() {
 #[test]
 fn phase3_attack_guard_matches_perl_with_rand_03125() {
     check_fixture_at("phase3-attack-guard", "03125");
+}
+
+#[test]
+fn phase3_attack_guard_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-guard", "96875");
+}
+
+#[test]
+fn phase3_attack_mon_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-mon", 0);
+}
+
+#[test]
+fn phase3_attack_mon_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-mon", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_mon_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-mon", "03125");
+}
+
+#[test]
+fn phase3_attack_mon_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-mon", "96875");
+}
+
+#[test]
+fn phase3_attack_send_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-send", 0);
+}
+
+#[test]
+fn phase3_attack_send_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-send", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_send_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-send", "03125");
+}
+
+#[test]
+fn phase3_attack_send_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-send", "96875");
 }
