@@ -188,7 +188,9 @@ LR_LANDS = [
     ("RottenSea", 5), ("Sea", 1), ("Sea", 0), ("Ice", 0), ("Ice", 1), mon(1, 3),
     ("Plains", 0),
 ]
-f, cmds = spots_fixture("phase3-attack-lr", LR, LR_LANDS)
+# 浅瀬 (11 番目の場所) の計画の座標だけ深い海にする (浅瀬にするのは計画の座標のまわり)
+f, cmds = spots_fixture("phase3-attack-lr", LR, LR_LANDS,
+                        extra_target={SPOTS[LR_LANDS.index(("Sea", 1))]: ("Sea", 0)})
 for i, c in cmds.items():
     f.commands(i, c)
 f.save()
@@ -198,7 +200,7 @@ f.save()
 LD_LANDS = [
     ("Mountain", 0), ("Onsen", 10), ("Gold", 0), ("Sbase", 10), ("Fune", 1),
     ("Frocity", 10), ("Umiamu", 10), ("Seatown", 10), ("Umishuto", 10), ("Seacity", 10),
-    mon(1, 3), ("RottenSea", 5), ("Sea", 1), ("Ice", 0), ("Town", 150), ("Sea", 0),
+    mon(1, 3), ("RottenSea", 5), ("Sea", 1), ("Ice", 0), ("Town", 159), ("Sea", 0),
     ("Oil", 0), ("Minato", 100), ("Newtown", 50), ("Bigtown", 60),
 ]
 # 核の着弾点 (6, 10) と (7, 11)、(0, 10) と (1, 11) のまわり
@@ -285,7 +287,7 @@ MON_SPEC = [  # (地形, 撃つ島, 計画, 弾数)
     (mon(21, 1), 3, NM, 1), (mon(22, 1), 2, NM, 1), (mon(18, 1), 1, NM, 1),
     (mon(30, 1), 3, NM, 1), (mon(19, 1), 2, NM, 1), (mon(14, 1), 1, NM, 1),
     (mon(17, 1), 3, NM, 1), (mon(8, 1), 2, NM, 1), (mon(1, 3), 1, NM, 1),
-    (mon(1, 1), 3, ST, 1), (mon(1, 2), 2, NM, 3), (("Monument", 25), 1, NM, 2),
+    (mon(1, 1), 3, ST, 1), (mon(1, 2), 2, NM, 3), (("Monument", 25), 1, ST, 2),
     (mon(6, 1), 3, ST, 1), (mon(10, 2), 2, NM, 2),
 ]
 for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
@@ -321,11 +323,13 @@ for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
 # 基地なし、賠償金
 f = Fixture("phase3-attack-boat")
 t = {(0, 0): ("Bigtown", 3000), (2, 0): ("Bigtown", 3000), (1, 1): ("Bigtown", 3000),
-     (6, 0): ("Bigtown", 2014), (8, 0): ("Bigtown", 2014), (7, 1): ("Bigtown", 2014),
+     (6, 0): ("Bigtown", 2015), (8, 0): ("Bigtown", 2015), (7, 1): ("Bigtown", 2015),
      (0, 4): ("Town", 114), (2, 4): ("Town", 114), (1, 5): ("Town", 114)}
 t.update(TARGET_HOME)
 t[(11, 11)] = ("Plains", 0)  # 島 2 は基地を持たない
+t[(11, 10)] = ("College", 99)  # 動物園はないが、eisei5 (経験値) は残る
 put(f, 2, t)
+f.main(2, eisei5="0,0,0,0,0,1000,0")
 # 島 1: 同盟、平和賞 8 を持つ。値 150 の町が 12 個、その後に平地が 12 個
 a = {}
 home(a, row=11, bases=(("Base", 4000),), extra=(("Taishi", 2),))
@@ -340,7 +344,9 @@ home(b, row=11)
 for p in range(20):
     b[(p % 12, p // 12)] = ("Town", 0)
 b[(8, 1)] = ("Plains", 0)
+b[(0, 5)] = ("Zoo", 0)
 put(f, 3, b)
+f.ips(3, etc6=",".join(["1"] * 31))
 f.main(3, prize="24,0,1,2")
 f.ips(3, etc7="2,5,2")
 for i in (1, 2, 3):
@@ -352,6 +358,7 @@ f.commands(1, [
 f.commands(3, [
     (PP, 2, 6, 0, 1),
     (ST, 2, 0, 4, 1),
+    (SEND, 2, 0, 0, 1),
 ])
 f.commands(2, [
     (NM, 2, 0, 0, 1),
@@ -361,10 +368,11 @@ f.save()
 # ---------------------------------------------------------------------------
 # phase3-attack-send: 動物派遣と大使派遣
 f = Fixture("phase3-attack-send")
+# 大学 99 があるので eisei5 が残る (estimate が消さない)
 # 島 2: 動物園 (怪獣 1 が 3 匹)、大使館 3 つ (それ以上受け入れない)。許可は島 3 (状態 1)
 t = {(x, 0): ("Plains", 0) for x in range(12)}
 t.update({(0, 2): ("Zoo", 0), (1, 2): ("Taishi", 1), (2, 2): ("Taishi", 3),
-          (3, 2): ("Taishi", 3), (4, 2): ("Forest", 10)})
+          (3, 2): ("Taishi", 3), (4, 2): ("Forest", 10), (5, 2): ("College", 99)})
 home(t, row=11)
 put(f, 2, t)
 f.ips(2, etc7="1,0,3", etc6=",".join(["0", "3"] + ["0"] * 29))
@@ -372,13 +380,14 @@ f.main(2, eisei5="0,0,0,0,0,300,0")
 # 島 1: 動物園 (怪獣 1 と 30 を 2 匹ずつ)、島 2 への許可
 a = {(x, 0): ("Plains", 0) for x in range(12)}
 a[(0, 2)] = ("Zoo", 0)
+a[(1, 2)] = ("College", 99)
 home(a, row=11)
 put(f, 1, a)
 f.ips(1, etc7="2,0,2", etc6=",".join(["0", "2"] + ["0"] * 28 + ["2"]))
 f.main(1, eisei5="0,0,0,0,0,100,0")
 # 島 3: 発電所がない (エネルギー不足)、島 2 への許可
 b = {(x, 0): ("Plains", 0) for x in range(12)}
-b.update({(0, 2): ("Zoo", 0), (0, 11): ("Town", 200), (1, 11): ("Town", 200),
+b.update({(0, 2): ("Zoo", 0), (1, 2): ("College", 99), (0, 11): ("Town", 200), (1, 11): ("Town", 200),
           (2, 11): ("Town", 200), (3, 11): ("Base", 4000)})
 put(f, 3, b)
 f.ips(3, etc7="2,5,2", etc6=",".join(["1"] * 31))
@@ -388,7 +397,7 @@ for i in (1, 2, 3):
 f.commands(1, [
     (SEND, 99, 0, 0, 1),
     (SEND, 3, 0, 0, 1),
-    (SEND, 2, 0, 0, 35),
+    (SEND, 2, 0, 0, 31),
     (SEND, 2, 0, 0, 1),
     (TAISHI, 99, 0, 0, 0),
     (TAISHI, 1, 0, 0, 0),
@@ -408,5 +417,40 @@ f.commands(2, [
     (SEND, 1, 0, 0, 1),
     (TAISHI, 1, 3, 0, 0),
     (TAISHI, 3, 3, 0, 0),
+])
+f.save()
+
+# ---------------------------------------------------------------------------
+# phase3-attack-defhex: 防衛施設の判定を覚える @HdefenceHex (撃った島と座標で覚えるので
+# 別の島を狙っても前の判定を使う)、防衛施設に当たると周りの判定を消す、SPP が防衛施設に
+# 当たると防衛される。島 3 は 0 発 (撃てるだけ = 100 発) 撃ち、不発弾の数 $alltotal を増やす
+f = Fixture("phase3-attack-defhex")
+D, P, Q = (5, 5), (5, 3), (1, 8)
+t = {D: ("Defence", 0), (1, 10): ("Defence", 0), P: ("Plains", 0), Q: ("Plains", 0)}
+t.update(TARGET_HOME)
+put(f, 2, t)
+a = {P: ("Plains", 0), Q: ("Plains", 0)}
+home(a, row=11, bases=(("Base", 4000), ("Base", 4000)), extra=(("Taishi", 2),))
+put(f, 1, a)
+f.ips(1, etc7="2,0,3")
+b = {P: ("Plains", 0), Q: ("Plains", 0)}
+for p in range(24):
+    b[(p % 12, 9 + p // 12)] = ("Base", 200)
+b.update({(0, 11): ("Town", 200), (1, 11): ("Town", 200), (2, 11): ("Town", 200),
+          (3, 11): ("EneAt", 4000)})
+put(f, 3, b)
+f.ips(3, etc7="2,5,2")
+for i in (1, 2, 3):
+    f.main(i, money=MONEY)
+f.main(2, absent=0)  # 計画がないと資金繰りが続いて放棄されるので
+f.commands(3, [(NM, 2, 9, 7, 0)])
+f.commands(1, [
+    (SPP, 2, *D, 1),
+    (SPP, 2, *P, 1),
+    (SPP, 3, *P, 1),
+    (SPP, 3, *Q, 1),
+    (SPP, 2, *Q, 1),
+    (NM, 2, *D, 1),
+    (SPP, 2, *P, 1),
 ])
 f.save()

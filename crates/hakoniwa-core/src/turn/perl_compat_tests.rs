@@ -806,6 +806,11 @@ fn phase3_attack_lr_matches_perl_with_rand_96875() {
 }
 
 #[test]
+fn phase3_attack_lr_matches_perl_with_rand_021484375() {
+    check_fixture_at("phase3-attack-lr", "021484375");
+}
+
+#[test]
 fn phase3_attack_ld_matches_perl_with_rand_0() {
     check_fixture("phase3-attack-ld", 0);
 }
@@ -923,4 +928,24 @@ fn phase3_attack_send_matches_perl_with_rand_03125() {
 #[test]
 fn phase3_attack_send_matches_perl_with_rand_96875() {
     check_fixture_at("phase3-attack-send", "96875");
+}
+
+#[test]
+fn phase3_attack_defhex_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-defhex", 0);
+}
+
+#[test]
+fn phase3_attack_defhex_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-defhex", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_defhex_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-defhex", "03125");
+}
+
+#[test]
+fn phase3_attack_defhex_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-defhex", "96875");
 }
