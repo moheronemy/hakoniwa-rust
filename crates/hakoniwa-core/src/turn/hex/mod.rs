@@ -23,7 +23,7 @@ mod monster;
 mod sea;
 mod special;
 mod stadium;
-mod town;
+pub(crate) mod town;
 mod train;
 
 use crate::log::tags::{self, wrap};
