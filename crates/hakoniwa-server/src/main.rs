@@ -121,7 +121,11 @@ pub fn app(state: Arc<AppState>) -> Router {
         .with_state(state)
 }
 
-async fn top_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+async fn top_page(
+    State(app): State<Arc<AppState>>,
+    headers: HeaderMap,
+    uri: axum::http::Uri,
+) -> Response {
     let login = pages::login_of(&app, &headers).await;
     let body = {
         let game = app.game.read().await;
@@ -129,6 +133,7 @@ async fn top_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Respo
             &app.config,
             &game,
             now_unix(),
+            uri.query().unwrap_or_default(),
             login.as_ref().map(|l| l.session.csrf.as_str()),
         )
     };

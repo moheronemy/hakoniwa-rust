@@ -78,6 +78,12 @@ button.secondary { background: transparent; color: var(--accent); border: 1px so
 .map .cell[data-x]:focus, .map .cell.picked { outline: 2px solid var(--warn); outline-offset: -2px; }
 .map .plan { position: absolute; right: 0; bottom: 0; font-size: 9px; background: rgba(0,0,0,.65); color: #fff; padding: 0 2px; }
 .pre { white-space: pre-line; }
+.departments { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.dept { padding: 6px 10px; font-size: .9em; }
+table.islands td:nth-child(2) { min-width: 9em; }
+table.islands td.sub { border-bottom: 2px solid var(--line); font-size: .9em; }
+.badge { display: inline-block; white-space: normal; max-width: 100%; overflow-wrap: anywhere; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin: 1px; font-size: .85em; }
+.paging a { margin-right: 8px; }
 table.info th { width: 8em; white-space: nowrap; color: var(--muted); font-weight: 500; }
 .map .axis { color: var(--muted); font-size: 10px; }
 @media (max-width: 480px) { .map .cell, .map .cell img, .map .cell .tile { width: 24px; height: 24px; font-size: 9px; } }
