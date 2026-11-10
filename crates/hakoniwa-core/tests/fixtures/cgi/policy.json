@@ -1,0 +1,104 @@
+{
+ "fixture": "phase5-command",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "10",
+    "ShoueneButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "20",
+    "BousaiButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "60",
+    "KankouButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "abc",
+    "SizenButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "-5",
+    "KyouikuButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "AMOUNT": "7",
+    "ChochikuButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "AMOUNT": "3",
+    "ShoueneButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "10",
+    "ShoueneButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "20",
+    "BousaiButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "60",
+    "KankouButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "x1",
+    "SizenButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "5",
+    "KyouikuButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "50.5",
+    "ChochikuButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "AMOUNT": "007",
+    "KankouButton2": "1"
+   }
+  }
+ ]
+}

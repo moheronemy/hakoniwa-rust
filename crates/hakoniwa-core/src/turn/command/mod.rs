@@ -275,7 +275,7 @@ pub(crate) fn do_command(ctx: &mut TurnContext, islands: &mut [Island], idx: usi
 }
 
 /// `slideBack($comArray, $number)`: `number` 番目の計画を複製して後ろにずらす (末尾は消える)
-pub(super) fn slide_back(commands: &mut Vec<PlannedCommand>, number: usize) {
+pub(crate) fn slide_back(commands: &mut Vec<PlannedCommand>, number: usize) {
     // return if $number == $#$command;
     if commands.len() == number + 1 {
         return;
