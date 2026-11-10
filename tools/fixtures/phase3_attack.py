@@ -10,10 +10,13 @@ rand 0 なら計画の座標そのもの、rand 0.5 なら誤差 19 の弾は (x
 
     python3 -I tools/fixtures/phase3_attack.py
     for f in phase3-attack phase3-attack-lr phase3-attack-ld phase3-attack-guard \
-             phase3-attack-mon phase3-attack-mon6 phase3-attack-boat phase3-attack-send; do
+             phase3-attack-mon phase3-attack-mon6 phase3-attack-boat phase3-attack-send \
+             phase3-attack-defhex; do
         RANDS="0 50 03125 96875" tools/perl-harness/run-harness.sh $f \
             estimate,income,commands,commands,commands,commands,commands,commands,commands,commands,commands,commands,estimate
     done
+    # 地形隆起弾の記念碑 (rand(1000) < 22) を 20 以上 22 未満で確かめる
+    RANDS=021484375 tools/perl-harness/run-harness.sh phase3-attack-lr (同じ STEPS)
 """
 import pathlib
 import sys

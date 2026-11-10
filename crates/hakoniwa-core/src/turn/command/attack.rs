@@ -12,6 +12,12 @@
 //!   上書きされ、以後の弾は「その他のミサイル」として扱われる。
 //! - 結果のログの `$tLname` と `$tPoint` は未定義のグローバル変数なので空になる。
 //! - 大使派遣のログの 2 番目の島 ID はグローバル変数 `$tId` (目標の島ではない)。
+//! - SPP ミサイルは「防衛される」から判定を始めるので、防衛施設そのものに当たると防衛される
+//!   (周りに防衛施設がなければ防衛されない)。
+//! - 不発弾が出ても続けて 1 発撃つので、弾数・資金の確認なしに 2 発分を使う
+//!   (弾数も資金も負になることがある)。
+//! - 動物派遣 (`$lovePeace` が 1 のとき) は、送った島が費用を受け取り、相手の島が払う。
+//!   `$lovePeace` が 0 のときの分岐も移植したが、設定が 1 なので Perl 版との突き合わせはしていない。
 //! - 大使派遣の予定地が島の外なら、Perl 版は `next` で doCommand を抜ける
 //!   (turnMain の `while (doCommand(...) == 0)` の次の繰り返しになる) ので、0 を返したのと同じ。
 
@@ -561,8 +567,9 @@ pub(super) fn missile(
 
     if ctx.config.love_peace {
         let other = id != t_id;
-        if msjotai == 2 && t_id == msid {
-        } else if doumei && other {
+        // 撃つ許可があるか同盟なら、そのまま撃てる
+        let permitted = (msjotai == 2 && t_id == msid) || (doumei && other);
+        if permitted {
         } else if islands[tn].monster_live == 0 && islands[tn].scratch.rot == 0 && other {
             islands[idx].money = 0;
             ctx.log
@@ -875,8 +882,7 @@ fn shoot(
 
     // 「効果なし」hexを最初に判定
     if !is(C::MissileLR)
-        && ((t_l == k(L::Sea) && t_lv == 0)
-            || (is_one_of(t_l, &NO_EFFECT) && !is(C::MissileLD)))
+        && ((t_l == k(L::Sea) && t_lv == 0) || (is_one_of(t_l, &NO_EFFECT) && !is(C::MissileLD)))
     {
         s.counts.mukou += 1;
         return;
@@ -913,10 +919,10 @@ fn shoot(
                 // $seaCount は未定義 (0) なので、必ず周りの海を浅瀬にする。
                 // しかも着弾点ではなく計画の座標のまわり (Perl 版のまま)
                 for i in 1..7 {
-                    if let Some((sx, sy)) = in_island(&islands[tn].map, around(c.x, c.y, i)) {
-                        if kind_at(&islands[tn], sx, sy) == k(L::Sea) {
-                            set_value(&mut islands[tn], sx, sy, 1);
-                        }
+                    if let Some((sx, sy)) = in_island(&islands[tn].map, around(c.x, c.y, i))
+                        && kind_at(&islands[tn], sx, sy) == k(L::Sea)
+                    {
+                        set_value(&mut islands[tn], sx, sy, 1);
                     }
                 }
             } else {
