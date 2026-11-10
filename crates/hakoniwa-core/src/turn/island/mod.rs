@@ -8,8 +8,6 @@
 //! ほとんどの値は `my` の無いグローバル変数 (`$toto2`, `$s00`.., `$msjotai`, `$value`, `$str` など) で、
 //! doEachHex・doCommand や別の島と値を共有する。
 
-// TODO(フェーズ4): すべての段階を移植したら外す
-
 /// 複数の段階で使う小さな関数とログの文面
 mod common {
     use crate::log::tags::{self, wrap};
