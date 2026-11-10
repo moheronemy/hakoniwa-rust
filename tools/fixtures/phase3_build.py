@@ -212,6 +212,7 @@ f.commands(1, [
     c("Umiamu", 0, 4),
     c("Umiamu", 7, 8, 2),
     c("Umiamu", 9, 8),                 # 平地 -> 不適当 (0)
+    c("Umiamu", 15, 4, 2),             # 島の外は海 (値 0) として読まれる。書き込みは保存されない
     c("Kyujo", 1, 8),
     c("Newtown", 2, 8),
     c("Rizort", 3, 8),
