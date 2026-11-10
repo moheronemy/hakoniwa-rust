@@ -12,6 +12,8 @@ pub(crate) mod island;
 mod ranking;
 
 #[cfg(test)]
+mod full_turn_tests;
+#[cfg(test)]
 mod perl_compat_tests;
 
 use std::collections::HashMap;
@@ -388,6 +390,14 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
 
     if !config.survey.enabled {
         world.survey_votes = [0; 5];
+    }
+
+    // estimate はアンケートが無効なら anflag を 0 にするが、Perl 版は次に読み込むとき
+    // `if($anflag == '') { $anflag = '1'; }` で 1 に戻す。保存と読み込みを挟んだ値にそろえる
+    for island in world.islands.iter_mut() {
+        if island.survey_flag == 0 {
+            island.survey_flag = 1;
+        }
     }
 
     for (lot, value) in world

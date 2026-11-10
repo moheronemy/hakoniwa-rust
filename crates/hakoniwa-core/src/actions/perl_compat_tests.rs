@@ -67,6 +67,17 @@ pub(crate) fn check_case(
     ignore: &[&str],
     apply: impl FnOnce(&mut GameState, &GameConfig, &mut Case),
 ) {
+    check_case_with(name, ignore, |_| {}, apply);
+}
+
+/// [`check_case`] に、Perl 版の結果を比べる前に直す `fix_want` を足したもの
+/// (移植版がわざと出さないログを取り除くときなど)
+pub(crate) fn check_case_with(
+    name: &str,
+    ignore: &[&str],
+    fix_want: impl FnOnce(&mut GameState),
+    apply: impl FnOnce(&mut GameState, &GameConfig, &mut Case),
+) {
     let dir = cgi_dir().join(name);
     let json: Value = serde_json::from_str(
         &std::fs::read_to_string(cgi_dir().join(format!("{name}.json"))).unwrap(),
@@ -81,7 +92,9 @@ pub(crate) fn check_case(
     let config = GameConfig::default();
     apply(&mut game, &config, &mut case);
 
-    let want = serde_json::to_value(import(&dir.join("after"))).unwrap();
+    let mut want = import(&dir.join("after"));
+    fix_want(&mut want);
+    let want = serde_json::to_value(want).unwrap();
     let got = serde_json::to_value(&game).unwrap();
     let mut diffs = Vec::new();
     diff(&want, &got, String::new(), ignore, &mut diffs);
