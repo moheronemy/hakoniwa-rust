@@ -307,7 +307,11 @@ fn riot(ctx: &mut TurnContext, island: &mut Island) {
             ],
         ) && ctx.random(100) < eisei1
         {
-            out(ctx, id, kire_damage(&name, &land_name(land_kind, lv), &point));
+            out(
+                ctx,
+                id,
+                kire_damage(&name, &land_name(land_kind, lv), &point),
+            );
             set(island, x, y, L::Waste, 0);
             // でも養殖場なら浅瀬
             if land_kind == k(L::Nursery) {
@@ -327,13 +331,21 @@ fn riot(ctx: &mut TurnContext, island: &mut Island) {
             ],
         ) && ctx.random(100) < eisei1 - 30
         {
-            out(ctx, id, kire_damage(&name, &land_name(land_kind, lv), &point));
+            out(
+                ctx,
+                id,
+                kire_damage(&name, &land_name(land_kind, lv), &point),
+            );
             set(island, x, y, L::Waste, 0);
         }
         if is_one_of(land_kind, &[L::Sbase, L::Seacity, L::Umiamu, L::Frocity])
             && ctx.random(100) < eisei1 - 60
         {
-            out(ctx, id, kire_damage(&name, &land_name(land_kind, lv), &point));
+            out(
+                ctx,
+                id,
+                kire_damage(&name, &land_name(land_kind, lv), &point),
+            );
             set(island, x, y, L::Sea, 0);
         }
     }
@@ -405,9 +417,8 @@ fn food_shortage(ctx: &mut TurnContext, island: &mut Island) {
 /// 津波判定 (15087〜15180 行)
 fn tsunami_check(ctx: &mut TurnContext, island: &mut Island) {
     let s04 = ctx.globals.etc5.0[4];
-    let threshold = ctx.config.disaster.tsunami
-        - trunc(island.eis[1] as f64 / 15.0)
-        - trunc(s04 as f64 / 10.0);
+    let threshold =
+        ctx.config.disaster.tsunami - trunc(island.eis[1] as f64 / 15.0) - trunc(s04 as f64 / 10.0);
     if ctx.random(1000) >= threshold {
         return;
     }
