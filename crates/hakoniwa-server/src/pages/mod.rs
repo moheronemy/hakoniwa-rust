@@ -246,6 +246,11 @@ mod tests {
         }
         let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
         assert!(page.contains("開発計画"), "{page}");
+        // 計画の入力欄と計画の一覧
+        assert!(
+            page.contains("name=\"kind\"") && page.contains("資金繰り"),
+            "{page}"
+        );
 
         // CSRF 対策のトークンが無い POST は受け付けない
         let res = send(

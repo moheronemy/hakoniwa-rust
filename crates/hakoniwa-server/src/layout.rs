@@ -78,6 +78,13 @@ button.secondary { background: transparent; color: var(--accent); border: 1px so
 .map .cell[data-x]:focus, .map .cell.picked { outline: 2px solid var(--warn); outline-offset: -2px; }
 .map .plan { position: absolute; right: 0; bottom: 0; font-size: 9px; background: rgba(0,0,0,.65); color: #fff; padding: 0 2px; }
 .pre { white-space: pre-line; }
+.owner-grid { display: grid; grid-template-columns: minmax(0, auto) minmax(260px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .owner-grid { grid-template-columns: minmax(0, 1fr); } }
+.command-form { margin-top: 12px; }
+.command-form select { max-width: 100%; }
+ol.plans { list-style: none; padding: 0; margin: 0; font-size: .92em; }
+ol.plans li { padding: 2px 0; border-bottom: 1px dotted var(--line); }
+.plan-no { background: transparent; color: var(--accent); border: 1px solid var(--line); padding: 0 6px; font-variant-numeric: tabular-nums; }
 .departments { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .dept { padding: 6px 10px; font-size: .9em; }
 table.islands td:nth-child(2) { min-width: 9em; }

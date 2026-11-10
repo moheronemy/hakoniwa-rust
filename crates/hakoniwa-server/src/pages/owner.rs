@@ -3,10 +3,13 @@
 use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::State;
+use std::fmt::Write;
+
+use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use hakoniwa_core::actions::{self, ActionError};
+use hakoniwa_core::view;
 use serde::Deserialize;
 
 use super::auth::require_login;
@@ -15,47 +18,193 @@ use crate::AppState;
 use crate::edit::{EditError, edit};
 use crate::layout::{csrf_field, esc};
 
-pub async fn owner_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+/// 開発画面の URL に付ける、前回の計画の入力 (選択の初期値)
+#[derive(Deserialize, Default)]
+pub struct OwnerQuery {
+    #[serde(default)]
+    kind: String,
+    #[serde(default)]
+    x: String,
+    #[serde(default)]
+    y: String,
+    #[serde(default)]
+    n: Option<usize>,
+    #[serde(default)]
+    lamount1: String,
+}
+
+fn options(choices: &[view::owner::Choice], selected_value: Option<i64>) -> String {
+    let mut h = String::new();
+    for c in choices {
+        let sel = match selected_value {
+            Some(v) => c.value == v,
+            None => c.selected,
+        };
+        let _ = write!(
+            h,
+            "<option value=\"{}\"{}>{}</option>",
+            c.value,
+            if sel { " selected" } else { "" },
+            esc(&c.label)
+        );
+    }
+    h
+}
+
+/// 計画の入力欄 (Perl 版の `tempOwner` の計画のフォーム)
+fn command_form(screen: &view::owner::OwnerScreen, csrf: &str, number: Option<usize>) -> String {
+    let menu = &screen.menu;
+    let mut kinds = String::new();
+    for c in &menu.commands {
+        let _ = write!(
+            kinds,
+            "<option value=\"{}\"{}>{}</option>",
+            c.kind,
+            if c.selected { " selected" } else { "" },
+            esc(&c.label())
+        );
+    }
+    let ijiri = match &menu.ijiri {
+        Some(ij) => format!(
+            "<label for=\"lamount1\">いじり (管理者)</label><select id=\"lamount1\" name=\"lamount1\">{}</select>\
+             <input type=\"text\" name=\"lamount2\" size=\"10\" aria-label=\"いじりの値\">",
+            options(&ij.lamount1, None)
+        ),
+        None => String::new(),
+    };
+    format!(
+        "<form method=\"post\" action=\"/owner/command\" class=\"card command-form\" id=\"command-form\">{csrf}\n\
+         <label for=\"number\">計画番号</label><select id=\"number\" name=\"number\">{numbers}</select>\n\
+         <label for=\"kind\">計画 <span class=\"muted\" title=\"{costtitle}\">(コスト修正 {costtotal})</span></label>\
+         <select id=\"kind\" name=\"kind\">{kinds}</select>\n\
+         <label>座標 (地図をクリックしても選べます)</label>(<select name=\"x\" id=\"px\" aria-label=\"x\">{xs}</select>, \
+         <select name=\"y\" id=\"py\" aria-label=\"y\">{ys}</select>)\n\
+         <label for=\"amount\">数量</label><select id=\"amount\" name=\"amount\">{amounts}</select>\n\
+         <label for=\"target\">目標の島</label><select id=\"target\" name=\"target\">{targets}</select>\n{ijiri}\n\
+         <p class=\"buttons\"><button name=\"mode\" value=\"insert\">挿入</button> \
+         <button name=\"mode\" value=\"write\" class=\"secondary\">上書き</button> \
+         <button name=\"mode\" value=\"delete\" class=\"secondary\">削除</button></p>\n</form>\n",
+        csrf = csrf_field(csrf),
+        numbers = options(&menu.plan_numbers, number.map(|n| n as i64)),
+        costtitle = esc(&menu.cost_modifier.details.join("\n")),
+        costtotal = esc(&menu.cost_modifier.total),
+        xs = options(&menu.xs, None),
+        ys = options(&menu.ys, None),
+        amounts = options(&menu.amounts, None),
+        targets = options(&menu.targets, None),
+    )
+}
+
+/// 計画の一覧。番号を押すと入力欄の計画番号に入る
+fn plan_list(screen: &view::owner::OwnerScreen) -> String {
+    let mut h = String::from("<ol class=\"plans\">\n");
+    for p in &screen.plans {
+        let _ = writeln!(
+            h,
+            "<li><button type=\"button\" class=\"plan-no\" data-n=\"{}\">{:02}</button> {}</li>",
+            p.number - 1,
+            p.number,
+            // 島の名前は保存の時点でエスケープ済みのものが入る (view::owner のとおり)
+            p.text
+        );
+    }
+    h.push_str("</ol>\n");
+    h
+}
+
+fn policy_form(screen: &view::owner::OwnerScreen, csrf: &str) -> String {
+    let Some(lines) = &screen.policies else {
+        return String::new();
+    };
+    let mut h = String::from("<h2>政策</h2>\n<ul>\n");
+    for l in lines {
+        let _ = writeln!(h, "<li>{}</li>", esc(&crate::render::plain(&l.text)));
+    }
+    let _ = write!(
+        h,
+        "</ul>\n<form method=\"post\" action=\"/owner/policy\" class=\"card\">{}\n\
+         <label for=\"policy\">政策</label><select id=\"policy\" name=\"policy\">\
+         <option value=\"shouene\">省エネ</option><option value=\"bousai\">防災</option>\
+         <option value=\"kankou\">観光</option><option value=\"sizen\">自然</option>\
+         <option value=\"kyouiku\">教育</option><option value=\"chochiku\">貯蓄</option></select>\n\
+         <label for=\"policy-amount\">予算 (0〜50)</label><input id=\"policy-amount\" type=\"number\" name=\"amount\" min=\"0\" max=\"50\" value=\"0\">\n\
+         <p><button>予算を変える</button></p>\n</form>\n",
+        csrf_field(csrf)
+    );
+    h
+}
+
+/// 地図のマスと計画番号を押したときに、入力欄に入れる
+const OWNER_SCRIPT: &str = r#"<script>
+document.querySelectorAll('.map .cell[data-x]').forEach(function (c) {
+  function pick() {
+    document.getElementById('px').value = c.dataset.x;
+    document.getElementById('py').value = c.dataset.y;
+    document.querySelectorAll('.map .picked').forEach(function (p) { p.classList.remove('picked'); });
+    c.classList.add('picked');
+  }
+  c.addEventListener('click', pick);
+  c.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+});
+document.querySelectorAll('.plan-no').forEach(function (b) {
+  b.addEventListener('click', function () { document.getElementById('number').value = b.dataset.n; });
+});
+</script>"#;
+
+pub async fn owner_page(
+    State(app): State<Arc<AppState>>,
+    headers: HeaderMap,
+    Query(q): Query<OwnerQuery>,
+) -> Response {
     let Some(login) = login_of(&app, &headers).await else {
         return require_login(&app).await;
     };
     let body = {
         let game = app.game.read().await;
-        let Some(island) = game
-            .world
-            .islands
-            .iter()
-            .find(|i| i.id == login.session.island_id)
-        else {
+        let Some(idx) = actions::island_index(&game.world, login.session.island_id) else {
             return require_login(&app).await;
         };
-        let idx = actions::island_index(&game.world, island.id).unwrap_or_default();
-        let view = hakoniwa_core::view::island_view(
+        let island = &game.world.islands[idx];
+        let master = login.session.master;
+        let iv = view::island_view(
             &game.world,
             &app.config,
             idx,
-            hakoniwa_core::view::Viewer::Owner {
-                master: login.session.master,
-            },
+            view::Viewer::Owner { master },
         );
+        let defaults = view::owner::MenuDefaults {
+            kind: q.kind.clone(),
+            x: q.x.clone(),
+            y: q.y.clone(),
+            lamount1: q.lamount1.clone(),
+            ..Default::default()
+        };
+        let screen = view::owner::owner_screen(&app.config, &game, idx, master, &defaults);
+        let csrf = &login.session.csrf;
         format!(
-            "<h1>{name}島開発計画</h1>\n{info}{map}\n\
-             <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf}\n\
+            "<h1>{name}島開発計画</h1>\n\
+             <div class=\"owner-grid\"><div>{map}{form}</div><div><h2>計画</h2>{plans}</div></div>\n\
+             <h2>島の情報</h2>{info}{policy}\n\
+             <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf_f}\n\
              <label for=\"message\">島のコメント</label>\n\
              <input id=\"message\" type=\"text\" name=\"message\" value=\"{comment}\" maxlength=\"80\" size=\"60\">\n\
-             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{change}",
-            change = super::register::change_forms(&app, &login.session.csrf),
+             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{change}{script}",
+            name = esc(&island.name),
+            map = crate::render::map_html(&iv, app.options.image_dir.is_some(), true),
+            form = command_form(&screen, csrf, q.n),
+            plans = plan_list(&screen),
+            info = crate::render::info_html(&iv.info),
+            policy = policy_form(&screen, csrf),
+            csrf_f = csrf_field(csrf),
+            // コメントは保存の時点でエスケープ済み (Perl 版と同じ)。入力欄に戻すときは元の文字に戻す
+            comment = esc(&unescape(&island.comment)),
             lbbs = if app.config.lbbs.enabled {
-                owner_lbbs(&app.config, island, &login.session.csrf)
+                owner_lbbs(&app.config, island, csrf)
             } else {
                 String::new()
             },
-            name = esc(&island.name),
-            info = crate::render::info_html(&view.info),
-            map = crate::render::map_html(&view, app.options.image_dir.is_some(), true),
-            csrf = csrf_field(&login.session.csrf),
-            // コメントは保存の時点でエスケープ済み (Perl 版と同じ)。入力欄に戻すときは元の文字に戻す
-            comment = esc(&unescape(&island.comment)),
+            change = super::register::change_forms(&app, csrf),
+            script = OWNER_SCRIPT,
         )
     };
     render(&app, Some(&login), "開発画面", &body)
@@ -239,7 +388,26 @@ pub async fn command(
         Ok(actions::command::CommandOutcome::Edited) => "書き換えました",
         _ => "計画を登録しました",
     };
-    finish(&app, &login, result.map(|_| ()), message).await
+    let back = format!(
+        "/owner?kind={}&x={}&y={}&n={}&lamount1={}",
+        enc(&form.kind),
+        enc(&form.x),
+        enc(&form.y),
+        (form.number + 1).min(app.config.command_max.saturating_sub(1)),
+        enc(&form.lamount1)
+    );
+    match result {
+        Ok(_) => redirect_with_flash(&app, &login, &back, message),
+        Err(e) => finish(&app, &login, Err(e), message).await,
+    }
+}
+
+/// URL のクエリに入れる値 (数字と符号だけを通す)
+fn enc(s: &str) -> String {
+    s.chars()
+        .filter(|c| c.is_ascii_digit() || *c == '-')
+        .take(8)
+        .collect()
 }
 
 #[derive(Deserialize)]
