@@ -2,6 +2,7 @@
 
 pub mod admin;
 pub mod auth;
+pub mod history;
 pub mod images;
 pub mod island;
 pub mod owner;

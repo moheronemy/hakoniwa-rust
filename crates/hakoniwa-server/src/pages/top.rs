@@ -300,7 +300,7 @@ pub fn top(
     for m in &page.logs {
         let _ = writeln!(h, "<p>ターン{}：{}</p>", m.turn, log_text(&m.message));
     }
-    h.push_str("</div>\n");
+    h.push_str("</div>\n<p><a href=\"/history\">それより前の出来事</a></p>\n");
     if !page.hcup_log.is_empty() {
         h.push_str("<h2>Hakoniwa Cup の記録</h2>\n<div class=\"log\">\n");
         for m in &page.hcup_log {

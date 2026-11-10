@@ -116,6 +116,7 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/island/{id}", get(pages::island::island_page))
         .route("/island/{id}/lbbs", post(pages::island::visitor_lbbs_post))
         .route("/img/{name}", get(pages::images::image))
+        .route("/history", get(pages::history::history_page))
         .route("/admin", get(pages::admin::admin_page))
         .route("/admin/login", post(pages::admin::admin_login))
         .route("/admin/time", post(pages::admin::set_time))
