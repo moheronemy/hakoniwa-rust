@@ -140,7 +140,22 @@ pub fn join(values: &[i64]) -> String {
 pub struct MatchScope {
     caps: Vec<i64>,
     /// `$1`.. の文字列 (画面に埋め込むとき用。数字の並びのまま、`""` もある)
-    texts: Vec<String>,
+    texts: Texts,
+}
+
+/// `$1`.. の文字列の元。ターン処理ではマスごとに何度もマッチするので、
+/// 欄ごとの文字列は作らず、要るときに作る
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+enum Texts {
+    /// まだマッチしていない
+    #[default]
+    None,
+    /// カンマ区切りの欄のマッチ: 一致した文字列 (末尾の改行を除いたもの) をそのまま持つ
+    Fields(String),
+    /// 数値の並び (文字列は数値を書いたもの)
+    Numbers,
+    /// 文字列の並び
+    Strings(Vec<String>),
 }
 
 impl MatchScope {
@@ -156,9 +171,17 @@ impl MatchScope {
     /// 一致したかどうかが要るとき (`if ($s =~ /.../)`)。一致すれば `$1`.. を更新する
     pub fn try_fields<const N: usize>(&mut self, s: &str) -> Option<[i64; N]> {
         let raw = fields_raw::<N>(s)?;
-        self.texts = raw.iter().map(|t| t.to_string()).collect();
         let v = raw.map(int);
-        self.caps = v.to_vec();
+        let src = s.strip_suffix('\n').unwrap_or(s);
+        match &mut self.texts {
+            Texts::Fields(t) => {
+                t.clear();
+                t.push_str(src);
+            }
+            other => *other = Texts::Fields(src.to_string()),
+        }
+        self.caps.clear();
+        self.caps.extend_from_slice(&v);
         Some(v)
     }
 
@@ -176,19 +199,29 @@ impl MatchScope {
 
     /// いまの `$1`..`$N` の文字列 (未定義は空文字列)
     pub fn current_text<const N: usize>(&self) -> [String; N] {
-        std::array::from_fn(|i| self.texts.get(i).cloned().unwrap_or_default())
+        match &self.texts {
+            Texts::None => std::array::from_fn(|_| String::new()),
+            Texts::Fields(s) => {
+                let mut parts = s.split(',');
+                std::array::from_fn(|_| parts.next().unwrap_or_default().to_string())
+            }
+            Texts::Numbers => {
+                std::array::from_fn(|i| self.caps.get(i).map(i64::to_string).unwrap_or_default())
+            }
+            Texts::Strings(v) => std::array::from_fn(|i| v.get(i).cloned().unwrap_or_default()),
+        }
     }
 
     /// 数字の欄に限らない正規表現が成功したとき (`$1`.. をその値にする)
     pub fn set(&mut self, caps: Vec<i64>) {
-        self.texts = caps.iter().map(i64::to_string).collect();
+        self.texts = Texts::Numbers;
         self.caps = caps;
     }
 
     /// [`MatchScope::set`] の文字列版 (数値としては [`int`] で読んだ値)
     pub fn set_text(&mut self, texts: Vec<String>) {
         self.caps = texts.iter().map(|t| int(t)).collect();
-        self.texts = texts;
+        self.texts = Texts::Strings(texts);
     }
 }
 

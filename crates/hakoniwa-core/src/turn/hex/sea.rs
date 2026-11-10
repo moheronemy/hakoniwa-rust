@@ -455,8 +455,14 @@ fn treasure(ctx: &mut TurnContext, island: &mut Island, l_name: &str, point: &st
     }
 }
 
-/// 怪獣を探して島の全マスを見る順 (`@Hrpx`, `@Hrpy` の順)
-fn monster_points(ctx: &TurnContext) -> Vec<(usize, usize)> {
+/// 怪獣を探して島の全マスを見る順 (`@Hrpx`, `@Hrpy` の順)。
+///
+/// 戦艦の攻撃は怪獣のマスでしか何もせず、攻撃で怪獣が増えることもない。
+/// そこで島に怪獣が 1 匹もいなければ空にする (大きな地図で戦艦ごとに全マスをなめないように)
+fn monster_points(ctx: &TurnContext, island: &Island) -> Vec<(usize, usize)> {
+    if !island.map.cells.iter().any(|c| c.kind == k(L::Monster)) {
+        return Vec::new();
+    }
     let n = ctx.config.point_number();
     ctx.points.iter().take(n).copied().collect()
 }
@@ -471,7 +477,7 @@ fn is_monster(island: &Island, sx: usize, sy: usize) -> bool {
 /// 戦艦RENAS: 島の怪獣を (1 ターンに 2 回まで) 攻撃する
 fn renas(ctx: &mut TurnContext, island: &mut Island, l_name: &str, here: &str) {
     let (id, turn) = (island.id, ctx.turn);
-    for (sx, sy) in monster_points(ctx) {
+    for (sx, sy) in monster_points(ctx, island) {
         if !is_monster(island, sx, sy) || ctx.globals.hex.kougekiseigen >= 2 {
             continue;
         }
@@ -520,7 +526,7 @@ fn renas(ctx: &mut TurnContext, island: &mut Island, l_name: &str, here: &str) {
 /// 戦艦ERADICATE: 島の怪獣すべてに多弾頭ミサイルを撃つ
 fn eradicate(ctx: &mut TurnContext, island: &mut Island, l_name: &str, here: &str) {
     let (id, turn) = (island.id, ctx.turn);
-    for (sx, sy) in monster_points(ctx) {
+    for (sx, sy) in monster_points(ctx, island) {
         if !is_monster(island, sx, sy) {
             continue;
         }
@@ -560,7 +566,7 @@ fn eradicate(ctx: &mut TurnContext, island: &mut Island, l_name: &str, here: &st
 /// 戦艦ERADICATE・改: 島の怪獣すべてにエネルギー砲を撃つ。オーバーヒートすると自分の周りが壊れる
 fn eradicate_kai(ctx: &mut TurnContext, island: &mut Island, h: &HexRun, l_name: &str, here: &str) {
     let (id, turn) = (island.id, ctx.turn);
-    for (sx, sy) in monster_points(ctx) {
+    for (sx, sy) in monster_points(ctx, island) {
         if !is_monster(island, sx, sy) {
             continue;
         }

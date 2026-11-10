@@ -13,6 +13,8 @@
 //! (最初のスナップショット、ターンごとのスナップショット、画面の操作 1 件の差分、読み込み)。
 //! `DIR` の中身は消して作り直す。
 //!
+//! `--digest` を付けると、ターンごとに状態全体 (ログを含む) のハッシュを出す (速くしても結果が同じかを確かめる)。
+//!
 //! `--save PATH` を付けると、複製して作った (ターンを進める前の) 状態を `state.json` の形で保存する
 //! (サーバーを目標の規模で動かして確かめるため)。
 //!
@@ -37,6 +39,7 @@ struct Args {
     max_turn_secs: Option<f64>,
     save: Option<std::path::PathBuf>,
     persist: Option<std::path::PathBuf>,
+    digest: bool,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -47,6 +50,7 @@ fn parse_args() -> Result<Args, String> {
         max_turn_secs: None,
         save: None,
         persist: None,
+        digest: false,
     };
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
@@ -60,10 +64,30 @@ fn parse_args() -> Result<Args, String> {
             }
             "--save" => args.save = Some(value()?.into()),
             "--persist" => args.persist = Some(value()?.into()),
+            "--digest" => args.digest = true,
             _ => return Err(format!("知らない引数 {a}")),
         }
     }
     Ok(args)
+}
+
+/// 状態全体 (ターンのログの行を含む) のハッシュ。速くする前と後で結果が同じかを確かめる
+fn digest(game: &hakoniwa_core::GameState) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut h = std::collections::hash_map::DefaultHasher::new();
+    let mut body = game.clone();
+    let turns = std::mem::take(&mut body.logs.turns);
+    world_bytes(&body).hash(&mut h);
+    for t in &turns {
+        for e in t.entries() {
+            (e.secret, e.turn, e.island1, e.island2, e.message).hash(&mut h);
+        }
+    }
+    h.finish()
+}
+
+fn world_bytes(game: &hakoniwa_core::GameState) -> Vec<u8> {
+    serde_json::to_vec(&game.world).expect("JSON")
 }
 
 fn dir_size(dir: &Path) -> u64 {
@@ -151,6 +175,9 @@ fn main() -> ExitCode {
             report.turn,
             game.world.islands.len()
         );
+        if args.digest {
+            println!("            状態のハッシュ {:016x}", digest(&game));
+        }
         if let Some(data) = &mut data {
             let t = Instant::now();
             data.snapshot(&game).expect("スナップショットを書けません");

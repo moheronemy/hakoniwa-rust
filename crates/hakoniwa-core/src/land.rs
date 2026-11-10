@@ -57,12 +57,44 @@ pub fn perl_get(map: &IslandMap, sx: i64, sy: i64) -> (u8, i64) {
 /// `countAround($land, $x, $y, $kind, $range)`: 周囲 `range` 個のマスのうち `kind` の数。
 /// 島の外は海として数える
 pub fn count_around(map: &IslandMap, x: i64, y: i64, kind: L, range: usize) -> i64 {
-    (0..range)
-        .filter(|&i| match in_island(map, around(x, y, i)) {
-            Some((sx, sy)) => map.get(sx, sy).is_some_and(|c| c.kind == kind as u8),
-            None => kind == L::Sea,
-        })
-        .count() as i64
+    let mut mask = [false; 256];
+    mask[kind as usize] = true;
+    count_around_mask(map, x, y, &mask, range)
+}
+
+/// 地形の種類の集まり ([`count_around_mask`] に渡す)
+pub const fn kind_mask(kinds: &[L]) -> [bool; 256] {
+    let mut mask = [false; 256];
+    let mut i = 0;
+    while i < kinds.len() {
+        mask[kinds[i] as usize] = true;
+        i += 1;
+    }
+    mask
+}
+
+/// 周囲 `range` 個のマスのうち、地形が `mask` に入っているものの数 (島の外は海として数える)。
+/// 種類ごとの [`count_around`] の合計と同じ (同じマスを 1 回だけ見るので速い)
+pub fn count_around_mask(map: &IslandMap, x: i64, y: i64, mask: &[bool; 256], range: usize) -> i64 {
+    let size = map.size as i64;
+    let cells = &map.cells;
+    // 奇数行から偶数行を見るときは x を 1 減らす ([`around`] と同じ)
+    let odd = y.rem_euclid(2) == 1;
+    let mut n = 0;
+    for i in 0..range {
+        let sy = y + AY[i];
+        let mut sx = x + AX[i];
+        if odd && sy.rem_euclid(2) == 0 {
+            sx -= 1;
+        }
+        let hit = if (0..size).contains(&sx) && (0..size).contains(&sy) {
+            mask[cells[(sy * size + sx) as usize].kind as usize]
+        } else {
+            mask[L::Sea as usize]
+        };
+        n += i64::from(hit);
+    }
+    n
 }
 
 /// `landName($land, $lv)`: ログに出す地形の名前。Perl 版で名前の無いものは空文字列

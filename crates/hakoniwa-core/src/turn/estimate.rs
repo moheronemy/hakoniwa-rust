@@ -618,6 +618,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
 
 /// マスごとに数える値 (Perl 版の `$oil++ if (...)` の並び)
 #[derive(Default)]
+#[cfg_attr(test, derive(Debug, PartialEq))]
 struct Counts {
     oil: i64,
     bas: i64,
@@ -694,8 +695,151 @@ struct Counts {
 }
 
 impl Counts {
-    /// 1 マス分を数える
+    /// 1 マス分を数える。Perl 版はマスごとに約 100 個の `$x++ if (...)` を順に評価する
+    /// ([`Counts::count_each`] がそのまま写したもの)。結果は同じなので、地形の種類で分けて
+    /// 当てはまるものだけを数える (大きな地図ではターン処理の時間の 1 割ほどになっていた)
     fn count(&mut self, kind: u8, value: i64, m_kind: usize) {
+        let Some(l) = L::from_u8(kind) else {
+            return;
+        };
+        match l {
+            L::Oil => self.oil += 1,
+            L::HTFactory => self.htf += 1,
+            L::SHTF => self.shtf += 1,
+            L::OWNF => self.ownf += 1,
+            L::Monument => {
+                self.kei += 1;
+                match value {
+                    73 => self.m73 += 1,
+                    96 => self.m96 += 1,
+                    97 => self.m97 += 1,
+                    98 => self.m98 += 1,
+                    99 => self.m99 += 1,
+                    100 => self.m100 += 1,
+                    101 => self.m101 += 1,
+                    86 => self.m26 += 1,
+                    87 => self.m27 += 1,
+                    74 => self.m74 += 1,
+                    75 => self.m75 += 1,
+                    76 => self.m76 += 1,
+                    77 => self.m77 += 1,
+                    78 => self.m78 += 1,
+                    79 => self.m79 += 1,
+                    84 => self.m84 += 1,
+                    17 => self.m17 += 1,
+                    26 => self.sin += 1,
+                    27 => self.jin += 1,
+                    93 => self.c13 += 1,
+                    _ => {}
+                }
+            }
+            L::Kyujo => self.kyu += 1,
+            L::Kyujokai => {
+                self.kyu += 1;
+                self.ky2 += 1;
+            }
+            L::Zoo => self.zoo += 1,
+            L::Umiamu => self.amu += 1,
+            L::Park => self.par += 1,
+            L::Rizort | L::Kajino => self.riz += 1,
+            L::Foodim if value < 480 => self.fim += 1,
+            L::RottenSea if value < 20 => self.rot += 1,
+            L::Seacity => self.sci += 1,
+            // 海底新都市は 2 回数えられる (Perl 版のまま)
+            L::Seatown => self.sci += 2,
+            L::Sbase => self.sba += 1,
+            L::Procity | L::Frocity => self.pro += 1,
+            L::Gold => self.kin += 1,
+            L::Newtown => self.nto += 1,
+            L::House => {
+                self.hou += 1;
+                if value == 10 {
+                    self.m93 += 1;
+                    self.h10 += 1;
+                }
+                if value == 11 {
+                    self.m93 += 1;
+                    self.h11 += 1;
+                }
+            }
+            L::EneCs => self.m17 += 1,
+            L::Monster => match m_kind {
+                11 => self.c11 += 1,
+                13 => self.c13 += 1,
+                21 => self.c21 += 1,
+                23 => self.c23 += 1,
+                28 => self.c28 += 1,
+                30 => {
+                    self.c28 += 1;
+                    self.tet += 1;
+                }
+                _ => {}
+            },
+            L::College => match value {
+                0 => self.co0 += 1,
+                1 => {
+                    self.co1 += 1;
+                    self.co01 += 1;
+                }
+                2 => {
+                    self.co2 += 1;
+                    self.co1 += 1;
+                    self.co0 += 1;
+                }
+                3 => self.co3 += 1,
+                4 | 96 => self.co4 += 1,
+                97 | 98 => {
+                    self.co4 += 1;
+                    self.tet += 1;
+                }
+                5 => self.co5 += 1,
+                6 => self.co6 += 1,
+                95 => {
+                    self.co6 += 1;
+                    self.co95 += 1;
+                }
+                7 => self.co7 += 1,
+                8 => {
+                    self.co1 += 1;
+                    self.co8 += 1;
+                }
+                99 => self.co99 += 1,
+                77 => self.co77 += 1,
+                78 => {
+                    self.co77 += 1;
+                    self.co78 += 1;
+                }
+                79 => {
+                    self.co77 += 1;
+                    self.co79 += 1;
+                }
+                80 => {
+                    self.co77 += 1;
+                    self.co80 += 1;
+                }
+                _ => {}
+            },
+            L::Yakusho => self.yaku += 1,
+            L::Onsen => self.hot += 1,
+            L::Taishi => self.tai += 1,
+            L::Shuto | L::Umishuto => self.shu += 1,
+            L::Fune if matches!(value, 1 | 2 | 5 | 6 | 11) => self.gyo += 1,
+            L::Train => {
+                self.tra += 1;
+                if (10..=19).contains(&value) {
+                    self.tra1 += 1;
+                }
+                if (20..=29).contains(&value) {
+                    self.tra2 += 1;
+                }
+            }
+            _ => {}
+        }
+    }
+
+    /// Perl 版の並びをそのまま写したもの ([`Counts::count`] と同じ結果になることをテストで確かめる)
+    #[cfg(test)]
+    fn count_each(&mut self, kind: u8, value: i64, m_kind: usize) {
         let is = |l: L| kind == k(l);
         let monument = |v: i64| is(L::Monument) && value == v;
         let college = |v: i64| is(L::College) && value == v;
@@ -889,6 +1033,22 @@ mod tests {
     fn monster_spec_unpacks_value() {
         // 種類 3 (怪獣レッドいのら)、体力 5
         assert_eq!(monster_spec((3 << 4) | 5), (3, "怪獣レッドいのら", 5));
+    }
+
+    #[test]
+    fn count_by_kind_matches_the_perl_order() {
+        // すべての地形の番号 (未知のものも)、値の境目、怪獣の種類の組み合わせ
+        let values: Vec<i64> = (-2..=110).chain([479, 480, 481, 4095, 9999]).collect();
+        for kind in 0..=u8::MAX {
+            for &value in &values {
+                for m_kind in 0..=32 {
+                    let (mut a, mut b) = (Counts::default(), Counts::default());
+                    a.count(kind, value, m_kind);
+                    b.count_each(kind, value, m_kind);
+                    assert_eq!(a, b, "kind {kind} value {value} monster {m_kind}");
+                }
+            }
+        }
     }
 
     #[test]

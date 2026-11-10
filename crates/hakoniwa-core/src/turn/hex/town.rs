@@ -65,10 +65,9 @@ pub(crate) const TOWN_KINDS: [L; 17] = [
 
 /// 周囲 2 ヘックスの町系の数
 pub(crate) fn town_count(island: &Island, x: usize, y: usize) -> i64 {
-    TOWN_KINDS
-        .iter()
-        .map(|&l| count_around(&island.map, x as i64, y as i64, l, 19))
-        .sum()
+    // 種類ごとに数えて足すのと同じ (種類は重ならず、海を含まない)
+    const MASK: [bool; 256] = crate::land::kind_mask(&TOWN_KINDS);
+    crate::land::count_around_mask(&island.map, x as i64, y as i64, &MASK, 19)
 }
 
 /// 町・港町・海底都市

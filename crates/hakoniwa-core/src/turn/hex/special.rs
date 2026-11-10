@@ -177,6 +177,11 @@ fn read_around(
 /// 内側のループの変数はすべて `my` なので、外側のループには影響しない
 fn mascot(ctx: &mut TurnContext, island: &mut Island, h: &HexRun, kind: usize, name: &str) {
     let skip_kind = kind;
+    // 出動の条件 (take < 1、c28 == 0) はループの中で出動したときにしか変わらない。
+    // 満たさなければループは何もしないので回らない (地図全体をなめるので、大きな地図では重い)
+    if ctx.globals.hex.special.take >= 1 || island.scratch.c28 != 0 {
+        return;
+    }
     for p in 0..ctx.points.len() {
         let (sx, sy) = ctx.points[p];
         let Some(cell) = island.map.get(sx, sy) else {
@@ -218,6 +223,8 @@ fn mascot(ctx: &mut TurnContext, island: &mut Island, h: &HexRun, kind: usize, n
                 ctx.globals.hex.special.take += 1;
                 island.scratch.co99 += 1;
                 island.monster_live += 1;
+                // take が 1 以上になったので、ここから先のループは何もしない
+                return;
             }
         }
     }
