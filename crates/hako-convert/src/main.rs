@@ -43,6 +43,11 @@ struct Args {
     /// ローカル掲示板行数 ($HlbbsMax)。--settings があればその値
     #[arg(long)]
     lbbs_max: Option<usize>,
+    /// 止めていた間のターンを飛ばす。最終更新時刻を、ターンの区切りの位置を保ったまま
+    /// いまに最も近い過去の時刻にする (付けなければ、サーバーは起動時に止めていた間の
+    /// ターンをすべて処理する)
+    #[arg(long)]
+    skip_missed_turns: bool,
     /// 旧形式の掲示板ログを変換しない ($HlbbsOldToNew = 0 のとき)
     #[arg(long)]
     keep_old_lbbs: bool,
@@ -110,7 +115,22 @@ fn main() -> Result<()> {
     for w in &import.warnings {
         eprintln!("警告: {w}");
     }
-    storage::save(&args.output, &import.state)?;
+    let mut state = import.state;
+    if args.skip_missed_turns {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs() as i64)
+            .unwrap_or(0);
+        let before = state.world.last_time;
+        state.world.last_time = skip_missed(before, now, config.unit_time);
+        if state.world.last_time != before {
+            eprintln!(
+                "止めていた間のターン ({} ターン分) を飛ばしました",
+                (state.world.last_time - before) / config.unit_time.max(1)
+            );
+        }
+    }
+    storage::save(&args.output, &state)?;
     if settings.is_some() {
         let out = args
             .config_out
@@ -126,12 +146,12 @@ fn main() -> Result<()> {
         eprintln!("サーバーの設定ファイルを書きました -> {}", out.display());
     }
 
-    let world = &import.state.world;
+    let world = &state.world;
     eprintln!(
         "変換しました: ターン {}、島 {} 個、ターンログ {} 件 (形式: {:?}) -> {}",
         world.turn,
         world.islands.len(),
-        import.state.logs.turns.len(),
+        state.logs.turns.len(),
         import.layout,
         args.output.display()
     );
@@ -158,4 +178,25 @@ fn write_server_config(out: &Path, state_path: &Path, game: &GameConfig) -> Resu
     std::fs::write(out, format!("{header}{text}"))
         .with_context(|| format!("{} に書けません", out.display()))?;
     Ok(())
+}
+
+/// 最終更新時刻 `last` を、ターンの区切りの位置を保ったまま `now` 以前で最も近い時刻にする
+fn skip_missed(last: i64, now: i64, unit: i64) -> i64 {
+    let unit = unit.max(1);
+    if now <= last {
+        return last;
+    }
+    last + (now - last) / unit * unit
+}
+
+#[cfg(test)]
+mod tests {
+    use super::skip_missed;
+
+    #[test]
+    fn skips_whole_turns_only() {
+        assert_eq!(skip_missed(1000, 1000 + 3 * 600 + 59, 600), 1000 + 3 * 600);
+        assert_eq!(skip_missed(1000, 1500, 600), 1000);
+        assert_eq!(skip_missed(1000, 900, 600), 1000);
+    }
 }
