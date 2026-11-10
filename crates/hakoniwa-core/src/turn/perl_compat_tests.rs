@@ -1492,3 +1492,23 @@ fn phase4_upkeep_2_matches_perl_with_rand_3_4() {
 fn phase4_upkeep_2_matches_perl_with_rand_31_32() {
     check_fixture_at("phase4-upkeep-2", "96875");
 }
+
+#[test]
+fn phase4_disaster1_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase4-disaster1", "03125");
+}
+
+#[test]
+fn phase4_disaster1_matches_perl_with_rand_half() {
+    check_fixture("phase4-disaster1", RAND_HALF);
+}
+
+#[test]
+fn phase4_disaster1_mon_matches_perl_with_rand_0() {
+    check_fixture("phase4-disaster1-mon", 0);
+}
+
+#[test]
+fn phase4_disaster1_mon2_matches_perl_with_rand_0() {
+    check_fixture("phase4-disaster1-mon2", 0);
+}
