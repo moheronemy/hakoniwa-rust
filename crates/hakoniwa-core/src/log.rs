@@ -19,7 +19,8 @@ pub mod tags {
 
     /// `${HtagName_}...${H_tagName}`
     pub fn wrap(tag: (&str, &str), s: &str) -> String {
-        format!("{}{}{}", tag.0, s, tag.1)
+        // ターンのログは数百万行になるので、長さを先に決めて 1 回で確保する
+        [tag.0, s, tag.1].concat()
     }
 }
 

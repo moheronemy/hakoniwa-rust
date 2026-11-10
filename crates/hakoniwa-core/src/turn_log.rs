@@ -45,14 +45,16 @@ impl TurnLog {
         let len = entries.len();
         let mut index: BTreeMap<i64, Vec<u32>> = BTreeMap::new();
         let groups: Vec<&[LogEntry]> = entries.chunks(CHUNK).collect();
+        // かたまりごとに島 ID を集めて重複を除いてから索引に入れる
+        // (行ごとに索引を引くと、数百万行では圧縮より時間がかかる)
+        let mut ids: Vec<i64> = Vec::with_capacity(CHUNK * 2);
         for (n, group) in groups.iter().enumerate() {
-            for e in group.iter() {
-                for id in [e.island1, e.island2].into_iter().flatten() {
-                    let list = index.entry(id).or_default();
-                    if list.last() != Some(&(n as u32)) {
-                        list.push(n as u32);
-                    }
-                }
+            ids.clear();
+            ids.extend(group.iter().flat_map(|e| [e.island1, e.island2]).flatten());
+            ids.sort_unstable();
+            ids.dedup();
+            for &id in &ids {
+                index.entry(id).or_default().push(n as u32);
             }
         }
         let chunks = compress_all(&groups);
@@ -118,9 +120,18 @@ impl TurnLog {
     }
 }
 
-fn compress(group: &[LogEntry]) -> Vec<u8> {
-    let raw = bincode::serialize(group).expect("ログを bincode にできない");
-    zstd::bulk::compress(&raw, LEVEL).expect("ログを圧縮できない")
+/// 1 つのかたまりを圧縮する。圧縮器 (zstd の作業領域) はスレッドの中で使い回す
+/// (かたまりごとに作ると、それだけで圧縮より時間がかかる)
+fn compress(z: &mut zstd::bulk::Compressor<'_>, raw: &mut Vec<u8>, group: &[LogEntry]) -> Vec<u8> {
+    raw.clear();
+    bincode::serialize_into(&mut *raw, group).expect("ログを bincode にできない");
+    z.compress(raw).expect("ログを圧縮できない")
+}
+
+fn compress_part(part: &[&[LogEntry]]) -> Vec<Vec<u8>> {
+    let mut z = zstd::bulk::Compressor::new(LEVEL).expect("圧縮器を作れない");
+    let mut raw = Vec::new();
+    part.iter().map(|g| compress(&mut z, &mut raw, g)).collect()
 }
 
 fn compress_all(groups: &[&[LogEntry]]) -> Vec<Vec<u8>> {
@@ -129,13 +140,13 @@ fn compress_all(groups: &[&[LogEntry]]) -> Vec<Vec<u8>> {
         .unwrap_or(1)
         .min(groups.len().div_ceil(8).max(1));
     if threads <= 1 {
-        return groups.iter().map(|g| compress(g)).collect();
+        return compress_part(groups);
     }
     let per = groups.len().div_ceil(threads);
     std::thread::scope(|s| {
         let handles: Vec<_> = groups
             .chunks(per)
-            .map(|part| s.spawn(move || part.iter().map(|g| compress(g)).collect::<Vec<_>>()))
+            .map(|part| s.spawn(move || compress_part(part)))
             .collect();
         handles
             .into_iter()

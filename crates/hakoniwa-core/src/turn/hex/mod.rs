@@ -410,7 +410,7 @@ pub(crate) mod msg {
 
     /// `${HtagName_}${name}島$point${H_tagName}`
     pub fn island_at(name: &str, point: &str) -> String {
-        wrap(tags::NAME, &format!("{name}島{point}"))
+        [tags::NAME.0, name, "島", point, tags::NAME.1].concat()
     }
 
     /// `logFukeiki`
