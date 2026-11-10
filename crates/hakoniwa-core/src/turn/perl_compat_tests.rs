@@ -1515,6 +1515,8 @@ fn phase4_disaster1_mon_matches_perl_with_rand_0() {
 #[test]
 fn phase4_disaster1_mon2_matches_perl_with_rand_0() {
     check_fixture("phase4-disaster1-mon2", 0);
+}
+
 /// ハコオクの落札 (phase4-auction-*) を rand 3/4 と 31/32 で突き合わせるテストを作る
 macro_rules! phase4_auction_tests {
     ($($name:ident => $fixture:literal,)*) => {
