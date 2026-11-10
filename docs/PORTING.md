@@ -85,8 +85,8 @@ tools/
 | `logFilePrint`, `historyPrint`, `hcPrint`, `aucPrint` | `core::model::Logs` + サーバーの画面 | データは済、画面は一部 |
 | `hakolock*`, `unlock` | サーバーの `RwLock` | 済 (不要) |
 | `random`, `int`, `htmlEscape`, `aboutMoney` | `core::perl`, `core::model::money_for_others` | 済 |
-| `cgiInput`, `cookieInput`, `cookieOutput` | axum のルーティングとフォーム | 未 |
-| `encode`, `checkPassword` | パスワード照合 | 未 (下記「パスワード」) |
+| `cgiInput`, `cookieInput`, `cookieOutput` | サーバーのフォームとセッション (`pages/`, `session.rs`)、入力の加工は `perl::cgi_text` / `cut_column` | 済 (クッキーにパスワードは入れない) |
+| `encode`, `checkPassword` | `core::actions::password` | 済 (下記「パスワード」) |
 | `turnMain` | `core::turn::run_turn` | 一部 (下記「フェーズ 1」) |
 | `estimate`, `income` | `core::turn::estimate`, `core::turn::income` | 済 (Perl 版と突き合わせ済み) |
 | `doIslandunemployed` | `core::turn::island::migrate` | 済 (Perl 版と突き合わせ済み) |
@@ -98,14 +98,15 @@ tools/
 | `makeRandomPointArray`, `randomArray`, `monsterSpec` | `core::turn` | 済 |
 | `countAround`, `countGrow`, `landName` | `core::land`, `core::turn::hex::town` | 済 |
 | `expToLevel`, `nameToNumber` | `core::turn` など | 未 |
-| `newIslandMain`, `makeNewIsland`, `makeNewLand` | `core::island::create` | 未 |
-| `changeMain`, `changeOwner` | `core::island` | 未 |
+| `newIslandMain`, `makeNewIsland`, `makeNewLand` | `core::actions::create` | 済 (Perl 版と突き合わせ済み) |
+| `changeMain`, `changeOwner` | `core::actions::change` | 済 (Perl 版と突き合わせ済み) |
+| `commandMain`, `commentMain`, `shoueneMain` ほか政策, `localBbsMain` | `core::actions::{command, owner, policy, lbbs}` | 済 (Perl 版と突き合わせ済み) |
 | `logOut`, `logLate`, `logSecret`, `logHistory`, `logFlush` | `core::log::TurnLog` | 済 |
 | `log*` (281 個の文面) | `core::log::msg` と各ファイルの文面 (Perl 版と同じ HTML) | 使う分から順に (doEachHex で使う分まで済) |
 | `islandSort`, 部門賞の `islandSort*` | `core::turn::ranking` | 済 |
-| `tempTopPage`, ランキング表示の `islandSort*` | サーバーのトップページ・ランキング | 一部 (順位表のみ) |
-| `islandInfo`, `islandMap`, `landString`, `landName`, `tempOwner`, `tempCommand`, `commandMain` | サーバーの開発画面・観光画面 | 未 |
-| `localBbsMain` ほか掲示板 | サーバーの掲示板 | 未 |
+| `tempTopPage`, ランキング表示の `islandSort*` | `core::view::top` + サーバーのトップページ | 済 (Perl 版と突き合わせ済み) |
+| `islandInfo`, `islandMap`, `landString`, `tempOwner`, `tempCommand`, `tempRecent` | `core::view::{info, map, owner}` + サーバーの開発画面・観光画面 | 済 (Perl 版と突き合わせ済み) |
+| `tempLbbsContents` ほか掲示板の表示 | `core::actions::lbbs::lbbs_posts` + サーバー | 済 |
 | `auctionMain`, `totoMain`, `changeAnkeito`, `msMain` ほか | サーバーの各機能 | 未 |
 | `hako-mente.cgi` | 管理画面または CLI | 未 (新規ゲームはサーバー起動時に自動作成) |
 
@@ -139,10 +140,10 @@ Perl 版の書き方の癖で、そのまま読むと挙動を見誤りやすい
 
 ## パスワード
 
-Perl 版はパスワードを `crypt($pw, 'h2')` (伝統的な DES crypt) で保存している。
-移行したプレイヤーがそのままログインできるよう、照合だけは DES crypt に対応させる
-(`pwhash` クレートの `unix_crypt` など)。新しく設定するパスワードは argon2 などで保存し、
-DES の値はログイン成功時に置き換える。
+Perl 版はパスワードを `crypt($pw, 'h2')` (伝統的な DES crypt。先頭 8 文字だけが効く) で保存している。
+移行したプレイヤーがそのままログインできるよう、照合は DES crypt にも対応する (`pwhash`)。
+新しく設定するパスワードは SHA-512 crypt で保存し、DES の値はログインに成功したときに置き換える。
+マスターパスワード (`passwords.master`) と管理用パスワードは、設定したときだけ使える。
 
 ## 検証の方法
 
@@ -205,7 +206,7 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
 - [x] **2. 地形ごとの処理** — `doEachHex` を地形の種類ごとに分けて移植 (詳細は下記)
 - [x] **3. 計画の実行** — `doCommand` を計画の種類ごとに分けて移植 (詳細は下記)
 - [x] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)、`doIslandunemployed` (詳細は下記)
-- [ ] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング
+- [x] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング (詳細は下記)
 - [ ] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能
 - [ ] **7. 移行** — パスワードの互換、本番データの変換手順、Perl 版との比較テスト
 
@@ -413,3 +414,50 @@ Perl コードとの突き合わせで一致し、全地形・全計画を入れ
 - `ctx.globals.process.auction` と `World::auction_lots`: turnMain のハコオクの出品の入れ替え (フェーズ 6)
 - `logs.hcup` (`logHcup`) と `logs.auction` (`logAuc`): Hakoniwa Cup とハコオクの記録の画面 (フェーズ 5・6)
 - `IslandScratch::typhoon`, `roudenflag`: estimate と doEachHex も読む (済)
+
+## フェーズ 5 (画面) の内容
+
+画面は作り直し、データの変え方と「何を見せるか」は Perl 版のとおりにした。
+
+- **ルール (`core::actions`)**: 島の登録・名前とパスワードとオーナー名の変更・計画の入力 (自動入力・
+  いじりを含む)・コメント・政策・ローカル掲示板。どれも「入力を受け取って `GameState` を書き換える」関数。
+- **表示 (`core::view`)**: トップページ (`top`)、島の情報 (`info`)、地図 (`map`)、開発画面の計画の入力欄と
+  計画の一覧 (`owner`)、島の近況 (`recent_logs`)。観光者に隠すもの (資金・森の木の数・基地や地雷の偽装・
+  計画の印・政策) も Perl 版のとおり。
+- **サーバー (`hakoniwa-server`)**: axum の画面とフォーム。ログインのときに 1 回だけパスワードを確かめ、
+  ランダムなトークンを HttpOnly のクッキーに入れる (Perl 版はパスワードをクッキーに入れていた)。
+  POST には CSRF 対策のトークンを付ける。データの書き換えは複製に対して行い、保存できたときだけ反映する。
+- **地図の画像**: Perl 版の画像は再配布できないので同梱しない。持っている運営者が `image_dir` に置けば使い、
+  無ければ地形の種類 (観光者には偽装後の種類) から色と文字のタイルを描く。
+
+### 突き合わせの方法
+
+`tools/perl-harness/run_cgi.py` が元の `hako-main.cgi` を本物の CGI として動かし (`rand()` と `time()` を固定)、
+操作の前後の Perl 形式のデータと応答の HTML を `tests/fixtures/cgi/<名前>/` に残す。
+操作は `actions::perl_compat_tests::check_case` が前のデータに移植版の操作を加え、後のデータと
+比べる (`GameState` 全体)。表示は Perl 版の HTML から値を取り出して、`view` の結果と比べる。
+
+| データ | 確かめていること |
+|---|---|
+| `cgi/comment-1` | コメント |
+| `cgi/new-island-*`, `cgi/change-*` | 島の登録 (地形の生成・上限・名前の規則・同じ接続元)、名前・パスワード・オーナー名の変更、管理用パスワード |
+| `cgi/command-*`, `cgi/policy`, `cgi/lbbs` | 計画の入力・自動入力・いじり・IP の記録、政策、掲示板 (公開・極秘・匿名・削除) |
+| `cgi/view-*` | 観光画面と開発画面の島の情報と地図 (全地形・偽装・マスターパスワード) |
+| `cgi/view-top-*` | トップページ (並べ替え・部門賞・資金の隠し方・ページ送り・アンケート・ハコオク) |
+| `cgi/owner-*` | 開発画面の計画の選択肢 (コストの修正)・計画の一覧の文面 |
+
+### 移植版で変えたもの
+
+- 入力の値の中の `&` から後ろが消える (`cgiInput` の読み取りの不具合) のは再現しない
+- 島が無い ID の操作は、Perl 版は 1 位の島に対して行ってしまうが、移植版はエラーにする (開発画面・計画・政策)。
+  名前の変更とオーナー名の変更は Perl 版のまま (ログイン中の島しか送られないので起きない)
+- 計画の番号が範囲外の入力は受け付けない。計画の値は整数で保存する
+- パスワードは上記「パスワード」のとおり。いじり (計画 60) はマスターパスワードでログインしたときだけ受け付ける
+- アクセスログ (`axeslog`)、ロック、クッキーへのパスワードの保存は移植しない
+
+### 後のフェーズに残したもの
+
+ハコオクの入札・出品の画面、toto・首都名、アンケートの投票、怪獣派遣の許可 (`msMain`)、
+IP 情報の裏ランキング (`hako-top2.cgi`)、管理画面 (`hako-mente.cgi`) はフェーズ 6。
+`view::owner::OwnerScreen` の `auction`・`comment` (toto・首都名・ミサイルの申請) と
+`view::top::TopPage` の `survey`・`auction` はすでにあるので、画面を作るときに使う。
