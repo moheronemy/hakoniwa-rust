@@ -352,7 +352,7 @@ f.save()
 # ---------------------------------------------------------------- phase3-build-5
 # 境界の値 (倉庫の上限、数量 9/10、政策の値 48)、海底基地のある島からの記念碑の発射
 rich5a = dict(RICH)
-rich5a[(3, 6)] = ("Kura", 195)
+rich5a[(3, 6)] = ("Kura", 198)
 rich5a[(4, 6)] = ("Kuraf", 2400)
 rich5a[(0, 5)] = ("Sbase", 0)
 rich5b = dict(RICH)
@@ -360,12 +360,13 @@ rich5b[(8, 9)] = ("College", 77)
 rich5b[(9, 9)] = ("Umishuto", 0)
 f = setup("phase3-build-5", rich5b, rich5a)
 f.ips(1, etc5=etc5(1, 50))             # s10b = 11 (数量 9 まで選べる)
+f.ips(2, etc5=etc5(1))                 # costseisaku = 48
 f.commands(1, [
     c("College", 7, 4, 9),             # 新設 -> 文部科学省で 8 に
     c("College", 1, 4, 0),             # 6 -> 95 (数量 0 なので選び直さない)
     c("Farmcpc", 9, 3, 0),             # 数量 0 -> 鶏
     c("Kuraf", 4, 7, 10),              # 10 -> 9
-    c("Kura", 3, 6, 7),                # 95 + 7 -> 99
+    c("Kura", 3, 6, 3),                # 98 + 3 -> 99
     c("Kura2", 4, 6, 0),               # 2400: 倉庫として 0 -> 食料倉庫として 1 (0)
     c("Kura2", 6, 7, 10),              # 10 -> 9 (0)
     c("Monument", 8, 8, 1, target=2),  # 発射 (海底基地も壊れる)

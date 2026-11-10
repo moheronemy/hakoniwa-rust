@@ -6,7 +6,8 @@
 //!
 //! # Perl 版の癖で、移植でも再現していること
 //!
-//! - 怪獣購入は doCommand の局所変数 `$kind` (計画番号) に怪獣の種類を代入する。
+//! - 怪獣購入は doCommand の局所変数 `$kind` (計画番号。`my` なのでグローバルの `$kind` ではない)
+//!   に怪獣の種類を代入する。
 //!   最後の「回数付きなら計画を戻す」はその値で判定するので、種類 12 (= 農場整備の番号)
 //!   の怪獣を数量 2 以上で買うと、農場整備の計画が先頭に入る。
 //! - 動物園 (動物園の上): 怪獣を逃がすと費用は引かれず、計画も 0 を返す (ターンを使わない)。
@@ -21,6 +22,8 @@
 //!   資金を 0 にしてから費用を引く (資金が負になる)。
 //! - 記念碑の季節限定の番号は実行した時刻の月日で決まる。12 月 < 月 < 3 月 は
 //!   成り立たないので 92 番は建てられない。
+//! - 予定地の座標が島の大きさ以上だと海 (値 0) として読まれるので、海あみゅは建設でき、
+//!   ログも費用も回数付きの戻しも普通に起きるが、地形の書き込みは保存されない。
 //! - 大学 (6 → 95) は資金不足のログを出して 0 を返すことがある。大学の建設後、
 //!   文部科学省があれば数量で種類を選び直せる (`$arg == 0` の判定は届かない)。
 
@@ -337,12 +340,8 @@ pub(super) fn build(
         C::EneCs => {
             let island = &mut islands[idx];
             if island.eis[6] == 0 {
-                ctx.log.out(
-                    turn,
-                    nes_eisei(&island.name, c.com_name),
-                    Some(id),
-                    None,
-                );
+                ctx.log
+                    .out(turn, nes_eisei(&island.name, c.com_name), Some(id), None);
                 return false;
             }
             grow(ctx, island, c, x, y, L::EneCs, 200, 4000, 400)
@@ -351,7 +350,11 @@ pub(super) fn build(
         C::EneNF => {
             let island = &mut islands[idx];
             let mut m = c.scope.clone();
-            let v = ctx.globals.hex.etc9.assign(m.fields::<7>(&island.etc_raw[4]));
+            let v = ctx
+                .globals
+                .hex
+                .etc9
+                .assign(m.fields::<7>(&island.etc_raw[4]));
             // ($co7, $magicf, $magici, $magica, $magicw, $magicl, $magicd)
             let (magica, magicl) = (v[3], v[5]);
             if magica != magicl
@@ -359,12 +362,8 @@ pub(super) fn build(
                 || island.scratch.con99 > 0
                 || island.scratch.co77 == 0
             {
-                ctx.log.out(
-                    turn,
-                    eisei_fail(&island.name, c.com_name),
-                    Some(id),
-                    None,
-                );
+                ctx.log
+                    .out(turn, eisei_fail(&island.name, c.com_name), Some(id), None);
                 // 広域被害ルーチン
                 wide_damage(ctx, island, c.x, c.y);
                 return false;
@@ -451,7 +450,7 @@ fn slide_back(commands: &mut Vec<PlannedCommand>) {
         return;
     }
     commands.pop();
-    let first = commands[0].clone();
+    let first = commands[0];
     commands.insert(0, first);
 }
 
@@ -919,13 +918,7 @@ fn college(ctx: &mut TurnContext, island: &mut Island, c: &CmdRun, x: usize, y: 
 }
 
 /// 牧場 (牧場の上なら家畜を売る)
-fn farmcpc(
-    ctx: &mut TurnContext,
-    island: &mut Island,
-    c: &mut CmdRun,
-    x: usize,
-    y: usize,
-) -> Step {
+fn farmcpc(ctx: &mut TurnContext, island: &mut Island, c: &mut CmdRun, x: usize, y: usize) -> Step {
     if c.arg >= 4 || c.arg == 0 {
         c.arg = 1;
     }
