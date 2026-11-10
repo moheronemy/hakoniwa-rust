@@ -338,3 +338,53 @@ fn phase2_town_matches_perl_with_rand_0() {
 fn phase2_town_matches_perl_with_rand_half() {
     check_fixture("phase2-town", RAND_HALF);
 }
+
+#[test]
+fn phase2_industry_matches_perl_with_rand_0() {
+    check_fixture("phase2-industry", 0);
+}
+
+#[test]
+fn phase2_industry_matches_perl_with_rand_half() {
+    check_fixture("phase2-industry", RAND_HALF);
+}
+
+#[test]
+fn phase2_industry_t10_matches_perl_with_rand_0() {
+    check_fixture("phase2-industry-t10", 0);
+}
+
+#[test]
+fn phase2_industry_t10_matches_perl_with_rand_half() {
+    check_fixture("phase2-industry-t10", RAND_HALF);
+}
+
+#[test]
+fn phase2_city_matches_perl_with_rand_0() {
+    check_fixture("phase2-city", 0);
+}
+
+#[test]
+fn phase2_city_matches_perl_with_rand_half() {
+    check_fixture("phase2-city", RAND_HALF);
+}
+
+#[test]
+fn phase2_city2_matches_perl_with_rand_0() {
+    check_fixture("phase2-city2", 0);
+}
+
+#[test]
+fn phase2_city2_matches_perl_with_rand_half() {
+    check_fixture("phase2-city2", RAND_HALF);
+}
+
+#[test]
+fn phase2_city3_matches_perl_with_rand_0() {
+    check_fixture("phase2-city3", 0);
+}
+
+#[test]
+fn phase2_city3_matches_perl_with_rand_half() {
+    check_fixture("phase2-city3", RAND_HALF);
+}
