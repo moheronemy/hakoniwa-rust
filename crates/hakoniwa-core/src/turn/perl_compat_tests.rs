@@ -168,6 +168,8 @@ fn field(island: &Island, name: &str) -> String {
         "prepare2" => n(sc.command.land.prepare2),
         "bigmissile" => n(sc.command.build.bigmissile),
         "par" => n(sc.par),
+        "Typhoonflag" => n(i64::from(sc.typhoon)),
+        "roudenflag" => n(sc.roudenflag),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -1460,4 +1462,66 @@ fn phase4_ending_matches_perl_with_rand_3_4() {
 #[test]
 fn phase4_ending_matches_perl_with_rand_31_32() {
     check_fixture_at("phase4-ending", "96875");
+}
+
+// 地盤沈下・台風・巨大隕石・巨大ミサイル・隕石・噴火 (tools/fixtures/phase4_disaster2.py)
+
+#[test]
+fn phase4_disaster2_a_matches_perl_with_rand_00390625() {
+    check_fixture_at("phase4-disaster2-a", "00390625");
+}
+
+#[test]
+fn phase4_disaster2_a_matches_perl_with_rand_0078125() {
+    check_fixture_at("phase4-disaster2-a", "0078125");
+}
+
+#[test]
+fn phase4_disaster2_b_matches_perl_with_rand_00390625() {
+    check_fixture_at("phase4-disaster2-b", "00390625");
+}
+
+#[test]
+fn phase4_disaster2_c_matches_perl_with_rand_25() {
+    check_fixture_at("phase4-disaster2-c", "25");
+}
+
+#[test]
+fn phase4_disaster2_c_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-disaster2-c", "50");
+}
+
+#[test]
+fn phase4_disaster2_d_matches_perl_with_rand_8125() {
+    check_fixture_at("phase4-disaster2-d", "8125");
+}
+
+#[test]
+fn phase4_disaster2_d_matches_perl_with_rand_875() {
+    check_fixture_at("phase4-disaster2-d", "875");
+}
+
+#[test]
+fn phase4_disaster2_d_matches_perl_with_rand_96875() {
+    check_fixture_at("phase4-disaster2-d", "96875");
+}
+
+#[test]
+fn phase4_disaster2_e_matches_perl_with_rand_75() {
+    check_fixture_at("phase4-disaster2-e", "75");
+}
+
+#[test]
+fn phase4_disaster2_e_matches_perl_with_rand_8125() {
+    check_fixture_at("phase4-disaster2-e", "8125");
+}
+
+#[test]
+fn phase4_disaster2_e_matches_perl_with_rand_875() {
+    check_fixture_at("phase4-disaster2-e", "875");
+}
+
+#[test]
+fn phase4_disaster2_e_matches_perl_with_rand_96875() {
+    check_fixture_at("phase4-disaster2-e", "96875");
 }
