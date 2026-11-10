@@ -91,7 +91,7 @@ tools/
 | `estimate`, `income` | `core::turn::estimate`, `core::turn::income` | 済 (Perl 版と突き合わせ済み) |
 | `doIslandunemployed` | `core::turn` | 未 |
 | `doEachHex` | `core::turn::hex` (地形の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
-| `doCommand` | `core::turn::command` (計画ごとに分割) | 共通部分・資金繰り・放棄のみ |
+| `doCommand` | `core::turn::command` (計画の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
 | `doIslandProcess`, `wideDamageli` | `core::turn::island`, `core::disaster` | 未 |
 | `wideDamage` | `core::turn::hex::monster::wide_damage` | 済 |
 | `makeRandomPointArray`, `randomArray`, `monsterSpec` | `core::turn` | 済 |
@@ -164,6 +164,8 @@ DES の値はログイン成功時に置き換える。
 | `phase2-town` | estimate, eachhex, estimate | 町・平地・火災・漏電・不景気・人口の増減 |
 | `phase2-industry*`, `phase2-city*`, `phase2-train`, `phase2-leisure`, `phase2-stadium*`, `phase2-special*`, `phase2-sea`, `phase2-monster*` | estimate, eachhex, estimate | doEachHex の系統ごと |
 | `phase2-badfields` | estimate, income, commands, eachhex, estimate | 複合値が正規表現に一致しないとき |
+| `phase3-land`, `phase3-build-*`, `phase3-city*`, `phase3-ops-*`, `phase3-attack*`, `phase3-magic*` | estimate, income, commands × n, estimate | doCommand の系統ごと |
+| `phase3-mix-1`〜`8` | estimate, income, commands, eachhex, ... (2〜3 ターン分) | 全地形の島に全種類の計画をランダムに入れたもの。rand は 0, 1/32, 1/2, 31/32 |
 | `phase2-mix-1`〜`6` | estimate, income, commands, eachhex, estimate, eachhex, estimate | 全地形を混ぜた島 (系統をまたぐ相互作用)。5, 6 は複合値も壊してある。rand は 0, 1/32, 1/2, 31/32 |
 
 比べているのは、島の保存される値と一時値、全マスの地形の種類と値、計画、ログ、記録ログ。
@@ -196,7 +198,7 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
 - [x] **1. ターン処理の骨格** — `turnMain` の流れ、`estimate`、`income`、食料消費、連続資金繰りと自動放棄、
       ログの保存とローテーション、バックアップ、サーバーでの定時実行 (詳細は下記)
 - [x] **2. 地形ごとの処理** — `doEachHex` を地形の種類ごとに分けて移植 (詳細は下記)
-- [ ] **3. 計画の実行** — `doCommand` を計画の種類ごとに分けて移植
+- [x] **3. 計画の実行** — `doCommand` を計画の種類ごとに分けて移植 (詳細は下記)
 - [ ] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)
 - [ ] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング
 - [ ] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能
@@ -304,3 +306,54 @@ doEachHex が書き、ほかの処理が読むグローバル変数・一時値:
 - `ctx.globals.hex.aucflag`: ハコオクの出品 (フェーズ 6)
 - `ctx.globals.hex.special.costseisaku`: doCommand も同じ変数を使う (フェーズ 3)
 - `monster::wide_damage` (`wideDamage`): 計画 (ミサイルなど) からも使う (フェーズ 3)
+
+## フェーズ 3 (計画の実行 doCommand) の内容
+
+`doCommand` (Perl 版 5,200 行) をすべて移植した。計画の系統ごとに `turn/command/` のファイルに分け、
+どれも元の Perl コードとの突き合わせで一致している。全地形の島に全種類の計画をランダムに入れた
+`phase3-mix-*` でも、計画の実行と地形ごとの処理を 2〜3 ターン分続けて一致する。
+
+| ファイル | 内容 |
+|---|---|
+| `mod.rs` | 計画の取り出し、費用の計算と確認、資金繰り、放棄、振り分け、`slideBack` と数量分のくり返し、共通の文面 |
+| `land.rs` | 整地・地ならし・埋め立て・港町開発・造船・関所・掘削・温泉掘削・伐採・採掘場整備 |
+| `build.rs` | 建設系 (植林・農場・発電所・コンデンサ・食物研究所・牧場・大学・工場・基地・記念碑・ハリボテ・怪獣購入・遊園地・動物園・地雷・養殖場・野球場・海あみゅ・ニュータウン・リゾート地・開発予定・役所・倉庫・電車・防衛施設) |
+| `city.rs` | ハイテク技術誘致・自宅建設・輝ける都市・改装・海底基地・海底都市・防災都市化・現代都市・海底新都市・僕の引越し |
+| `ops.rs` | 人工衛星 (打ち上げ・修復・破壊砲・レーザー)・ハコオク出品・エサ・食料輸出・資金/食料援助・電力援助・誘致活動 |
+| `attack.rs` | ミサイル 7 種・動物派遣・大使派遣 |
+| `magic.rs` | 魔術師派遣 |
+
+### Perl 版の挙動をそのまま再現しているもの (主なもの)
+
+- doCommand の中の `next` は、turnMain の `while (doCommand(...) == 0)` に効いて「0 を返した」扱いになる
+  (自分の島の怪獣を魔術で攻撃すると、同じターンに次の計画も実行される)
+- 地ならし・伐採・食料輸出・援助などは 0 を返し、同じターンに次の計画も実行される
+- 怪獣の購入は doCommand の局所変数 `$kind` を書き換える (数量 2 以上だと農場整備の計画が入ることがある)
+- ミサイルの防衛施設の判定結果 (`@HdefenceHex`) は発射した島と座標で記録され、別の島でも使い回される
+- 不発のあとの発射は数量・資金を確かめ直さないので、どちらも負になりうる
+- 援助先の島が存在しないと先頭の島に送られる (ログには予定していた島の番号が出る)
+- 衛星レーザーの跡にできる記念碑は、撃った側の島の同じ座標に置かれる
+- 改装でチームの能力値を上げるとき、Perl の文字列の `++` で `"06"` は `"07"` になる
+
+一覧は各ファイルの先頭とコメントにある。
+
+### 再現していないもの・突き合わせで通っていない道筋
+
+- 食料輸出の代金は Perl 版ではターンの間だけ資金が小数になることがあるが、移植版はすぐ切り捨てる
+- 記念碑の季節ものは実行時の日付で決まる (移植版は UTC、Perl 版はサーバーの時刻) ので突き合わせていない
+- 乱数を一つの値に固定するため、「1 回目と 2 回目で結果が違う」組み合わせ (大学のランダム建設の
+  一部、エサのマスコット強化の一部、古代遺跡の発見など) は通せない
+- 動物園建設は Perl 版が rand 0.5 などで無限ループになるので、rand 0 と 1/32 だけで突き合わせている
+
+### 後のフェーズに渡す値
+
+doCommand が書き、島全体の処理 (フェーズ 4)・turnMain の付加機能 (フェーズ 6) が読むもの:
+
+- `scratch.command.land.prepare2` (地ならしの回数): 地震の確率
+- `scratch.command.attack.{monstersend, monstersendkind}`: doIslandProcess が派遣された怪獣を出す
+- `scratch.command.build.bigmissile`: doIslandProcess
+- `scratch.command.city.{stocklandkind, stocklandvalue}`: doIslandProcess のハコオクの落札処理も書く
+- `ctx.globals.command.ops.auction` (`$auction1`..`3`): ターンの開始時に `World::auction_lots` から読み、
+  終わりに書き戻す。turnMain のハコオクの処理が読む
+- `ctx.globals.etc7` (`$msjotai`, `$nokotan`, `$msid`): doIslandProcess も代入する
+- `scratch.propaganda` (誘致活動): doEachHex が読む (済)

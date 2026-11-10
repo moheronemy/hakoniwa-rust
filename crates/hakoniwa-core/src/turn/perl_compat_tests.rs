@@ -1262,3 +1262,163 @@ fn phase3_attack_defhex_matches_perl_with_rand_03125() {
 fn phase3_attack_defhex_matches_perl_with_rand_96875() {
     check_fixture_at("phase3-attack-defhex", "96875");
 }
+
+#[test]
+fn phase3_mix_1_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-1", "0");
+}
+
+#[test]
+fn phase3_mix_1_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-1", "03125");
+}
+
+#[test]
+fn phase3_mix_1_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-1", "50");
+}
+
+#[test]
+fn phase3_mix_1_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-1", "96875");
+}
+
+#[test]
+fn phase3_mix_2_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-2", "0");
+}
+
+#[test]
+fn phase3_mix_2_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-2", "03125");
+}
+
+#[test]
+fn phase3_mix_2_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-2", "50");
+}
+
+#[test]
+fn phase3_mix_2_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-2", "96875");
+}
+
+#[test]
+fn phase3_mix_3_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-3", "0");
+}
+
+#[test]
+fn phase3_mix_3_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-3", "03125");
+}
+
+#[test]
+fn phase3_mix_3_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-3", "50");
+}
+
+#[test]
+fn phase3_mix_3_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-3", "96875");
+}
+
+#[test]
+fn phase3_mix_4_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-4", "0");
+}
+
+#[test]
+fn phase3_mix_4_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-4", "03125");
+}
+
+#[test]
+fn phase3_mix_4_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-4", "50");
+}
+
+#[test]
+fn phase3_mix_4_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-4", "96875");
+}
+
+#[test]
+fn phase3_mix_5_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-5", "0");
+}
+
+#[test]
+fn phase3_mix_5_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-5", "03125");
+}
+
+#[test]
+fn phase3_mix_5_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-5", "50");
+}
+
+#[test]
+fn phase3_mix_5_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-5", "96875");
+}
+
+#[test]
+fn phase3_mix_6_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-6", "0");
+}
+
+#[test]
+fn phase3_mix_6_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-6", "03125");
+}
+
+#[test]
+fn phase3_mix_6_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-6", "50");
+}
+
+#[test]
+fn phase3_mix_6_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-6", "96875");
+}
+
+#[test]
+fn phase3_mix_7_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-7", "0");
+}
+
+#[test]
+fn phase3_mix_7_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-7", "03125");
+}
+
+#[test]
+fn phase3_mix_7_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-7", "50");
+}
+
+#[test]
+fn phase3_mix_7_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-7", "96875");
+}
+
+#[test]
+fn phase3_mix_8_matches_perl_with_rand_0() {
+    check_fixture_at("phase3-mix-8", "0");
+}
+
+#[test]
+fn phase3_mix_8_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-mix-8", "03125");
+}
+
+#[test]
+fn phase3_mix_8_matches_perl_with_rand_50() {
+    check_fixture_at("phase3-mix-8", "50");
+}
+
+#[test]
+fn phase3_mix_8_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-mix-8", "96875");
+}
