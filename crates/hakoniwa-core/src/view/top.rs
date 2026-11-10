@@ -98,8 +98,11 @@ pub struct TopPage {
     /// ハコオクのログ (`hakojima.auc`、新しい順)。Perl 版は本文だけを出す
     pub auction_log: Vec<String>,
     /// 最近の出来事 (`logPrintTop`: 最新 `config.top_log_turns` ターン分のログのうち、
-    /// 機密でないもの)。Perl 版は「ターンN：本文」と出す
+    /// 機密でないもの)。Perl 版は「ターンN：本文」と出す。
+    /// [`top_page_with_log_limit`] で作ったときは、その行数まで
     pub logs: Vec<TurnMessage>,
+    /// `logs` を行数の上限で打ち切ったか (続きは最近の出来事のページで見る)
+    pub logs_truncated: bool,
     /// 発見の記録 (`hakojima.his`、新しい順)。Perl 版は「ターンN：本文」と出す
     pub history: Vec<TurnMessage>,
 }
@@ -534,6 +537,19 @@ struct LotHead {
 /// 書くが、移植していない。ターン処理が必要な時刻なら、呼ぶ前にターン処理を済ませること
 /// (Perl 版は `readIslandsFile` がターン処理をしてからトップページを出す)
 pub fn top_page(game: &GameState, config: &GameConfig, now: i64, view: ViewRange) -> TopPage {
+    top_page_with_log_limit(game, config, now, view, usize::MAX)
+}
+
+/// [`top_page`] で、最近の出来事を `log_limit` 行までにしたもの。
+/// 大きな地図・多くの島では 1 ターンのログが数百万行になるので、サーバーはこちらを使う
+/// (かたまりは要るぶんだけ展開する)
+pub fn top_page_with_log_limit(
+    game: &GameState,
+    config: &GameConfig,
+    now: i64,
+    view: ViewRange,
+    log_limit: usize,
+) -> TopPage {
     let world = &game.world;
     let islands = &world.islands;
     let n = islands.len();
@@ -818,6 +834,27 @@ pub fn top_page(game: &GameState, config: &GameConfig, now: i64, view: ViewRange
     let turn = world.turn;
     // $hcturn と $acturn は表示のループの中で決まる
     let shown = !list.rows.is_empty();
+    // 最近の出来事: 最新 top_log_turns ターン分の機密でない行を、log_limit 行まで
+    let logs = {
+        let mut lines = Vec::new();
+        let mut truncated = false;
+        'turns: for log in game.logs.turns.iter().take(config.top_log_turns) {
+            for (_, e) in log.iter_from(0) {
+                if e.secret {
+                    continue;
+                }
+                if lines.len() == log_limit {
+                    truncated = true;
+                    break 'turns;
+                }
+                lines.push(TurnMessage {
+                    turn: e.turn,
+                    message: e.message,
+                });
+            }
+        }
+        (lines, truncated)
+    };
     TopPage {
         turn,
         remaining_secs: config.unit_time + world.last_time - now,
@@ -848,18 +885,8 @@ pub fn top_page(game: &GameState, config: &GameConfig, now: i64, view: ViewRange
             .rev()
             .map(|m| m.message.clone())
             .collect(),
-        logs: game
-            .logs
-            .turns
-            .iter()
-            .take(config.top_log_turns)
-            .flat_map(|t| t.entries())
-            .filter(|e| !e.secret)
-            .map(|e| TurnMessage {
-                turn: e.turn,
-                message: e.message.clone(),
-            })
-            .collect(),
+        logs: logs.0,
+        logs_truncated: logs.1,
         history: game.logs.history.iter().rev().cloned().collect(),
     }
 }

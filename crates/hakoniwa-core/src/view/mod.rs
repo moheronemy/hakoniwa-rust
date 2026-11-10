@@ -11,6 +11,7 @@
 
 pub mod info;
 pub mod ipinfo;
+pub mod logs;
 pub mod map;
 pub mod owner;
 pub mod top;

@@ -509,6 +509,83 @@ mod tests {
         );
     }
 
+    /// 最近の出来事はターンごとに決まった行数ずつページを送り、トップページは行数を打ち切って続きへ案内する
+    #[tokio::test]
+    async fn history_pages_through_the_logs() {
+        let (mut state, _dir) = legacy_app();
+        {
+            let app = std::sync::Arc::get_mut(&mut state).unwrap();
+            app.options.history_page_lines = 2;
+            app.options.top_log_lines = 1;
+        }
+        // 最新のターンのログを、行の多いもの (3 行に 1 行は機密) にする
+        {
+            let mut w = state.game.write().await;
+            let mut next = (*w.current()).clone();
+            let entries = (0..7)
+                .map(|i| hakoniwa_core::model::LogEntry {
+                    secret: i % 3 == 2,
+                    turn: next.world.turn,
+                    island1: Some(1),
+                    island2: None,
+                    message: format!("<B>出来事{i}</B>"),
+                })
+                .collect();
+            next.logs.turns[0] =
+                std::sync::Arc::new(hakoniwa_core::turn_log::TurnLog::new(entries));
+            w.publish(std::sync::Arc::new(next));
+        }
+        let game = state.game.snapshot();
+        let want: Vec<String> = game.logs.turns[0]
+            .entries()
+            .into_iter()
+            .filter(|e| !e.secret)
+            .map(|e| crate::render::plain(&e.message))
+            .collect();
+        assert!(want.len() > 2, "{want:?}");
+
+        // ページを送って、最新のターンの機密でない行をすべて読む
+        let mut got = Vec::new();
+        let mut uri = "/history".to_string();
+        loop {
+            let page = body(send(&state, get(&uri, None)).await).await;
+            for line in page.split("<p>ターン").skip(1) {
+                let text = line
+                    .split_once('：')
+                    .unwrap()
+                    .1
+                    .split("</p>")
+                    .next()
+                    .unwrap();
+                got.push(text.to_string());
+            }
+            match page.split("href=\"/history?turn=0&amp;from=").nth(1) {
+                Some(rest) => {
+                    let from = rest.split('"').next().unwrap();
+                    uri = format!("/history?turn=0&from={from}");
+                }
+                None => {
+                    assert!(
+                        page.contains("href=\"/history?turn=1\">前のターン"),
+                        "{page}"
+                    );
+                    break;
+                }
+            }
+        }
+        let want: Vec<String> = want.iter().map(|w| crate::layout::esc(w)).collect();
+        assert_eq!(got, want);
+
+        // 古いターンも開ける。範囲外は空
+        let page = body(send(&state, get("/history?turn=1", None)).await).await;
+        assert!(page.contains("<strong>ターン"), "{page}");
+        let page = body(send(&state, get("/history?turn=99", None)).await).await;
+        assert!(page.contains("このターンのログはありません"), "{page}");
+
+        let top = body(send(&state, get("/", None)).await).await;
+        assert!(top.contains("続きと、それより前の出来事"), "{top}");
+    }
+
     #[tokio::test]
     async fn admin_flow() {
         let (mut state, _dir) = legacy_app();

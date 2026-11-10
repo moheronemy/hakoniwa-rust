@@ -63,7 +63,7 @@ struct ServerConfig {
 }
 
 /// 画面まわりの設定 (ゲームのルールに関係しないもの)
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 #[serde(default)]
 pub struct ServerOptions {
     /// ログインのクッキーに Secure を付ける (HTTPS で公開するとき)
@@ -73,6 +73,23 @@ pub struct ServerOptions {
     /// Perl 版の地形の画像を置いたディレクトリ。無ければ地図は色と文字のタイルで描く
     /// (画像は移植元の著作物で再配布できないので同梱していない)
     pub image_dir: Option<PathBuf>,
+    /// トップページの「最近の出来事」に出す行数の上限 (続きは /history で見る)。
+    /// 多くの島・大きな地図では 1 ターンのログが数百万行になるので打ち切る
+    pub top_log_lines: usize,
+    /// 最近の出来事 (/history) の 1 ページの行数
+    pub history_page_lines: usize,
+}
+
+impl Default for ServerOptions {
+    fn default() -> Self {
+        Self {
+            secure_cookie: false,
+            trust_forwarded: false,
+            image_dir: None,
+            top_log_lines: 500,
+            history_page_lines: 500,
+        }
+    }
 }
 
 impl Default for ServerConfig {
@@ -155,6 +172,7 @@ async fn top_page(
             now_unix(),
             uri.query().unwrap_or_default(),
             login.as_ref().map(|l| l.session.csrf.as_str()),
+            app.options.top_log_lines,
         )
     };
     pages::render(&app, login.as_ref(), "", &body)

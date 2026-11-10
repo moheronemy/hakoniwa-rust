@@ -87,6 +87,24 @@ impl TurnLog {
             .collect()
     }
 
+    /// `start` 行目 (0 から) から後ろの行を、位置と一緒に順に返す。
+    /// かたまりは読み進めたぶんだけ展開する (ページ送りで先頭の数百行だけ要るときなど)
+    pub fn iter_from(&self, start: usize) -> impl Iterator<Item = (usize, LogEntry)> + '_ {
+        let first = start / CHUNK;
+        self.0
+            .chunks
+            .iter()
+            .enumerate()
+            .skip(first)
+            .flat_map(|(n, chunk)| {
+                decompress(chunk)
+                    .into_iter()
+                    .enumerate()
+                    .map(move |(i, e)| (n * CHUNK + i, e))
+            })
+            .skip(start % CHUNK)
+    }
+
     /// 行を書き換えたものを作る (テストで Perl 版の結果を直すときなど)
     pub fn map_entries(&self, f: impl FnOnce(&mut Vec<LogEntry>)) -> Self {
         let mut entries = self.entries();
@@ -221,6 +239,26 @@ mod tests {
                     .collect();
                 assert_eq!(log.entries_for(id), want, "len {len} id {id}");
             }
+        }
+    }
+
+    #[test]
+    fn iter_from_starts_anywhere() {
+        let all = sample(CHUNK * 2 + 10);
+        let log = TurnLog::new(all.clone());
+        for start in [
+            0,
+            1,
+            CHUNK - 1,
+            CHUNK,
+            CHUNK + 3,
+            CHUNK * 2 + 9,
+            CHUNK * 2 + 10,
+            99_999,
+        ] {
+            let got: Vec<_> = log.iter_from(start).collect();
+            let want: Vec<_> = all.iter().cloned().enumerate().skip(start).collect();
+            assert_eq!(got, want, "start {start}");
         }
     }
 

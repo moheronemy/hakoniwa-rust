@@ -7,7 +7,7 @@ use std::fmt::Write;
 use hakoniwa_core::GameConfig;
 use hakoniwa_core::model::GameState;
 use hakoniwa_core::view::top::{
-    Badge, CommentLine, Hover, LotStatus, TopPage, Value, ViewRange, top_page,
+    Badge, CommentLine, Hover, LotStatus, TopPage, Value, ViewRange, top_page_with_log_limit,
 };
 
 use crate::layout::{csrf_field, esc};
@@ -205,8 +205,9 @@ pub fn top(
     now: i64,
     query: &str,
     csrf: Option<&str>,
+    log_lines: usize,
 ) -> String {
-    let page = top_page(game, config, now, ViewRange::from_query(query));
+    let page = top_page_with_log_limit(game, config, now, ViewRange::from_query(query), log_lines);
     let mut h = String::new();
     let _ = write!(
         h,
@@ -317,7 +318,16 @@ pub fn top(
     for m in &page.logs {
         let _ = writeln!(h, "<p>ターン{}：{}</p>", m.turn, log_text(&m.message));
     }
-    h.push_str("</div>\n<p><a href=\"/history\">それより前の出来事</a></p>\n");
+    h.push_str("</div>\n");
+    if page.logs_truncated {
+        let _ = writeln!(
+            h,
+            "<p><a href=\"/history\">続きと、それより前の出来事</a> <small class=\"muted\">(ここには {} 行まで出しています)</small></p>",
+            page.logs.len()
+        );
+    } else {
+        h.push_str("<p><a href=\"/history\">それより前の出来事</a></p>\n");
+    }
     if !page.hcup_log.is_empty() {
         h.push_str("<h2>Hakoniwa Cup の記録</h2>\n<div class=\"log\">\n");
         for m in &page.hcup_log {
