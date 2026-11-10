@@ -141,6 +141,11 @@ fn field(island: &Island, name: &str) -> String {
         "trainmoney2" => n(sc.trainmoney2),
         "hcsankaflag" => n(sc.hcsankaflag),
         "stsankahantei" => n(sc.hex.stadium.stsankahantei),
+        "stockflag" => n(sc.command.city.stockflag),
+        "stocklandkind" => n(sc.command.city.stocklandkind),
+        "stocklandvalue" => n(sc.command.city.stocklandvalue),
+        "pointb" => sc.command.city.pointb.clone(),
+        "condenmekki" => n(sc.command.city.condenmekki),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -839,4 +844,24 @@ fn phase3_magic_4_matches_perl_with_rand_03125() {
 #[test]
 fn phase3_magic_4_matches_perl_with_rand_96875() {
     check_fixture_at("phase3-magic-4", "96875");
+}
+
+#[test]
+fn phase3_city_matches_perl_with_rand_0() {
+    check_fixture("phase3-city", 0);
+}
+
+#[test]
+fn phase3_city_matches_perl_with_rand_half() {
+    check_fixture("phase3-city", RAND_HALF);
+}
+
+#[test]
+fn phase3_city2_matches_perl_with_rand_0() {
+    check_fixture("phase3-city2", 0);
+}
+
+#[test]
+fn phase3_city2_matches_perl_with_rand_half() {
+    check_fixture("phase3-city2", RAND_HALF);
 }
