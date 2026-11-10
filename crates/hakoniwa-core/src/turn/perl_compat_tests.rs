@@ -1615,3 +1615,58 @@ fn phase4_disaster2_e_matches_perl_with_rand_875() {
 fn phase4_disaster2_e_matches_perl_with_rand_96875() {
     check_fixture_at("phase4-disaster2-e", "96875");
 }
+
+#[test]
+fn phase4_migrate_1_matches_perl_with_rand_015625() {
+    check_fixture_at("phase4-migrate-1", "015625");
+}
+
+#[test]
+fn phase4_migrate_1_matches_perl_with_rand_03125() {
+    check_fixture_at("phase4-migrate-1", "03125");
+}
+
+#[test]
+fn phase4_migrate_1_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-migrate-1", "50");
+}
+
+#[test]
+fn phase4_migrate_2_matches_perl_with_rand_015625() {
+    check_fixture_at("phase4-migrate-2", "015625");
+}
+
+#[test]
+fn phase4_migrate_2_matches_perl_with_rand_03125() {
+    check_fixture_at("phase4-migrate-2", "03125");
+}
+
+#[test]
+fn phase4_migrate_2_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-migrate-2", "50");
+}
+
+#[test]
+fn phase4_migrate_3_matches_perl_with_rand_015625() {
+    check_fixture_at("phase4-migrate-3", "015625");
+}
+
+#[test]
+fn phase4_migrate_3_matches_perl_with_rand_03125() {
+    check_fixture_at("phase4-migrate-3", "03125");
+}
+
+#[test]
+fn phase4_migrate_3_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-migrate-3", "50");
+}
+
+#[test]
+fn phase4_migrate_4_matches_perl_with_rand_02734375() {
+    check_fixture_at("phase4-migrate-4", "02734375");
+}
+
+#[test]
+fn phase4_migrate_4_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-migrate-4", "50");
+}
