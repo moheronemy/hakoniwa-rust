@@ -1451,3 +1451,13 @@ fn phase3_mix_8_matches_perl_with_rand_50() {
 fn phase3_mix_8_matches_perl_with_rand_96875() {
     check_fixture_at("phase3-mix-8", "96875");
 }
+
+#[test]
+fn phase4_ending_matches_perl_with_rand_3_4() {
+    check_fixture_at("phase4-ending", "75");
+}
+
+#[test]
+fn phase4_ending_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase4-ending", "96875");
+}

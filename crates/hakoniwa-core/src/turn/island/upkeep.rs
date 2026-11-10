@@ -1,4 +1,4 @@
-//! 人工衛星・宇宙ステーションなどの維持 (Perl 版 15666〜15787 行) と、政策・食料と資金のあふれ・集計・繁栄賞と災難賞 (16958〜17143 行)。
+//! 人工衛星・宇宙ステーションなどの維持 (Perl 版 15666〜15787 行)。
 //!
 //! TODO(フェーズ4): Perl 版の該当する部分を移植する。いまは何もしない。
 
@@ -15,18 +15,4 @@ pub struct Globals {}
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Scratch {}
 
-pub(super) fn upkeep(
-    _ctx: &mut TurnContext,
-    _islands: &mut [Island],
-    _idx: usize,
-    _p: &mut ProcRun,
-) {
-}
-
-pub(super) fn finish(
-    _ctx: &mut TurnContext,
-    _islands: &mut [Island],
-    _idx: usize,
-    _p: &mut ProcRun,
-) {
-}
+pub(super) fn run(_ctx: &mut TurnContext, _islands: &mut [Island], _idx: usize, _p: &mut ProcRun) {}

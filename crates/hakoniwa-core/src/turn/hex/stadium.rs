@@ -33,7 +33,7 @@
 
 use crate::land::{count_around, land_name};
 use crate::log::tags::{self, wrap};
-use crate::model::{Island, TurnMessage};
+use crate::model::Island;
 use crate::perl::{Captures, fields, join, trunc};
 use crate::tables::LandKind as L;
 use crate::turn::TurnContext;

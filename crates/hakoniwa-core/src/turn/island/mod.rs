@@ -14,8 +14,9 @@
 mod auction;
 mod disaster1;
 mod disaster2;
-mod finish;
+mod ending;
 mod migrate;
+mod upkeep;
 
 use crate::log::tags::{self, wrap};
 use crate::model::Island;
@@ -47,7 +48,8 @@ pub struct ProcessGlobals {
     pub migrate: migrate::Globals,
     pub disaster1: disaster1::Globals,
     pub disaster2: disaster2::Globals,
-    pub finish: finish::Globals,
+    pub ending: ending::Globals,
+    pub upkeep: upkeep::Globals,
     pub auction: auction::Globals,
 }
 
@@ -57,7 +59,7 @@ pub struct Scratch {
     pub migrate: migrate::Scratch,
     pub disaster1: disaster1::Scratch,
     pub disaster2: disaster2::Scratch,
-    pub finish: finish::Scratch,
+    pub upkeep: upkeep::Scratch,
     pub auction: auction::Scratch,
 }
 
@@ -72,9 +74,9 @@ pub(crate) fn do_island_process(ctx: &mut TurnContext, islands: &mut [Island], i
     migrate::resort_fatigue(ctx, islands, idx, &mut p); // 14635-14849
     disaster1::run(ctx, islands, idx, &mut p); // 14850-15247
     disaster2::run(ctx, islands, idx, &mut p); // 15248-15665
-    finish::upkeep(ctx, islands, idx, &mut p); // 15666-15787
+    upkeep::run(ctx, islands, idx, &mut p); // 15666-15787
     auction::run(ctx, islands, idx, &mut p); // 15788-16957
-    finish::finish(ctx, islands, idx, &mut p); // 16958-17143
+    ending::run(ctx, islands, idx, &mut p); // 16958-17143
 }
 
 /// `doIslandunemployed($number, $island)`
