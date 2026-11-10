@@ -1,0 +1,785 @@
+Set-Cookie: http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiOWNISLANDPASSWORD=(pass2) ; expires=Tuesday, 10-Nov-2026 06:00:01 GMT
+Set-Cookie: http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiTARGETISLANDID=(1) ; expires=Tuesday, 10-Nov-2026 06:00:01 GMT
+Set-Cookie: http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiKIND=(63) ; expires=Tuesday, 10-Nov-2026 06:00:01 GMT
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>
+☆Hakoniwa R.A.☆
+</TITLE>
+<BASE HREF="http://www.xxxxxxxx/cgi-bin/hako/hakoimg/">
+
+<STYLE type="text/css">
+<!--
+
+	A:link.type1 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type1 { color:#800080; text-decoration: none; }
+
+	A:hover.type1, A:focus.type1 { color:#0000FF; text-decoration: underline; }
+
+	A:action.type1 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type2 { color:#0000FF; text-decoration: underline; }
+
+	A:visited.type2 { color:#800080; text-decoration: underline; }
+
+	A:hover.type2, A:focus.type2 { color:#FF00FF; text-decoration: underline; }
+
+	A:action.type2 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type3 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type3 { color:#800080; text-decoration: none; }
+
+	A:hover.type3, A:focus.type3 { background-color: pink; color: #FFFFFF; text-decoration: none; }
+
+	A:action.type3 { color:#FF0000; text-decoration: none; }
+
+
+	/* 観光画面ナビゲータ・ウィンドウ */
+	#NaviView{
+	  visibility: hidden;
+	  z-index:1;
+	  position:absolute;
+	  background-color: #000000;
+	  border: solid #4169E1;
+	  border-width: 10px 1px 1px 1px;
+	  margin-top : -224px;
+	}
+	.NaviTitle {
+	  color: #ffffff;
+	  font-size: 11pt;
+	}
+	.NaviImg {
+	  margin : 1px;
+	}
+	.NaviText {
+	  color: #ffffff;
+	  font-size: 9pt;
+	}
+	TD.M {
+	  cursor:default;
+	  border-style:outset;
+	  border-width:0px;
+	  border-color:#CCCCFF;
+	}
+
+	body{ scrollbar-3dlight-color:royalblue;
+	scrollbar-arrow-color:royalblue;
+	scrollbar-darkshadow-color:lemonchiffon;
+	scrollbar-face-color:lemonchiffon;
+	scrollbar-highlight-color:lemonchiffon;
+	scrollbar-shadow-color:royalblue;
+	scrollbar-track-color:lemonchiffon;
+
+-->
+
+</STYLE>
+
+</HEAD>
+<BODY BGCOLOR="lemonchiffon">
+[<A CLASS="type3" HREF="http://t.pos.to/hako/" target="_blank">箱庭諸島スクリプト配布元</A>] [<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/" target="_blank">Hakoniwa R.A.スクリプト配布元</A>] [<A CLASS="type3" HREF="http://">トップページ</A>]<HR>
+
+<hr WIDTH="100%">
+<FONT SIZE=5>コマンドを削除しました</FONT><HR>
+<CENTER>
+<FONT SIZE=5><FONT COLOR="#a06040"><B>Alpha島</B></FONT>開発計画</FONT><BR>
+<A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi"><FONT SIZE=5>トップへ戻る</FONT></A><BR>
+</CENTER>
+
+<SCRIPT Language="JavaScript">
+<!--
+function ps(x, y) {
+    document.forms[0].elements[4].options[x].selected = true;
+    document.forms[0].elements[5].options[y].selected = true;
+    return true;
+}
+
+function ns(x) {
+    document.forms[0].elements[2].options[x].selected = true;
+    return true;
+}
+
+//-->
+</SCRIPT>
+<CENTER>
+<TABLE BORDER>
+<TR>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>総合Point</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>人口</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>資金</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>食料</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>面積</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>農場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>職場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>採掘場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>発電力</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>失業率</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>軍事技術</B></FONT></NOBR></TH>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=2 align=middle nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>3</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>962</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>5700人</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>500億円</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>18600トン</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>3100万坪</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>244万ｋＷ</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR><font color="red">100.00%</font></NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>Ｌｖ1</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=11 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>info：<font size="-1"><font color="SALMON"></font><font color="hotpink"></font><IMG SRC="kansoku.gif" ALT="観測衛星" WIDTH=16 HEIGHT="16">200%</font></font><IMG SRC="ele.gif" ALT="使用状況(消費14万ｋＷ／過不足230万ｋＷ)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('使用状況/消費14万ｋＷ<br>過不足230万ｋＷ'); Navi2(12, 'ele.gif', '使用状況', '消費14万ｋＷ<br>過不足230万ｋＷ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></NOBR></TD>
+</TR>
+</TABLE></CENTER>
+
+
+<SCRIPT Language="JavaScript">
+<!--
+
+function MM_displayStatusMsg(msgStr) {
+    window.status=msgStr;
+}
+
+function Navi(HislandSize, position, position2, x, y, img, title, title2, text, exp) {
+	StyElm = document.getElementById("NaviView");
+	StyElm.style.visibility = "visible";
+
+	if(HislandSize < 15) {
+		if(position == 1) {
+			if(position2 == 1) {
+			    StyElm.style.marginLeft = -32;
+			    StyElm.style.marginTop = -360;
+			} else {
+			    StyElm.style.marginLeft = -32;
+			    StyElm.style.marginTop = -120;
+			}
+		} else {
+		    StyElm.style.marginLeft = 240;
+		    StyElm.style.marginTop = -240;
+		}
+
+	} else {
+
+		if(position == 1) {
+		    StyElm.style.marginLeft = 32;
+		    StyElm.style.marginTop = (y - 19) * 32;
+		} else {
+		    StyElm.style.marginLeft = 336;
+		    StyElm.style.marginTop = (y - 19) * 32;
+		}
+
+	}
+
+
+	if(HislandSize < 15) {
+	    StyElm.innerHTML = "<table><tr><td class='M'><img class='NaviImg' src=" + img + "></td><td class='M'><div class='NaviTitle'>" + title + " (" + x + "," + y + ")</div><div class='NaviText'><hr>" + title2 + " </div></td></tr></table>";
+	} else {
+	    StyElm.innerHTML = "<table><tr><td class='M'><img class='NaviImg' src=" + img + "></td><td class='M' width=256><div class='NaviTitle'>" + title + " (" + x + "," + y + ")</div><div class='NaviText'><hr>" + title2 + " </div></td></tr></table>";
+	}
+
+
+}
+
+function Navi2(HislandSize,img, title, title2, text, exp) {
+	StyElm = document.getElementById("NaviView");
+	StyElm.style.visibility = "visible";
+
+	if(HislandSize < 15) {
+
+		    StyElm.style.marginLeft = 0;
+		    StyElm.style.marginTop = -400;
+
+	} else {
+
+		    StyElm.style.marginLeft = 0;
+		    StyElm.style.marginTop = -656;
+
+	}
+
+	    StyElm.innerHTML = "<table><tr><td class='M'><img class='NaviImg' src=" + img + "></td><td class='M'><div class='NaviTitle'>" + title + "</div><div class='NaviText'><hr>" + title2 + " </div></td></tr></table>";
+
+}
+
+function NaviClose() {
+	StyElm = document.getElementById("NaviView");
+	StyElm.style.visibility = "hidden";
+}
+
+//-->
+</SCRIPT>
+
+<CENTER>
+<TABLE BORDER>
+<TR>
+<TD BGCOLOR="LAVENDER" >
+<CENTER>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method=POST>
+<INPUT TYPE=submit VALUE="計画送信" NAME=CommandButton2>
+<HR>
+<B>パスワード</B></BR>
+<INPUT TYPE=password NAME=PASSWORD VALUE="pass2">
+<HR>
+<B>計画番号</B><SELECT NAME=NUMBER>
+<OPTION VALUE=0>1
+<OPTION VALUE=1>2
+<OPTION VALUE=2>3
+<OPTION VALUE=3>4
+<OPTION VALUE=4>5
+<OPTION VALUE=5>6
+<OPTION VALUE=6>7
+<OPTION VALUE=7>8
+<OPTION VALUE=8>9
+<OPTION VALUE=9>10
+<OPTION VALUE=10>11
+<OPTION VALUE=11>12
+<OPTION VALUE=12>13
+<OPTION VALUE=13>14
+<OPTION VALUE=14>15
+<OPTION VALUE=15>16
+<OPTION VALUE=16>17
+<OPTION VALUE=17>18
+<OPTION VALUE=18>19
+<OPTION VALUE=19>20
+<OPTION VALUE=20>21
+<OPTION VALUE=21>22
+<OPTION VALUE=22>23
+<OPTION VALUE=23>24
+<OPTION VALUE=24>25
+<OPTION VALUE=25>26
+<OPTION VALUE=26>27
+<OPTION VALUE=27>28
+<OPTION VALUE=28>29
+<OPTION VALUE=29>30
+<OPTION VALUE=30>31
+<OPTION VALUE=31>32
+<OPTION VALUE=32>33
+<OPTION VALUE=33>34
+<OPTION VALUE=34>35
+<OPTION VALUE=35>36
+<OPTION VALUE=36>37
+<OPTION VALUE=37>38
+<OPTION VALUE=38>39
+<OPTION VALUE=39>40
+</SELECT><BR>
+<HR>
+
+<B>開発計画</B><BR>
+<FONT size=-1>
+<SELECT NAME=COMMAND onMouseOver="MM_displayStatusMsg('コスト修正(x0.657)/所持資金…x0.8<br>開発度修正…x1<br>文部科学省…x0.822'); Navi2(12, 'black.gif', 'コスト修正(x0.657)', '所持資金…x0.8<br>開発度修正…x1<br>文部科学省…x0.822', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></font>
+<OPTION VALUE=77 >自宅建設/税率変更(1897億円)
+<OPTION VALUE=79 >輝ける都市計画(632億円)
+<OPTION VALUE=101 >改装・強化(632億円)
+<OPTION VALUE=119 >僕の引越し２(2530億円)
+<OPTION VALUE=1 >整地(3億円)
+<OPTION VALUE=42 >食料輸出(10000トン)
+<OPTION VALUE=2 >地ならし(657億円)
+<OPTION VALUE=105 >開発予定計画(657億円)
+<OPTION VALUE=3 >埋め立て(98億円)
+<OPTION VALUE=76 >遠距離埋め立て(3288億円)
+<OPTION VALUE=103 >２段階埋め立て(3288億円)
+<OPTION VALUE=4 >掘削(131億円)
+<OPTION VALUE=104 >２段階掘削(1972億円)
+<OPTION VALUE=75 >温泉掘削(32億円)
+<OPTION VALUE=5 >伐採(無料)
+<OPTION VALUE=11 >植林(32億円)
+<OPTION VALUE=115 >風力発電所建設(98億円)
+<OPTION VALUE=113 >水力発電所建設(196億円)
+<OPTION VALUE=112 >火力発電所建設(4932億円)
+<OPTION VALUE=111 >原子力発電所建設(26304億円)
+<OPTION VALUE=116 >バイオマス発電所建設(26304億円)
+<OPTION VALUE=117 >ソーラー発電所建設(39456億円)
+<OPTION VALUE=118 >コスモ発電所建設(195964億円)
+<OPTION VALUE=120 >核融合発電所建設(986400億円)
+<OPTION VALUE=114 >コンデンサ建設(64444億円)
+<OPTION VALUE=12 >農場整備(12億円)
+<OPTION VALUE=28 >食物研究所建設(3288億円)
+<OPTION VALUE=73 >牧場建設・家畜販売(1972億円)
+<OPTION VALUE=13 >工場建設(65億円)
+<OPTION VALUE=102 >ハイテク技術誘致(6576億円)
+<OPTION VALUE=14 >採掘場整備(196億円)
+<OPTION VALUE=25 >養殖場設置(32億円)
+<OPTION VALUE=74 >大学建設(1315億円)
+<OPTION VALUE=23 >遊園地建設(1972億円)
+<OPTION VALUE=26 >野球場建設(3288億円)
+<OPTION VALUE=27 >海あみゅ建設(9864億円)
+<OPTION VALUE=121 >動物園建設(65760億円)
+<OPTION VALUE=78 >リゾート地開発(32880億円)
+<OPTION VALUE=15 >ミサイル基地建設(196億円)
+<OPTION VALUE=16 >防衛施設建設(525億円)
+<OPTION VALUE=17 >海底基地建設(6576億円)
+<OPTION VALUE=20 >海底都市建設(51145億円)
+<OPTION VALUE=18 >記念碑建造(6575億円)
+<OPTION VALUE=21 >怪獣の購入・配置(2616億円)
+<OPTION VALUE=22 >テトラの購入・配置(6576億円)
+<OPTION VALUE=19 >ハリボテ設置(無料)
+<OPTION VALUE=24 >地雷設置(65億円)
+<OPTION VALUE=6 >港町開発(361億円)
+<OPTION VALUE=7 >造船・出航(328億円)
+<OPTION VALUE=29 >防災都市化(16440億円)
+<OPTION VALUE=70 >ニュータウン建設(624億円)
+<OPTION VALUE=71 >現代都市建設(29592億円)
+<OPTION VALUE=72 >海底新都市建設(45900億円)
+<OPTION VALUE=30 >僕の引越し(657億円)
+<OPTION VALUE=10 >関所建設(657億円)
+<OPTION VALUE=106 >島役所建設(19728億円)
+<OPTION VALUE=107 >倉庫建設・貯金(10500億円)
+<OPTION VALUE=109 >倉庫建設・貯食(1000000トン)
+<OPTION VALUE=108 >倉庫引き出し(500億円)
+<OPTION VALUE=110 >駅・線路・電車建設(6576億円)
+<OPTION VALUE=39 >人工衛星打ち上げ(6575億円)
+<OPTION VALUE=40 >人工衛星修復(3288億円)
+<OPTION VALUE=82 >大使派遣(32880億円)
+<OPTION VALUE=83 >魔術師派遣(3288億円)
+<OPTION VALUE=31 >ミサイル発射(12億円)
+<OPTION VALUE=32 >PPミサイル発射(328億円)
+<OPTION VALUE=36 >SPPミサイル発射(1315億円)
+<OPTION VALUE=33 >STミサイル発射(32億円)
+<OPTION VALUE=34 >陸地破壊弾発射(1972億円)
+<OPTION VALUE=38 >地形隆起弾発射(3288億円)
+<OPTION VALUE=37 >核ミサイル発射(7891億円)
+<OPTION VALUE=80 >衛星レーザー発射(26303億円)
+<OPTION VALUE=81 >衛星破壊砲発射(32879億円)
+<OPTION VALUE=35 >動物派遣(6576億円)
+<OPTION VALUE=41 >資金繰り(無料)
+<OPTION VALUE=43 >資金援助(100億円)
+<OPTION VALUE=44 >食料援助(10000トン)
+<OPTION VALUE=47 >電力援助(65億円)
+<OPTION VALUE=45 >誘致活動(1315億円)
+<OPTION VALUE=46 >島の放棄(無料)
+<OPTION VALUE=100 >エサをあげる(5000000トン)
+<OPTION VALUE=64 >浅瀬埋め立て自動入力(無料)
+<OPTION VALUE=65 >浅瀬掘削自動入力(無料)
+<OPTION VALUE=66 >伐採自動入力(無料)
+<OPTION VALUE=67 >伐採＆植林自動入力(無料)
+<OPTION VALUE=61 >整地自動入力(無料)
+<OPTION VALUE=62 >地ならし自動入力(無料)
+<OPTION VALUE=68 >開発予定計画自動入力(無料)
+<OPTION VALUE=69 >宇宙ステ修復自動入力(無料)
+<OPTION VALUE=63 SELECTED>全計画を白紙撤回(無料)
+</SELECT>
+<HR>
+<B>座標(</B>
+<SELECT NAME=POINTX>
+
+<OPTION VALUE=0 SELECTED>0
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+<OPTION VALUE=3>3
+<OPTION VALUE=4>4
+<OPTION VALUE=5>5
+<OPTION VALUE=6>6
+<OPTION VALUE=7>7
+<OPTION VALUE=8>8
+<OPTION VALUE=9>9
+<OPTION VALUE=10>10
+<OPTION VALUE=11>11
+</SELECT>, <SELECT NAME=POINTY>
+<OPTION VALUE=0 SELECTED>0
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+<OPTION VALUE=3>3
+<OPTION VALUE=4>4
+<OPTION VALUE=5>5
+<OPTION VALUE=6>6
+<OPTION VALUE=7>7
+<OPTION VALUE=8>8
+<OPTION VALUE=9>9
+<OPTION VALUE=10>10
+<OPTION VALUE=11>11
+</SELECT><B>)</B>
+<HR>
+
+
+
+
+<B>数量</B><SELECT NAME=AMOUNT>
+<OPTION VALUE=0>0
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+<OPTION VALUE=3>3
+<OPTION VALUE=4>4
+<OPTION VALUE=5>5
+<OPTION VALUE=6>6
+<OPTION VALUE=7>7
+<OPTION VALUE=8>8
+<OPTION VALUE=9>9
+<OPTION VALUE=10>10
+<OPTION VALUE=11>11
+<OPTION VALUE=12>12
+<OPTION VALUE=13>13
+<OPTION VALUE=14>14
+<OPTION VALUE=15>15
+<OPTION VALUE=16>16
+<OPTION VALUE=17>17
+<OPTION VALUE=18>18
+<OPTION VALUE=19>19
+<OPTION VALUE=20>20
+<OPTION VALUE=21>21
+<OPTION VALUE=22>22
+<OPTION VALUE=23>23
+<OPTION VALUE=24>24
+<OPTION VALUE=25>25
+<OPTION VALUE=26>26
+<OPTION VALUE=27>27
+<OPTION VALUE=28>28
+<OPTION VALUE=29>29
+<OPTION VALUE=30>30
+<OPTION VALUE=31>31
+<OPTION VALUE=32>32
+<OPTION VALUE=33>33
+<OPTION VALUE=34>34
+<OPTION VALUE=35>35
+<OPTION VALUE=36>36
+<OPTION VALUE=37>37
+<OPTION VALUE=38>38
+<OPTION VALUE=39>39
+<OPTION VALUE=40>40
+<OPTION VALUE=41>41
+<OPTION VALUE=42>42
+<OPTION VALUE=43>43
+<OPTION VALUE=44>44
+<OPTION VALUE=45>45
+<OPTION VALUE=46>46
+<OPTION VALUE=47>47
+<OPTION VALUE=48>48
+<OPTION VALUE=49>49
+<OPTION VALUE=50>50
+<OPTION VALUE=51>51
+<OPTION VALUE=52>52
+<OPTION VALUE=53>53
+<OPTION VALUE=54>54
+<OPTION VALUE=55>55
+<OPTION VALUE=56>56
+<OPTION VALUE=57>57
+<OPTION VALUE=58>58
+<OPTION VALUE=59>59
+<OPTION VALUE=60>60
+<OPTION VALUE=61>61
+<OPTION VALUE=62>62
+<OPTION VALUE=63>63
+<OPTION VALUE=64>64
+<OPTION VALUE=65>65
+<OPTION VALUE=66>66
+<OPTION VALUE=67>67
+<OPTION VALUE=68>68
+<OPTION VALUE=69>69
+<OPTION VALUE=70>70
+<OPTION VALUE=71>71
+<OPTION VALUE=72>72
+<OPTION VALUE=73>73
+<OPTION VALUE=74>74
+<OPTION VALUE=75>75
+<OPTION VALUE=76>76
+<OPTION VALUE=77>77
+<OPTION VALUE=78>78
+<OPTION VALUE=79>79
+<OPTION VALUE=80>80
+<OPTION VALUE=81>81
+<OPTION VALUE=82>82
+<OPTION VALUE=83>83
+<OPTION VALUE=84>84
+<OPTION VALUE=85>85
+<OPTION VALUE=86>86
+<OPTION VALUE=87>87
+<OPTION VALUE=88>88
+<OPTION VALUE=89>89
+<OPTION VALUE=90>90
+<OPTION VALUE=91>91
+<OPTION VALUE=92>92
+<OPTION VALUE=93>93
+<OPTION VALUE=94>94
+<OPTION VALUE=95>95
+<OPTION VALUE=96>96
+<OPTION VALUE=97>97
+<OPTION VALUE=98>98
+<OPTION VALUE=99>99
+</SELECT>
+<HR>
+<B>目標の島</B><BR>
+<FONT size=-1><SELECT NAME=TARGETID>
+<OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" >テスト島
+<OPTION VALUE="2" SELECTED>Alpha島
+<BR>
+</SELECT></FONT>
+<HR>
+<B>動作</B><BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=insert CHECKED>挿入
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=write>上書き<BR>
+<INPUT TYPE=radio NAME=COMMANDMODE VALUE=delete>削除
+<HR>
+<INPUT TYPE=submit VALUE="計画送信" NAME=CommandButton2>
+<hr><B>政策(数量0～50で指定してください)</B><br><table border="0" cellpadding="0" cellspacing="0"><tr><td><INPUT TYPE="submit" VALUE="省エネ" NAME="ShoueneButton2"></td><td>　予算1兆円/消費電力-2%</td><tr><td><INPUT TYPE="submit" VALUE=" 教育 " NAME="KyouikuButton2"></td><td>　予算9兆円/指定可能+3</td></tr><tr><td><INPUT TYPE="submit" VALUE=" 防災 " NAME="BousaiButton2"></td><td>　予算3兆円/予測精度+0</td></tr><tr><td><INPUT TYPE="submit" VALUE=" 観光 " NAME="KankouButton2"></td><td>　予算5兆円/人気+1</td></tr><tr><td><INPUT TYPE="submit" VALUE=" 自然 " NAME="SizenButton2"></td><td>　予算7兆円/清浄+1</td></tr><tr><td><INPUT TYPE="submit" VALUE=" 貯蓄 " NAME="ChochikuButton2"></td><td>　予算11兆円/貯蓄3倍</td></tr></table>
+</CENTER>
+</FORM>
+</TD>
+<TD BGCOLOR="LAVENDER">
+<CENTER><TABLE BORDER><TR><TD>
+<IMG SRC="xbar.gif"><BR><IMG SRC="space0.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,0) 海  '); Navi(12, 0, 0, 0, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,0) 海  '); Navi(12, 0, 0, 1, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,0) 海  '); Navi(12, 0, 0, 2, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,0) 海  '); Navi(12, 0, 0, 3, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,0) 海  '); Navi(12, 0, 0, 4, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,0) 海  '); Navi(12, 0, 0, 5, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,0) 海  '); Navi(12, 1, 0, 6, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,0) 海  '); Navi(12, 1, 0, 7, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,0) 海  '); Navi(12, 1, 0, 8, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,0) 海  '); Navi(12, 1, 0, 9, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,0) 海  '); Navi(12, 1, 0, 10, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,0)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,0) 海  '); Navi(12, 1, 0, 11, 0,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,1) 海  '); Navi(12, 0, 0, 0, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,1) 海  '); Navi(12, 0, 0, 1, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,1) 海  '); Navi(12, 0, 0, 2, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,1) 海  '); Navi(12, 0, 0, 3, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,1) 海  '); Navi(12, 0, 0, 4, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,1) 海  '); Navi(12, 0, 0, 5, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,1) 海  '); Navi(12, 1, 0, 6, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,1) 海  '); Navi(12, 1, 0, 7, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,1) 海  '); Navi(12, 1, 0, 8, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,1) 海  '); Navi(12, 1, 0, 9, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,1) 海  '); Navi(12, 1, 0, 10, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,1)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,1) 海  '); Navi(12, 1, 0, 11, 1,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space1.gif" width=16 height=32><BR><IMG SRC="space2.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,2) 海  '); Navi(12, 0, 0, 0, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,2) 海  '); Navi(12, 0, 0, 1, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,2) 海  '); Navi(12, 0, 0, 2, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,2) 海  '); Navi(12, 0, 0, 3, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,2) 海  '); Navi(12, 0, 0, 4, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,2) 海  '); Navi(12, 0, 0, 5, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,2)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,2) 海(浅瀬)  '); Navi(12, 1, 0, 6, 2,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,2)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,2) 荒地  '); Navi(12, 1, 0, 7, 2,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,2)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,2) 荒地  '); Navi(12, 1, 0, 8, 2,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,2)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,2) 平地  '); Navi(12, 1, 0, 9, 2,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,2) 海  '); Navi(12, 1, 0, 10, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,2)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,2) 海  '); Navi(12, 1, 0, 11, 2,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,3) 海  '); Navi(12, 0, 0, 0, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,3) 海  '); Navi(12, 0, 0, 1, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,3) 海  '); Navi(12, 0, 0, 2, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,3) 海  '); Navi(12, 0, 0, 3, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,3)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,3) 海(浅瀬)  '); Navi(12, 0, 0, 4, 3,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,3)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,3) 海(浅瀬)  '); Navi(12, 0, 0, 5, 3,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,3)"><IMG SRC="land38.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,3) 砂浜  '); Navi(12, 1, 0, 6, 3,'land38.gif', '砂浜', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,3) 海  '); Navi(12, 1, 0, 7, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,3)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,3) 荒地  '); Navi(12, 1, 0, 8, 3,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,3)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,3) 平地  '); Navi(12, 1, 0, 9, 3,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,3) 海  '); Navi(12, 1, 0, 10, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,3)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,3) 海  '); Navi(12, 1, 0, 11, 3,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space3.gif" width=16 height=32><BR><IMG SRC="space4.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,4)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,4) 海  '); Navi(12, 0, 0, 0, 4,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,4)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,4) 海  '); Navi(12, 0, 0, 1, 4,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,4)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,4) 荒地  '); Navi(12, 0, 0, 2, 4,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,4)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,4) 荒地  '); Navi(12, 0, 0, 3, 4,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,4)"><IMG SRC="land6.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,4) 森 700本 '); Navi(12, 0, 0, 4, 4,'land6.gif', '森', '700本<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,4)"><IMG SRC="land21.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,4) 港町 1100人 '); Navi(12, 0, 0, 5, 4,'land21.gif', '港町', '1100人<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,4)"><IMG SRC="land66.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,4) 風力発電所 出力50万ｋＷ/50-125%変動 '); Navi(12, 1, 0, 6, 4,'land66.gif', '風力発電所', '出力50万ｋＷ/50-125%変動<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,4)"><IMG SRC="land6.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,4) 森 800本 '); Navi(12, 1, 0, 7, 4,'land6.gif', '森', '800本<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,4)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,4) 海(浅瀬)  '); Navi(12, 1, 0, 8, 4,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,4)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,4) 海(浅瀬)  '); Navi(12, 1, 0, 9, 4,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,4)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,4) 海  '); Navi(12, 1, 0, 10, 4,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,4)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,4) 海  '); Navi(12, 1, 0, 11, 4,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,5) 海  '); Navi(12, 0, 0, 0, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,5) 海  '); Navi(12, 0, 0, 1, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,5) 海  '); Navi(12, 0, 0, 2, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,5)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,5) 海(浅瀬)  '); Navi(12, 0, 0, 3, 5,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,5)"><IMG SRC="land9.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,5) ミサイル基地 レベル 1/経験値 0 '); Navi(12, 0, 0, 4, 5,'land9.gif', 'ミサイル基地', 'レベル 1/経験値 0<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,5)"><IMG SRC="land3.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,5) 村 1300人 '); Navi(12, 0, 0, 5, 5,'land3.gif', '村', '1300人<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,5)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,5) 平地  '); Navi(12, 1, 0, 6, 5,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,5)"><IMG SRC="land6.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,5) 森 900本 '); Navi(12, 1, 0, 7, 5,'land6.gif', '森', '900本<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,5)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,5) 荒地  '); Navi(12, 1, 0, 8, 5,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,5) 海  '); Navi(12, 1, 0, 9, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,5) 海  '); Navi(12, 1, 0, 10, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,5)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,5) 海  '); Navi(12, 1, 0, 11, 5,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space5.gif" width=16 height=32><BR><IMG SRC="space6.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,6) 海  '); Navi(12, 0, 1, 0, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,6) 海  '); Navi(12, 0, 1, 1, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,6) 海  '); Navi(12, 0, 1, 2, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,6)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,6) 海(浅瀬)  '); Navi(12, 0, 1, 3, 6,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,6)"><IMG SRC="land3.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,6) 村 1900人 '); Navi(12, 0, 1, 4, 6,'land3.gif', '村', '1900人<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,6)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,6) 荒地  '); Navi(12, 0, 1, 5, 6,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,6)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,6) 平地  '); Navi(12, 1, 1, 6, 6,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,6)"><IMG SRC="land35.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,6) 工業大学  '); Navi(12, 1, 1, 7, 6,'land35.gif', '工業大学', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,6)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,6) 海(浅瀬)  '); Navi(12, 1, 1, 8, 6,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,6) 海  '); Navi(12, 1, 1, 9, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,6) 海  '); Navi(12, 1, 1, 10, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,6)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,6) 海  '); Navi(12, 1, 1, 11, 6,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,7) 海  '); Navi(12, 0, 1, 0, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,7) 海  '); Navi(12, 0, 1, 1, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,7) 海  '); Navi(12, 0, 1, 2, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,7) 海  '); Navi(12, 0, 1, 3, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,7)"><IMG SRC="land11.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,7) 山  '); Navi(12, 0, 1, 4, 7,'land11.gif', '山', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,7)"><IMG SRC="land28.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,7) ニュータウン 1400人/普通職場0000人 '); Navi(12, 0, 1, 5, 7,'land28.gif', 'ニュータウン', '1400人/普通職場0000人<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,7)"><IMG SRC="land76.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,7) 黄金のコンデンサ 蓄電230万ｋＷ '); Navi(12, 1, 1, 6, 7,'land76.gif', '黄金のコンデンサ', '蓄電230万ｋＷ<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,7)"><IMG SRC="land6.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,7) 森 700本 '); Navi(12, 1, 1, 7, 7,'land6.gif', '森', '700本<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,7)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,7) 海(浅瀬)  '); Navi(12, 1, 1, 8, 7,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,7) 海  '); Navi(12, 1, 1, 9, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,7) 海  '); Navi(12, 1, 1, 10, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,7)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,7) 海  '); Navi(12, 1, 1, 11, 7,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space7.gif" width=16 height=32><BR><IMG SRC="space8.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,8) 海  '); Navi(12, 0, 1, 0, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,8) 海  '); Navi(12, 0, 1, 1, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,8) 海  '); Navi(12, 0, 1, 2, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,8)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,8) 海(浅瀬)  '); Navi(12, 0, 1, 3, 8,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,8)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,8) 平地  '); Navi(12, 0, 1, 4, 8,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,8)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,8) 海(浅瀬)  '); Navi(12, 0, 1, 5, 8,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,8)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,8) 平地  '); Navi(12, 1, 1, 6, 8,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,8)"><IMG SRC="land2.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,8) 平地  '); Navi(12, 1, 1, 7, 8,'land2.gif', '平地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,8)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,8) 海(浅瀬)  '); Navi(12, 1, 1, 8, 8,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,8) 海  '); Navi(12, 1, 1, 9, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,8) 海  '); Navi(12, 1, 1, 10, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,8)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,8) 海  '); Navi(12, 1, 1, 11, 8,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,9) 海  '); Navi(12, 0, 1, 0, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,9) 海  '); Navi(12, 0, 1, 1, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,9) 海  '); Navi(12, 0, 1, 2, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,9) 海  '); Navi(12, 0, 1, 3, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,9)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,9) 荒地  '); Navi(12, 0, 1, 4, 9,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,9)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,9) 海(浅瀬)  '); Navi(12, 0, 1, 5, 9,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,9)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,9) 荒地  '); Navi(12, 1, 1, 6, 9,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,9)"><IMG SRC="land1.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,9) 荒地  '); Navi(12, 1, 1, 7, 9,'land1.gif', '荒地', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,9)"><IMG SRC="land14.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,9) 海(浅瀬)  '); Navi(12, 1, 1, 8, 9,'land14.gif', '海(浅瀬)', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,9) 海  '); Navi(12, 1, 1, 9, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,9) 海  '); Navi(12, 1, 1, 10, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,9)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,9) 海  '); Navi(12, 1, 1, 11, 9,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space9.gif" width=16 height=32><BR><IMG SRC="space10.gif" width=16 height=32><A HREF="JavaScript:void(0);" onclick="ps(0,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,10) 海  '); Navi(12, 0, 1, 0, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,10) 海  '); Navi(12, 0, 1, 1, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,10) 海  '); Navi(12, 0, 1, 2, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,10) 海  '); Navi(12, 0, 1, 3, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,10) 海  '); Navi(12, 0, 1, 4, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,10) 海  '); Navi(12, 0, 1, 5, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,10) 海  '); Navi(12, 1, 1, 6, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,10) 海  '); Navi(12, 1, 1, 7, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,10) 海  '); Navi(12, 1, 1, 8, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,10) 海  '); Navi(12, 1, 1, 9, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,10) 海  '); Navi(12, 1, 1, 10, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,10)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,10) 海  '); Navi(12, 1, 1, 11, 10,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><BR><A HREF="JavaScript:void(0);" onclick="ps(0,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(0,11) 海  '); Navi(12, 0, 1, 0, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(1,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(1,11) 海  '); Navi(12, 0, 1, 1, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(2,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(2,11) 海  '); Navi(12, 0, 1, 2, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(3,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(3,11) 海  '); Navi(12, 0, 1, 3, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(4,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(4,11) 海  '); Navi(12, 0, 1, 4, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(5,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(5,11) 海  '); Navi(12, 0, 1, 5, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(6,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(6,11) 海  '); Navi(12, 1, 1, 6, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(7,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(7,11) 海  '); Navi(12, 1, 1, 7, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(8,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(8,11) 海  '); Navi(12, 1, 1, 8, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(9,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(9,11) 海  '); Navi(12, 1, 1, 9, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(10,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(10,11) 海  '); Navi(12, 1, 1, 10, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><A HREF="JavaScript:void(0);" onclick="ps(11,11)"><IMG SRC="land0.gif" width=32 height=32 BORDER=0 onMouseOver="MM_displayStatusMsg('(11,11) 海  '); Navi(12, 1, 1, 11, 11,'land0.gif', '海', '<br>', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></A><IMG SRC="space11.gif" width=16 height=32><BR><div id="NaviView"></div></TD></TR></TABLE></CENTER>
+<CENTER>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST" target="_blank">
+<B>観光する島</B><SELECT NAME=TARGETID><OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" >テスト島
+<OPTION VALUE="2" SELECTED>Alpha島
+<BR></SELECT>
+<INPUT TYPE="submit" VALUE="画面を開く" NAME="SightButton"><br><br>
+</FORM>
+
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method=POST>
+<B>Hakoniwa Auction</B>
+<br>①<font color="royalblue"><B>黄金のコンデンサ</B></font>／<font color="SALMON"><B>0兆円以上</B></font>(残り13ターン)
+<br>②<font color="royalblue"><B>コスモ0万ｋＷ</B></font>／<font color="SALMON"><B>0兆円以上</B></font>(残り13ターン)
+
+<br>パスワード<INPUT TYPE=password NAME=PASSWORD VALUE="pass2" SIZE=10>
+
+
+品番<SELECT NAME=AUCNUMBER>
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+</SELECT>
+
+金額＋<SELECT NAME=AMOUNT>
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+<OPTION VALUE=3>3
+<OPTION VALUE=4>4
+<OPTION VALUE=5>5
+<OPTION VALUE=6>6
+<OPTION VALUE=7>7
+<OPTION VALUE=8>8
+<OPTION VALUE=9>9
+<OPTION VALUE=10>10
+<OPTION VALUE=11>11
+<OPTION VALUE=12>12
+<OPTION VALUE=13>13
+<OPTION VALUE=14>14
+<OPTION VALUE=15>15
+<OPTION VALUE=16>16
+<OPTION VALUE=17>17
+<OPTION VALUE=18>18
+<OPTION VALUE=19>19
+<OPTION VALUE=20>20
+<OPTION VALUE=21>21
+<OPTION VALUE=22>22
+<OPTION VALUE=23>23
+<OPTION VALUE=24>24
+<OPTION VALUE=25>25
+<OPTION VALUE=26>26
+<OPTION VALUE=27>27
+<OPTION VALUE=28>28
+<OPTION VALUE=29>29
+<OPTION VALUE=30>30
+<OPTION VALUE=31>31
+<OPTION VALUE=32>32
+<OPTION VALUE=33>33
+<OPTION VALUE=34>34
+<OPTION VALUE=35>35
+<OPTION VALUE=36>36
+<OPTION VALUE=37>37
+<OPTION VALUE=38>38
+<OPTION VALUE=39>39
+<OPTION VALUE=40>40
+<OPTION VALUE=41>41
+<OPTION VALUE=42>42
+<OPTION VALUE=43>43
+<OPTION VALUE=44>44
+<OPTION VALUE=45>45
+<OPTION VALUE=46>46
+<OPTION VALUE=47>47
+<OPTION VALUE=48>48
+<OPTION VALUE=49>49
+<OPTION VALUE=50>50
+<OPTION VALUE=51>51
+<OPTION VALUE=52>52
+<OPTION VALUE=53>53
+<OPTION VALUE=54>54
+<OPTION VALUE=55>55
+<OPTION VALUE=56>56
+<OPTION VALUE=57>57
+<OPTION VALUE=58>58
+<OPTION VALUE=59>59
+<OPTION VALUE=60>60
+<OPTION VALUE=61>61
+<OPTION VALUE=62>62
+<OPTION VALUE=63>63
+<OPTION VALUE=64>64
+<OPTION VALUE=65>65
+<OPTION VALUE=66>66
+<OPTION VALUE=67>67
+<OPTION VALUE=68>68
+<OPTION VALUE=69>69
+<OPTION VALUE=70>70
+<OPTION VALUE=71>71
+<OPTION VALUE=72>72
+<OPTION VALUE=73>73
+<OPTION VALUE=74>74
+<OPTION VALUE=75>75
+<OPTION VALUE=76>76
+<OPTION VALUE=77>77
+<OPTION VALUE=78>78
+<OPTION VALUE=79>79
+<OPTION VALUE=80>80
+<OPTION VALUE=81>81
+<OPTION VALUE=82>82
+<OPTION VALUE=83>83
+<OPTION VALUE=84>84
+<OPTION VALUE=85>85
+<OPTION VALUE=86>86
+<OPTION VALUE=87>87
+<OPTION VALUE=88>88
+<OPTION VALUE=89>89
+<OPTION VALUE=90>90
+<OPTION VALUE=91>91
+<OPTION VALUE=92>92
+<OPTION VALUE=93>93
+<OPTION VALUE=94>94
+<OPTION VALUE=95>95
+<OPTION VALUE=96>96
+<OPTION VALUE=97>97
+<OPTION VALUE=98>98
+<OPTION VALUE=99>99
+</SELECT>兆円
+<INPUT TYPE="submit" VALUE="入札する" NAME="AuctionButton2">
+</FORM>
+</CENTER>
+</TD>
+<TD BGCOLOR="LAVENDER">
+<A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(0)"><NOBR><FONT COLOR="#800000"><B>01：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(1)"><NOBR><FONT COLOR="#800000"><B>02：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(2)"><NOBR><FONT COLOR="#800000"><B>03：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(3)"><NOBR><FONT COLOR="#800000"><B>04：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(4)"><NOBR><FONT COLOR="#800000"><B>05：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(5)"><NOBR><FONT COLOR="#800000"><B>06：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(6)"><NOBR><FONT COLOR="#800000"><B>07：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(7)"><NOBR><FONT COLOR="#800000"><B>08：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(8)"><NOBR><FONT COLOR="#800000"><B>09：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(9)"><NOBR><FONT COLOR="#800000"><B>10：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(10)"><NOBR><FONT COLOR="#800000"><B>11：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(11)"><NOBR><FONT COLOR="#800000"><B>12：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(12)"><NOBR><FONT COLOR="#800000"><B>13：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(13)"><NOBR><FONT COLOR="#800000"><B>14：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(14)"><NOBR><FONT COLOR="#800000"><B>15：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(15)"><NOBR><FONT COLOR="#800000"><B>16：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(16)"><NOBR><FONT COLOR="#800000"><B>17：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(17)"><NOBR><FONT COLOR="#800000"><B>18：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(18)"><NOBR><FONT COLOR="#800000"><B>19：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(19)"><NOBR><FONT COLOR="#800000"><B>20：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(20)"><NOBR><FONT COLOR="#800000"><B>21：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(21)"><NOBR><FONT COLOR="#800000"><B>22：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(22)"><NOBR><FONT COLOR="#800000"><B>23：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(23)"><NOBR><FONT COLOR="#800000"><B>24：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(24)"><NOBR><FONT COLOR="#800000"><B>25：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(25)"><NOBR><FONT COLOR="#800000"><B>26：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(26)"><NOBR><FONT COLOR="#800000"><B>27：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(27)"><NOBR><FONT COLOR="#800000"><B>28：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(28)"><NOBR><FONT COLOR="#800000"><B>29：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(29)"><NOBR><FONT COLOR="#800000"><B>30：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(30)"><NOBR><FONT COLOR="#800000"><B>31：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(31)"><NOBR><FONT COLOR="#800000"><B>32：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(32)"><NOBR><FONT COLOR="#800000"><B>33：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(33)"><NOBR><FONT COLOR="#800000"><B>34：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(34)"><NOBR><FONT COLOR="#800000"><B>35：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(35)"><NOBR><FONT COLOR="#800000"><B>36：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(36)"><NOBR><FONT COLOR="#800000"><B>37：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(37)"><NOBR><FONT COLOR="#800000"><B>38：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(38)"><NOBR><FONT COLOR="#800000"><B>39：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR><A CLASS="type3" HREF="JavaScript:void(0);" onClick="ns(39)"><NOBR><FONT COLOR="#800000"><B>40：</B></FONT><FONT COLOR="#000000" size="-1"><FONT COLOR="#d08000"><B>資金繰り</B></FONT></FONT></NOBR></A><BR>
+</TD>
+</TR>
+</TABLE>
+</CENTER>
+<HR>
+<CENTER>
+<FONT SIZE=5>コメント更新</FONT><BR>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+コメント<INPUT TYPE=text NAME=MESSAGE SIZE=80 VALUE="こんにちは"><BR>
+パスワード<INPUT TYPE=password NAME=PASSWORD VALUE="pass2">
+<INPUT TYPE=submit VALUE="コメント更新" NAME=MessageButton2>
+<INPUT TYPE="submit" VALUE="各種予想" NAME="TotoButton2">
+
+
+<BR>
+目標の島<SELECT NAME=TARGETID><OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" >テスト島
+<OPTION VALUE="2" SELECTED>Alpha島
+<BR></SELECT>
+有効ターン数<SELECT NAME=AMOUNT>
+<OPTION VALUE=0>0
+<OPTION VALUE=1>1
+<OPTION VALUE=2>2
+<OPTION VALUE=3>3
+<OPTION VALUE=4>4
+<OPTION VALUE=5>5
+<OPTION VALUE=6>6
+<OPTION VALUE=7>7
+<OPTION VALUE=8>8
+<OPTION VALUE=9>9
+<OPTION VALUE=10>10
+<OPTION VALUE=11>11
+<OPTION VALUE=12>12
+<OPTION VALUE=13>13
+<OPTION VALUE=14>14
+<OPTION VALUE=15>15
+<OPTION VALUE=16>16
+<OPTION VALUE=17>17
+<OPTION VALUE=18>18
+<OPTION VALUE=19>19
+<OPTION VALUE=20>20
+<OPTION VALUE=21>21
+<OPTION VALUE=22>22
+<OPTION VALUE=23>23
+<OPTION VALUE=24>24
+</SELECT>
+<INPUT TYPE="submit" VALUE="大量破壊兵器の使用許可申請" NAME="MsButton2">
+<INPUT TYPE="submit" VALUE="申請許可" NAME="Ms2Button2">
+
+<BR><BR>（注）申請許可をされた島からは有効ターンの間、ミサイルを撃たれることが可能になります。
+<BR>　　大使館派遣の際にも、事前に申請許可をもらってから派遣を行なってください。
+</FORM>
+</CENTER>
+<HR>
+<CENTER>
+<FONT SIZE=5><FONT COLOR="#a06040"><B>Alpha島</B></FONT>観光者通信</FONT><BR>
+</CENTER>
+<CENTER>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+<TABLE BORDER>
+<TR>
+<TH>名前</TH>
+<TH COLSPAN=2>内容</TH>
+</TR>
+<TR>
+<TD><INPUT TYPE="text" SIZE=32 MAXLENGTH=32 NAME="LBBSNAME" VALUE=""></TD>
+<TD COLSPAN=2><INPUT TYPE="text" SIZE=80 NAME="LBBSMESSAGE"></TD>
+</TR>
+<TR>
+<TH>パスワード</TH>
+<TH COLSPAN=2>動作</TH>
+</TR>
+<TR>
+<TD><INPUT TYPE=password SIZE=32 MAXLENGTH=32 NAME=PASSWORD VALUE="pass2"></TD>
+<TD align=right>
+<INPUT TYPE="submit" VALUE="記帳する" NAME="LbbsButtonOW2">
+</TD>
+<TD align=right>
+番号
+<SELECT NAME=NUMBER>
+<OPTION VALUE=0>1
+<OPTION VALUE=1>2
+<OPTION VALUE=2>3
+<OPTION VALUE=3>4
+<OPTION VALUE=4>5
+<OPTION VALUE=5>6
+<OPTION VALUE=6>7
+<OPTION VALUE=7>8
+<OPTION VALUE=8>9
+<OPTION VALUE=9>10
+<OPTION VALUE=10>11
+<OPTION VALUE=11>12
+<OPTION VALUE=12>13
+<OPTION VALUE=13>14
+<OPTION VALUE=14>15
+</SELECT>
+<INPUT TYPE="submit" VALUE="削除する" NAME="LbbsButtonDL2">
+</TD>
+</TR>
+</TABLE>
+</FORM>
+</CENTER>
+<CENTER>
+<TABLE BORDER>
+<TR>
+<TH>番号</TH>
+<TH>記帳内容</TH>
+</TR>
+<TR><TD align=center><FONT COLOR="#800000"><B>1</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>2</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>3</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>4</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>5</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>6</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>7</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>8</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>9</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>10</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>11</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>12</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>13</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>14</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR><TR><TD align=center><FONT COLOR="#800000"><B>15</B></FONT></TD><TD><FONT COLOR="#0000ff"><B> > </B></FONT> </TD></TR>
+</TD></TR></TABLE></CENTER>
+<HR>
+<FONT SIZE=5><FONT COLOR="#a06040"><B>Alpha島</B></FONT>の近況</FONT><BR>
+<HR>
+<P align=center>
+管理者:管理人(<A CLASS="type3" HREF="mailto:めあど">めあど</A>)<BR>
+掲示板(<A CLASS="type3" HREF="掲示板">掲示板</A>)<BR>
+トップページ(<A CLASS="type3" HREF="http://">http://</A>)<BR>
+箱庭諸島のページ(<A CLASS="type3" HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html</A>)<BR>
+Hakoniwa R.A.のページ(<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/">http://www5b.biglobe.ne.jp/~k-e-i/</A>)
+<br>
+
+</P>
+<DIV align="right">
+<SMALL>CPU(0.03) : user(0.03) system(0)</SMALL>
+</DIV>
+</BODY>
+</HTML>

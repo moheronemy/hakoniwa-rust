@@ -1,0 +1,188 @@
+{
+ "fixture": "phase5-command",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "LBBSNAME": "島主<b>\"",
+    "LBBSMESSAGE": "長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長いabc",
+    "LbbsButtonOW1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "LBBSNAME": "",
+    "LBBSMESSAGE": "本文",
+    "LbbsButtonOW1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "LBBSNAME": "名",
+    "LBBSMESSAGE": "",
+    "LbbsButtonOW1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "LBBSNAME": "名",
+    "LBBSMESSAGE": "x",
+    "LbbsButtonOW1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "旅人",
+    "LBBSMESSAGE": "こんにちは",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "ISLANDID2": "1",
+    "LBBSTYPE": "SECRET",
+    "LBBSNAME": "秘密",
+    "LBBSMESSAGE": "ないしょ",
+    "LbbsButtonSS2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "SECRET",
+    "LBBSNAME": "秘密2",
+    "LBBSMESSAGE": "お金がない",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "LBBSTYPE": "ANON",
+    "LBBSNAME": "匿名",
+    "LBBSMESSAGE": "どうも",
+    "LbbsButtonSS1": "1"
+   },
+   "addr": "10.9.9.9"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "99",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "誰",
+    "LBBSMESSAGE": "x",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "誰",
+    "LBBSMESSAGE": "x",
+    "LbbsButtonSS99": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "誰",
+    "LBBSMESSAGE": "x",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "",
+    "LBBSMESSAGE": "x",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "ISLANDID2": "1",
+    "LBBSTYPE": "SECRET",
+    "LBBSNAME": "自分",
+    "LBBSMESSAGE": "自島へ",
+    "LbbsButtonSS1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "LbbsButtonDL1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "13",
+    "LbbsButtonDL1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "20",
+    "LbbsButtonDL1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "NUMBER": "0",
+    "LbbsButtonDL1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "ISLANDID2": "1",
+    "LBBSTYPE": "PUBLIC",
+    "LBBSNAME": "公開",
+    "LBBSMESSAGE": "やあ",
+    "LbbsButtonSS3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "ISLANDID2": "2",
+    "LBBSTYPE": "SECRET",
+    "LBBSNAME": "極秘",
+    "LBBSMESSAGE": "秘",
+    "LbbsButtonSS3": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "PASSWORD": "pass2",
+    "OwnerButton": "1"
+   }
+  },
+  {
+   "form": {
+    "TARGETID": "2",
+    "SightButton": "1"
+   }
+  }
+ ]
+}

@@ -1,0 +1,485 @@
+{
+ "fixture": "phase5-command",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-1",
+    "LAMOUNT2": "7",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-1",
+    "LAMOUNT2": "9",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-1",
+    "LAMOUNT2": "abc",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-2",
+    "LAMOUNT2": "1.255",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-3",
+    "LAMOUNT2": "あいうえおかきくけこさしすせそたちつてと<なにぬ>",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-4",
+    "LAMOUNT2": "12abc",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-5",
+    "LAMOUNT2": "5",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-6",
+    "LAMOUNT2": "6",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-7",
+    "LAMOUNT2": "7",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-8",
+    "LAMOUNT2": "8",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-9",
+    "LAMOUNT2": "9",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-10",
+    "LAMOUNT2": "42",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-11",
+    "LAMOUNT2": "20",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-12",
+    "LAMOUNT2": "3",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-13",
+    "LAMOUNT2": "4",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-14",
+    "LAMOUNT2": "5",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "0",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "24",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "3",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "40",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "05",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "abc",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "2.5",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "2",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-15",
+    "LAMOUNT2": "1",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-16",
+    "LAMOUNT2": "8",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-17",
+    "LAMOUNT2": "9",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "-18",
+    "LAMOUNT2": "10",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "1",
+    "POINTY": "1",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "2",
+    "LAMOUNT2": "5000",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "-1",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "4",
+    "LAMOUNT2": "abc",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "20",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "1",
+    "LAMOUNT2": "3",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "2.5",
+    "POINTY": "-12",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "3.9",
+    "LAMOUNT2": "12.7",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "60",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "delete",
+    "LAMOUNT1": "5",
+    "LAMOUNT2": "6",
+    "CommandButton2": "1"
+   }
+  }
+ ]
+}

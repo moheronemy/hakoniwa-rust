@@ -187,9 +187,161 @@ pub fn cut_column(s: &str, c: usize) -> String {
     out
 }
 
+/// 文字列を Perl の数値 (倍精度) として読む (`$s == 1`, `$s > 50`, `$s * 2` などの `$s`)。
+///
+/// 先頭の空白を読み飛ばし、符号・数字・小数点・指数 (`1.5e3`) を読めるだけ読む
+/// (`"10.0.0.1"` は 10、`"12abc"` は 12、`"abc"` は 0)。`Inf`/`Infinity`/`NaN` (大文字小文字を
+/// 問わない) も Perl と同じく読む。[`int`] と違って小数部を残す
+pub fn num(s: &str) -> f64 {
+    let t = s.trim_start_matches([' ', '\t', '\n', '\r', '\x0c']);
+    let b = t.as_bytes();
+    let mut i = 0;
+    let neg = match b.first() {
+        Some(b'-') => {
+            i = 1;
+            true
+        }
+        Some(b'+') => {
+            i = 1;
+            false
+        }
+        _ => false,
+    };
+    let rest = t[i..].to_ascii_lowercase();
+    let special = if rest.starts_with("inf") {
+        Some(f64::INFINITY)
+    } else if rest.starts_with("nan") {
+        Some(f64::NAN)
+    } else {
+        None
+    };
+    if let Some(v) = special {
+        return if neg { -v } else { v };
+    }
+    let start = i;
+    while i < b.len() && b[i].is_ascii_digit() {
+        i += 1;
+    }
+    if i < b.len() && b[i] == b'.' {
+        i += 1;
+        while i < b.len() && b[i].is_ascii_digit() {
+            i += 1;
+        }
+    }
+    // 数字が 1 つも無ければ 0 ("." や "-" だけも 0)
+    if !t[start..i].bytes().any(|c| c.is_ascii_digit()) {
+        return 0.0;
+    }
+    // 指数部は後ろに数字があるときだけ
+    if i < b.len() && (b[i] == b'e' || b[i] == b'E') {
+        let mut j = i + 1;
+        if j < b.len() && (b[j] == b'+' || b[j] == b'-') {
+            j += 1;
+        }
+        if j < b.len() && b[j].is_ascii_digit() {
+            while j < b.len() && b[j].is_ascii_digit() {
+                j += 1;
+            }
+            i = j;
+        }
+    }
+    let v: f64 = t[start..i].parse().unwrap_or(0.0);
+    if neg { -v } else { v }
+}
+
+/// Perl が数値を文字列にする形 (`"$x"`、`%.15g`)。整数ならそのまま、そうでなければ
+/// 有効数字 15 桁で末尾の 0 を落とす (`11.5`、`1e+20`)
+pub fn num_to_string(x: f64) -> String {
+    if x.is_nan() {
+        return "NaN".into();
+    }
+    if x.is_infinite() {
+        return if x > 0.0 { "Inf" } else { "-Inf" }.into();
+    }
+    if x == 0.0 {
+        return "0".into();
+    }
+    let sci = format!("{x:.14e}");
+    let (mantissa, exp) = sci.split_once('e').expect("exponent");
+    let exp: i32 = exp.parse().expect("exponent");
+    let trim = |s: &str| {
+        if s.contains('.') {
+            s.trim_end_matches('0').trim_end_matches('.').to_string()
+        } else {
+            s.to_string()
+        }
+    };
+    if !(-4..15).contains(&exp) {
+        let sign = if exp < 0 { '-' } else { '+' };
+        format!("{}e{sign}{:02}", trim(mantissa), exp.abs())
+    } else {
+        trim(&format!("{:.*}", (14 - exp) as usize, x))
+    }
+}
+
+/// Perl の `$s++` を、数字だけの文字列 (`/^[0-9]*$/` にマッチした値) に適用する。
+///
+/// 正規表現で取り出した値は文字列なので、Perl は「文字列のインクリメント」をして
+/// 桁数を保つ (`"007"` → `"008"`、`"099"` → `"100"`、`"9"` → `"10"`)。空文字列は 1 になる
+pub fn digits_inc(s: &str) -> String {
+    if s.is_empty() {
+        return "1".into();
+    }
+    debug_assert!(s.bytes().all(|b| b.is_ascii_digit()));
+    let mut digits: Vec<u8> = s.bytes().collect();
+    for d in digits.iter_mut().rev() {
+        if *d == b'9' {
+            *d = b'0';
+        } else {
+            *d += 1;
+            return String::from_utf8(digits).expect("ascii");
+        }
+    }
+    let mut out = String::from("1");
+    out.push_str(std::str::from_utf8(&digits).expect("ascii"));
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn num_matches_perl() {
+        assert_eq!(num(""), 0.0);
+        assert_eq!(num("10.0.0.1"), 10.0);
+        assert_eq!(num("192.168.1.9"), 192.168);
+        assert_eq!(num(" 2.5abc"), 2.5);
+        assert_eq!(num("-3"), -3.0);
+        assert_eq!(num("1e3"), 1000.0);
+        assert_eq!(num("1e"), 1.0);
+        assert_eq!(num(".5"), 0.5);
+        assert_eq!(num("."), 0.0);
+        assert_eq!(num("abc"), 0.0);
+        assert_eq!(num("host.example"), 0.0);
+        assert!(num("inf") > 1e300);
+        assert!(num("NaN").is_nan());
+    }
+
+    #[test]
+    fn num_to_string_matches_perl() {
+        assert_eq!(num_to_string(11.5), "11.5");
+        assert_eq!(num_to_string(103.0), "103");
+        assert_eq!(num_to_string(-2.0), "-2");
+        assert_eq!(num_to_string(0.1 + 0.2), "0.3");
+        assert_eq!(num_to_string(1e20), "1e+20");
+        assert_eq!(num_to_string(0.00001), "1e-05");
+        assert_eq!(num_to_string(224.5), "224.5");
+    }
+
+    #[test]
+    fn digits_inc_keeps_width() {
+        assert_eq!(digits_inc(""), "1");
+        assert_eq!(digits_inc("0"), "1");
+        assert_eq!(digits_inc("007"), "008");
+        assert_eq!(digits_inc("099"), "100");
+        assert_eq!(digits_inc("99"), "100");
+    }
 
     #[test]
     fn int_matches_perl() {

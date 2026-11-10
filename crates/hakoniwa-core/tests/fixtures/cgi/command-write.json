@@ -1,0 +1,181 @@
+{
+ "fixture": "phase5-command",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "1",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "3",
+    "POINTY": "4",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   },
+   "addr": "10.0.0.1"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "2",
+    "COMMAND": "31",
+    "AMOUNT": "5",
+    "TARGETID": "2",
+    "POINTX": "1",
+    "POINTY": "2",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   },
+   "addr": "10.0.0.9"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "39",
+    "COMMAND": "7",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "41",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "delete",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "39",
+    "COMMAND": "41",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "delete",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "5",
+    "COMMAND": "3.7",
+    "AMOUNT": "2.9",
+    "TARGETID": "abc",
+    "POINTX": "1,1",
+    "POINTY": " 4",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   },
+   "addr": "192.168.0.1"
+  },
+  {
+   "form": {
+    "PASSWORD": "wrong",
+    "NUMBER": "6",
+    "COMMAND": "2",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   },
+   "addr": "172.16.0.1"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "41",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton3": "1"
+   },
+   "addr": "10.5.5.5"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "1",
+    "COMMAND": "41",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   },
+   "addr": "192.168.1.200"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "2",
+    "COMMAND": "41",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "write",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   },
+   "addr": "host.example"
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "7",
+    "COMMAND": "61",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "delete",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "8",
+    "COMMAND": "8",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "0",
+    "POINTY": "0",
+    "COMMANDMODE": "writeX",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  }
+ ]
+}
