@@ -132,8 +132,10 @@ pub(super) fn build(
         return false;
     }
 
-    // 予定地は島の中 (建設できる地形だったので)
-    let (x, y) = c.cell(&islands[idx]).expect("suitable land is in the island");
+    // 予定地。計画の座標は 0 以上だが島の大きさ以上のことがあり、そこは海 (値 0) として
+    // 読まれる (海あみゅは建設できる)。Perl 版はそこに書き込んでも保存されないので、
+    // 移植版では書き込みを捨てる (島の外の座標を渡すと set/set_value は何もしない)
+    let (x, y) = c.cell(&islands[idx]).unwrap_or((usize::MAX, usize::MAX));
 
     let step = match kind {
         C::Plant => {
@@ -887,7 +889,7 @@ fn college(ctx: &mut TurnContext, island: &mut Island, c: &CmdRun, x: usize, y: 
         } else if ctx.random(100) < 15 {
             3
         } else if ctx.random(100) < 15 {
-            if false {
+            if no_mascot {
                 island.eisei_raw[2] = "3,5,5,5,0,0,0".into();
             }
             4
