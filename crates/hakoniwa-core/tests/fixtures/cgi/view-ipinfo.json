@@ -1,0 +1,4 @@
+{"fixture": "phase6-ipinfo", "rand": "5", "requests": [
+  {"form": {"ISLANDID": "1", "ISLANDNAME": "", "OLDPASS": "uhusnuvnurkanjhfh", "PASSWORD": "", "PASSWORD2": "", "IPInfoButton": "(・∀・)"}},
+  {"form": {"ISLANDID": "1", "ISLANDNAME": "", "OLDPASS": "pass1", "PASSWORD": "", "PASSWORD2": "", "IPInfoButton": "(・∀・)"}}
+]}

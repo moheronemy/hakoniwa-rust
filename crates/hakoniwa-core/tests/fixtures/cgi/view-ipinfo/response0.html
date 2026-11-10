@@ -1,0 +1,260 @@
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>
+☆Hakoniwa R.A.☆
+</TITLE>
+<BASE HREF="http://www.xxxxxxxx/cgi-bin/hako/hakoimg/">
+
+<STYLE type="text/css">
+<!--
+
+	A:link.type1 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type1 { color:#800080; text-decoration: none; }
+
+	A:hover.type1, A:focus.type1 { color:#0000FF; text-decoration: underline; }
+
+	A:action.type1 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type2 { color:#0000FF; text-decoration: underline; }
+
+	A:visited.type2 { color:#800080; text-decoration: underline; }
+
+	A:hover.type2, A:focus.type2 { color:#FF00FF; text-decoration: underline; }
+
+	A:action.type2 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type3 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type3 { color:#800080; text-decoration: none; }
+
+	A:hover.type3, A:focus.type3 { background-color: pink; color: #FFFFFF; text-decoration: none; }
+
+	A:action.type3 { color:#FF0000; text-decoration: none; }
+
+
+	/* 観光画面ナビゲータ・ウィンドウ */
+	#NaviView{
+	  visibility: hidden;
+	  z-index:1;
+	  position:absolute;
+	  background-color: #000000;
+	  border: solid #4169E1;
+	  border-width: 10px 1px 1px 1px;
+	  margin-top : -224px;
+	}
+	.NaviTitle {
+	  color: #ffffff;
+	  font-size: 11pt;
+	}
+	.NaviImg {
+	  margin : 1px;
+	}
+	.NaviText {
+	  color: #ffffff;
+	  font-size: 9pt;
+	}
+	TD.M {
+	  cursor:default;
+	  border-style:outset;
+	  border-width:0px;
+	  border-color:#CCCCFF;
+	}
+
+	body{ scrollbar-3dlight-color:royalblue;
+	scrollbar-arrow-color:royalblue;
+	scrollbar-darkshadow-color:lemonchiffon;
+	scrollbar-face-color:lemonchiffon;
+	scrollbar-highlight-color:lemonchiffon;
+	scrollbar-shadow-color:royalblue;
+	scrollbar-track-color:lemonchiffon;
+
+-->
+
+</STYLE>
+
+</HEAD>
+<BODY BGCOLOR="lemonchiffon">
+[<A CLASS="type3" HREF="http://t.pos.to/hako/" target="_blank">箱庭諸島スクリプト配布元</A>] [<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/" target="_blank">Hakoniwa R.A.スクリプト配布元</A>] [<A CLASS="type3" HREF="http://">トップページ</A>]<HR>
+
+<hr WIDTH="100%">
+<FONT SIZE=7 COLOR="#8888ff">☆Hakoniwa R.A.☆</FONT>（裏ランキング）
+<H1><FONT COLOR="#4444ff">ターン3</FONT></H1>
+
+<HR>
+<H1><FONT COLOR="#4444ff">自分の島へ</FONT></H1>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+あなたの島の名前は？<BR>
+<SELECT NAME="ISLANDID">
+<OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" SELECTED>テスト島
+<OPTION VALUE="2" >Alpha島
+
+</SELECT><BR>
+
+パスワードをどうぞ！！<BR>
+<INPUT TYPE="password" NAME="PASSWORD" VALUE="" SIZE=32 MAXLENGTH=32><BR>
+<INPUT TYPE="submit" VALUE="開発しに行く" NAME="OwnerButton"><BR>
+</FORM>
+
+<HR>
+
+<H1><FONT COLOR="#4444ff">表の説明</FONT></H1>
+<P>
+・IP発見数はそれぞれの島の６つのIPについて、自分以外の全ての島のものから比較して算出してます。<br>
+　つまり複数発見された場合、他の島に同IPがあるということになります(当たり前か^^;)<br><br>
+・IP変化数はプロバイダによりけりなので、多い島はプロバイダについて調べてみるのがいいかもです。<br>
+　複数の回線を使ってる場合は怪しいかもです。ちなみにBIGLOBEは接続の度にIP変動しました(T∇T)<br><br>
+・裏ランキングは同IP発見数で決まっています。高順位のものほど怪しい！？かな！？<br>
+　こうゆうものを数えてみれば怪しさの参考になるのでは？という意見は<br>
+　ぜひご一報を。。。（例）ミサイル発射数、コメント発言数←黙ってる人は怪しいの原理？！<br><br>
+・登録時IPは島発見時のもので、既存の島などは初コマンド入力の際にゲットされます。<br>
+　この情報は基本的に消えないはずです。（バックアップ使用時は未対応かも^^;;;（大汗<br><br>
+・最新 ― ― ― 古 のIPは過去５回までのIPの変動値です。コマンド入力時のIPが最新のものと<br>
+　異なっていた場合に更新されます。その場合古いIPは消えます。（過去５回分では少ないでしょうか？！）
+</P>
+<TABLE BORDER>
+<TR>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>島</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>同IP発見数</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>最新</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>―</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>―</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>―</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>古</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>登録時</B></FONT></NOBR></TH>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=3 align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>1</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=3 align=left nowrap=nowrap>
+<NOBR>
+<A STYlE="text-decoration:none" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1">
+<FONT COLOR="#808080"><B>テスト島(2)</B></FONT>
+</A><br>(ID:1)
+</NOBR>
+</TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>6</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR></NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.8</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.7</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.7</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.1</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.9</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>同IPを発見した島：</B></FONT>箱庭島(ID:3)／Alpha島(ID:2)／箱庭島(ID:3)／Alpha島(ID:2)／Alpha島(ID:2)／Alpha島(ID:2)／</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>その他情報：</B></FONT>00～99ターンでのIP変動数(1回)・通算IP変動数(10回)</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=3 align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>2</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=3 align=left nowrap=nowrap>
+<NOBR>
+<A STYlE="text-decoration:none" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2">
+<FONT COLOR="#808080"><B>Alpha島(23)</B></FONT>
+</A><br>(ID:2)
+</NOBR>
+</TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>6</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR></NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.2</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.2</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.2</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.7</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.9</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>同IPを発見した島：</B></FONT>テスト島(ID:1)／箱庭島(ID:3)／箱庭島(ID:3)／テスト島(ID:1)／テスト島(ID:1)／テスト島(ID:1)／</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>その他情報：</B></FONT>00～99ターンでのIP変動数(2回)・通算IP変動数(20回)</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=3 align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>3</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=3 align=left nowrap=nowrap>
+<NOBR>
+<A STYlE="text-decoration:none" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3">
+<FONT COLOR="#808080"><B>箱庭島(23)</B></FONT>
+</A><br>(ID:3)
+</NOBR>
+</TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>4</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.9</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.5</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.4</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.3</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.3</NOBR></TD>
+<TD BGCOLOR="LIGHTPINK" align=right nowrap=nowrap><NOBR>10.0.0.9</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>同IPを発見した島：</B></FONT>テスト島(ID:1)／Alpha島(ID:2)／テスト島(ID:1)／Alpha島(ID:2)／</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=7 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>その他情報：</B></FONT>00～99ターンでのIP変動数(3回)・通算IP変動数(30回)</NOBR></TD>
+</TR>
+</TABLE>
+
+<HR>
+<H1><FONT COLOR="#4444ff">新しい島を探す</FONT></H1>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+どんな名前をつける予定？<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>島<BR>
+パスワードは？<BR>
+<INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
+念のためパスワードをもう一回<BR>
+<INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
+
+<INPUT TYPE="submit" VALUE="探しに行く" NAME="NewIslandButton">
+</FORM>
+<HR>
+<H1><FONT COLOR="#4444ff">島の名前とパスワードの変更</FONT></H1>
+<P>
+(注意)名前の変更には500億円かかります。
+</P>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+どの島ですか？<BR>
+<SELECT NAME="ISLANDID">
+<OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" SELECTED>テスト島
+<OPTION VALUE="2" >Alpha島
+
+</SELECT>
+<BR>
+どんな名前に変えますか？(変更する場合のみ)<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>島<BR>
+パスワードは？(必須)<BR>
+<INPUT TYPE="password" NAME="OLDPASS" SIZE=32 MAXLENGTH=32><BR>
+新しいパスワードは？(変更する時のみ)<BR>
+<INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
+念のためパスワードをもう一回(変更する時のみ)<BR>
+<INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
+
+<INPUT TYPE="submit" VALUE="変更する" NAME="ChangeInfoButton">
+<INPUT TYPE="submit" VALUE="(・∀・)" NAME="IPInfoButton">
+</FORM>
+
+<HR>
+
+<HR>
+<P align=center>
+管理者:管理人(<A CLASS="type3" HREF="mailto:めあど">めあど</A>)<BR>
+掲示板(<A CLASS="type3" HREF="掲示板">掲示板</A>)<BR>
+トップページ(<A CLASS="type3" HREF="http://">http://</A>)<BR>
+箱庭諸島のページ(<A CLASS="type3" HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html</A>)<BR>
+Hakoniwa R.A.のページ(<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/">http://www5b.biglobe.ne.jp/~k-e-i/</A>)
+<br>
+
+</P>
+<DIV align="right">
+<SMALL>CPU(0.01) : user(0.01) system(0)</SMALL>
+</DIV>
+</BODY>
+</HTML>
