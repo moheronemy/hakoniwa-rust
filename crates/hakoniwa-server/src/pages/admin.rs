@@ -14,7 +14,7 @@ use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use hakoniwa_core::model::GameState;
-use hakoniwa_core::storage;
+use hakoniwa_core::persist;
 use serde::Deserialize;
 
 use super::{
@@ -66,14 +66,14 @@ fn login_form(error: Option<&str>) -> String {
 }
 
 /// データ 1 つ分の概要
-fn summary(title: &str, game: &GameState) -> String {
+fn summary(title: &str, turn: i64, last_time: i64, islands: usize) -> String {
     format!(
         "<tr><th>{}</th><td class=\"num\">ターン{}</td><td>{}<br><small class=\"muted\">{} 秒</small></td><td class=\"num\">{} 島</td>",
         esc(title),
-        game.world.turn,
-        utc(game.world.last_time),
-        game.world.last_time,
-        game.world.islands.len()
+        turn,
+        utc(last_time),
+        last_time,
+        islands
     )
 }
 
@@ -94,14 +94,24 @@ pub async fn admin_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
     );
     {
         let game = app.game.read().await;
-        h.push_str(&summary("現役データ", &game));
+        h.push_str(&summary(
+            "現役データ",
+            game.world.turn,
+            game.world.last_time,
+            game.world.islands.len(),
+        ));
         h.push_str("<td></td></tr>\n");
     }
     for n in 0..app.config.backup_keep {
-        let path = storage::backup_path(&app.state_path, n);
-        match storage::load(&path) {
-            Ok(Some(game)) => {
-                h.push_str(&summary(&format!("バックアップ{n}"), &game));
+        // 見出しだけを読む (状態は展開しない)
+        match persist::read_backup_header(&persist::backup_dir(&app.data_dir, n)) {
+            Ok(Some(head)) => {
+                h.push_str(&summary(
+                    &format!("バックアップ{n}"),
+                    head.turn,
+                    head.last_time,
+                    head.islands,
+                ));
                 let _ = writeln!(
                     h,
                     "<td><form class=\"inline\" method=\"post\" action=\"/admin/restore\">{csrf}<input type=\"hidden\" name=\"n\" value=\"{n}\"><button class=\"secondary\">このデータを現役に</button></form> \
@@ -241,12 +251,14 @@ async fn replace(
 ) -> anyhow::Result<()> {
     let mut writer = app.game.write().await;
     let next = Arc::new(make()?);
-    crate::store::save(
-        app.state_path.clone(),
-        next.clone(),
-        Some(app.config.backup_keep),
-    )
-    .await?;
+    let (current, saved, keep) = (writer.current(), next.clone(), app.config.backup_keep);
+    writer
+        .with_data(move |data| {
+            data.backup(&current, keep)?;
+            data.snapshot(&saved)?;
+            Ok(())
+        })
+        .await?;
     writer.publish(next);
     Ok(())
 }
@@ -305,10 +317,13 @@ pub async fn restore(
     let Some(n) = form.n.filter(|&n| n < app.config.backup_keep) else {
         return Redirect::to("/admin").into_response();
     };
-    let path = storage::backup_path(&app.state_path, n);
+    let dir = persist::backup_dir(&app.data_dir, n);
     // 戻す前にバックアップの番号がずれるので、読み込んでから差し替える
     let result = replace(&app, || {
-        storage::load(&path)?.ok_or_else(|| anyhow::anyhow!("バックアップ{n}がありません"))
+        if !dir.exists() {
+            anyhow::bail!("バックアップ{n}がありません");
+        }
+        Ok(persist::read_backup(&dir)?)
     })
     .await;
     done(
@@ -332,8 +347,12 @@ pub async fn delete_backup(
     let Some(n) = form.n.filter(|&n| n < app.config.backup_keep) else {
         return Redirect::to("/admin").into_response();
     };
-    let path = storage::backup_path(&app.state_path, n);
-    let result = std::fs::remove_file(&path).map_err(anyhow::Error::from);
+    let dir = persist::backup_dir(&app.data_dir, n);
+    // バックアップのログはハードリンクなので、消しても今のデータのログは残る
+    let result = {
+        let _writer = app.game.write().await;
+        std::fs::remove_dir_all(&dir).map_err(anyhow::Error::from)
+    };
     done(
         &app,
         &login,

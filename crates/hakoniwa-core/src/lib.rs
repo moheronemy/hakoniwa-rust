@@ -5,6 +5,7 @@
 //! - [`tables`] — 地形・計画・怪獣などの定義表 (Perl 版から自動生成)
 //! - [`model`] — セーブデータのモデル
 //! - [`storage`] — 移植版のセーブデータ (JSON) の読み書き
+//! - [`persist`] — 大規模向けのセーブデータ (スナップショット・操作の差分・ターンごとのログ)
 //! - [`land`] — 地形の名前と周囲の数え上げ
 //! - [`legacy`] — Perl 版のセーブデータの読み込み
 //! - [`legacy_settings`] — Perl 版の設定 (`hako-main.cgi`) の読み込み
@@ -24,6 +25,7 @@ pub mod legacy_settings;
 pub mod log;
 pub mod model;
 pub mod perl;
+pub mod persist;
 pub mod storage;
 pub mod tables;
 pub mod turn;

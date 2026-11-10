@@ -23,6 +23,7 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::{get, post};
 use clap::Parser;
+use hakoniwa_core::persist::DataDir;
 use hakoniwa_core::{GameConfig, GameState, storage};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
@@ -34,6 +35,11 @@ struct Args {
     /// 設定ファイル (TOML)。省略時は既定値で動く
     #[arg(long, short)]
     config: Option<PathBuf>,
+    /// サーバーを起動せず、データディレクトリの状態を JSON に書き出して終わる
+    /// (中身を確かめるとき、データの形式の版が変わるときに使う。書き出した JSON は
+    /// データディレクトリを消して `state_path` に置けば、次の起動で読み込まれる)
+    #[arg(long, value_name = "PATH")]
+    export_json: Option<PathBuf>,
 }
 
 /// サーバーの設定ファイル
@@ -42,8 +48,11 @@ struct Args {
 struct ServerConfig {
     /// 待ち受けるアドレス
     bind: String,
-    /// セーブデータのパス
+    /// JSON のセーブデータ (`hako-convert` が書くもの)。データディレクトリがまだ無いときに読み込む
     state_path: PathBuf,
+    /// データディレクトリ (スナップショット・操作の差分・ターンごとのログ・バックアップ)。
+    /// 省略時は `state_path` と同じディレクトリの `store`
+    data_dir: Option<PathBuf>,
     /// ターンの時刻を確かめる間隔 (秒)
     tick_secs: u64,
     /// 画面まわりの設定
@@ -71,6 +80,7 @@ impl Default for ServerConfig {
         Self {
             bind: "127.0.0.1:8080".into(),
             state_path: "data/state.json".into(),
+            data_dir: None,
             tick_secs: 10,
             options: ServerOptions::default(),
             game: GameConfig::default(),
@@ -82,7 +92,8 @@ pub struct AppState {
     pub config: GameConfig,
     pub options: ServerOptions,
     pub sessions: session::Sessions,
-    pub state_path: PathBuf,
+    /// データディレクトリ (バックアップの一覧に使う)
+    pub data_dir: PathBuf,
     /// ゲームの状態 (読み取りはスナップショット、書き込みは順番待ち。[`store`] を参照)
     pub game: store::Store,
 }
@@ -172,6 +183,44 @@ async fn debug_turn(State(app): State<Arc<AppState>>) -> Response {
     }
 }
 
+/// データディレクトリを読み込む。無ければ JSON のセーブデータ (`state_path`) から作り、
+/// それも無ければ新しいゲームを始める
+fn open_data(
+    data_dir: &std::path::Path,
+    state_path: &std::path::Path,
+    config: &GameConfig,
+) -> Result<(DataDir, GameState)> {
+    let started = std::time::Instant::now();
+    if let Some((data, game)) = DataDir::open(data_dir)? {
+        tracing::info!(
+            path = %data_dir.display(),
+            turn = game.world.turn,
+            islands = game.world.islands.len(),
+            secs = started.elapsed().as_secs_f64(),
+            "セーブデータを読み込みました"
+        );
+        return Ok((data, game));
+    }
+    let game = match storage::load(state_path)? {
+        Some(game) => {
+            tracing::info!(
+                from = %state_path.display(),
+                to = %data_dir.display(),
+                turn = game.world.turn,
+                islands = game.world.islands.len(),
+                "JSON のセーブデータをデータディレクトリに移しました"
+            );
+            game
+        }
+        None => {
+            tracing::info!(path = %data_dir.display(), "新しいゲームを作りました");
+            GameState::new_game(now_unix(), config)
+        }
+    };
+    let data = DataDir::create(data_dir, &game)?;
+    Ok((data, game))
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -190,30 +239,28 @@ async fn main() -> Result<()> {
         None => ServerConfig::default(),
     };
 
-    let game = match storage::load(&config.state_path)? {
-        Some(game) => {
-            tracing::info!(
-                path = %config.state_path.display(),
-                turn = game.world.turn,
-                islands = game.world.islands.len(),
-                "セーブデータを読み込みました"
-            );
-            game
-        }
-        None => {
-            let game = GameState::new_game(now_unix(), &config.game);
-            storage::save(&config.state_path, &game)?;
-            tracing::info!(path = %config.state_path.display(), "新しいゲームを作りました");
-            game
-        }
-    };
+    let data_dir = config.data_dir.clone().unwrap_or_else(|| {
+        config
+            .state_path
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .join("store")
+    });
+    if let Some(out) = &args.export_json {
+        let (_, game) = DataDir::open(&data_dir)?
+            .with_context(|| format!("{} にセーブデータがありません", data_dir.display()))?;
+        storage::save(out, &game)?;
+        tracing::info!(path = %out.display(), turn = game.world.turn, "JSON に書き出しました");
+        return Ok(());
+    }
+    let (data, game) = open_data(&data_dir, &config.state_path, &config.game)?;
 
     let state = Arc::new(AppState {
         config: config.game,
         options: config.options,
         sessions: Default::default(),
-        state_path: config.state_path,
-        game: store::Store::new(game, StdRng::from_entropy()),
+        data_dir,
+        game: store::Store::new(game, StdRng::from_entropy(), data),
     });
     tokio::spawn(turns::scheduler(
         state.clone(),
@@ -246,12 +293,14 @@ mod tests {
     pub(crate) fn test_app_with(config: GameConfig) -> (Arc<AppState>, tempfile::TempDir) {
         let dir = tempfile::tempdir().unwrap();
         let game = GameState::new_game(1_794_250_000, &config);
+        let data_dir = dir.path().join("store");
+        let data = DataDir::create(&data_dir, &game).unwrap();
         let app = Arc::new(AppState {
             config,
             options: ServerOptions::default(),
             sessions: Default::default(),
-            state_path: dir.path().join("state.json"),
-            game: store::Store::new(game, StdRng::seed_from_u64(0)),
+            data_dir,
+            game: store::Store::new(game, StdRng::seed_from_u64(0), data),
         });
         (app, dir)
     }

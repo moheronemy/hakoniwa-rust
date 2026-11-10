@@ -152,12 +152,14 @@ pub(crate) mod test_util {
         )
         .unwrap()
         .state;
+        let data_dir = dir.path().join("store");
+        let data = hakoniwa_core::persist::DataDir::create(&data_dir, &game).unwrap();
         let state = Arc::new(AppState {
             config: GameConfig::default(),
             options: ServerOptions::default(),
             sessions: Default::default(),
-            state_path: dir.path().join("state.json"),
-            game: crate::store::Store::new(game, StdRng::seed_from_u64(0)),
+            data_dir,
+            game: crate::store::Store::new(game, StdRng::seed_from_u64(0), data),
         });
         (state, dir)
     }
@@ -277,8 +279,8 @@ mod tests {
         let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
         assert!(page.contains("コメントを更新しました"));
         assert!(page.contains("value=\"やあ&lt;b&gt;\""), "{page}");
-        // 保存もされている
-        let saved = hakoniwa_core::storage::load(&state.state_path)
+        // 保存もされている (データディレクトリを読み直すと、操作の差分が当たっている)
+        let (_, saved) = hakoniwa_core::persist::DataDir::open(&state.data_dir)
             .unwrap()
             .unwrap();
         assert_eq!(
@@ -581,6 +583,14 @@ mod tests {
         .await;
         assert_eq!(res.status(), 303);
         assert_eq!(state.game.read().await.world.islands.len(), 3);
+        // データディレクトリを読み直しても戻っている (再起動したときと同じ)
+        let (_, saved) = hakoniwa_core::persist::DataDir::open(&state.data_dir)
+            .unwrap()
+            .unwrap();
+        assert_eq!(saved.world.islands.len(), 3);
+        assert_eq!(saved.world.last_time, 1000);
+        let page = body(send(&state, get("/admin", Some(&cookie))).await).await;
+        assert!(page.contains("バックアップ0"), "{page}");
     }
 
     #[tokio::test]

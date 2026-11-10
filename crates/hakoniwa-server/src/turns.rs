@@ -11,7 +11,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Result;
-use hakoniwa_core::storage;
 use hakoniwa_core::turn::run_turn;
 
 use crate::store::Writer;
@@ -21,19 +20,19 @@ use crate::{AppState, now_unix};
 async fn run_one(app: &AppState, writer: &mut Writer<'_>) -> Result<i64> {
     let current = writer.current();
     let config = app.config.clone();
-    let path = app.state_path.clone();
     let mut rng = writer.rng().clone();
-    let (next, turn, rng) = tokio::task::spawn_blocking(move || -> Result<_> {
-        let mut next = (*current).clone();
-        drop(current);
-        let report = run_turn(&mut next, &config, &mut rng);
-        if report.backup_due {
-            storage::rotate_backups(&path, config.backup_keep)?;
-        }
-        storage::save(&path, &next)?;
-        Ok((next, report.turn, rng))
-    })
-    .await??;
+    let (next, turn, rng) = writer
+        .with_data(move |data| {
+            let mut next = (*current).clone();
+            let report = run_turn(&mut next, &config, &mut rng);
+            // バックアップはターンの前のデータ (Perl 版がターンの前に data を退避していたのと同じ)
+            if report.backup_due {
+                data.backup(&current, config.backup_keep)?;
+            }
+            data.snapshot(&next)?;
+            Ok((next, report.turn, rng))
+        })
+        .await?;
     // 保存できたときだけ新しい状態を公開し、乱数を進める
     *writer.rng() = rng;
     writer.publish(Arc::new(next));
@@ -97,7 +96,10 @@ mod tests {
         let game = app.game.read().await;
         assert_eq!(game.world.last_time, start + unit * 3);
         // 保存もされている
-        let saved = storage::load(&app.state_path).unwrap().unwrap();
+        let (data, saved) = hakoniwa_core::persist::DataDir::open(&app.data_dir)
+            .unwrap()
+            .unwrap();
+        assert_eq!(data.header().turn, 4);
         assert_eq!(saved.world.turn, 4);
     }
 

@@ -7,27 +7,37 @@
 //! - 書き込む側は今の状態を複製して書き換え、保存できたときだけ新しいスナップショットとして公開する。
 //!   地図とターンのログは複製のあいだで共有されるので (`hakoniwa_core::model`)、複製は安い
 //! - 重い処理 (ターン処理・保存) は `spawn_blocking` で行い、非同期の処理を止めない
+//! - 保存はデータディレクトリ ([`hakoniwa_core::persist`]) に行う。画面の操作は差分を追記し、
+//!   ターン処理のあとはスナップショットを書き直す
 
-use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 
 use hakoniwa_core::model::GameState;
-use hakoniwa_core::storage;
+use hakoniwa_core::persist::DataDir;
 use rand::rngs::StdRng;
 use tokio::sync::{Mutex, MutexGuard};
 
 pub struct Store {
     /// 公開中のスナップショット。ロックはポインタを取り出す・差し替えるあいだだけ持つ
     current: RwLock<Arc<GameState>>,
-    /// 書き込みの順番待ち。乱数は書き込む側だけが使うので、ここに持つ
-    writer: Mutex<StdRng>,
+    /// 書き込みの順番待ち。書き込む側だけが使う乱数とデータディレクトリをここに持つ
+    writer: Mutex<WriterState>,
+}
+
+struct WriterState {
+    rng: StdRng,
+    /// 書き込みの順番を持っているあいだだけ使う。別のスレッドに渡すため `Arc<Mutex>` にしてある
+    data: Arc<std::sync::Mutex<DataDir>>,
 }
 
 impl Store {
-    pub fn new(game: GameState, rng: StdRng) -> Self {
+    pub fn new(game: GameState, rng: StdRng, data: DataDir) -> Self {
         Self {
             current: RwLock::new(Arc::new(game)),
-            writer: Mutex::new(rng),
+            writer: Mutex::new(WriterState {
+                rng,
+                data: Arc::new(std::sync::Mutex::new(data)),
+            }),
         }
     }
 
@@ -45,15 +55,15 @@ impl Store {
     pub async fn write(&self) -> Writer<'_> {
         Writer {
             store: self,
-            rng: self.writer.lock().await,
+            state: self.writer.lock().await,
         }
     }
 }
 
-/// 書き込みの権利。今の状態の取り出し・乱数・新しい状態の公開ができる
+/// 書き込みの権利。今の状態の取り出し・乱数・保存・新しい状態の公開ができる
 pub struct Writer<'a> {
     store: &'a Store,
-    rng: MutexGuard<'a, StdRng>,
+    state: MutexGuard<'a, WriterState>,
 }
 
 impl Writer<'_> {
@@ -63,7 +73,17 @@ impl Writer<'_> {
     }
 
     pub fn rng(&mut self) -> &mut StdRng {
-        &mut self.rng
+        &mut self.state.rng
+    }
+
+    /// データディレクトリ。別のスレッドで `f` を呼ぶ (書き込みの順番を持っているので、ほかに使う者はいない)
+    pub async fn with_data<T: Send + 'static>(
+        &self,
+        f: impl FnOnce(&mut DataDir) -> anyhow::Result<T> + Send + 'static,
+    ) -> anyhow::Result<T> {
+        let data = self.state.data.clone();
+        tokio::task::spawn_blocking(move || f(&mut data.lock().expect("data dir lock poisoned")))
+            .await?
     }
 
     /// 新しい状態を公開する (保存が済んでから呼ぶ)
@@ -72,35 +92,22 @@ impl Writer<'_> {
     }
 }
 
-/// `state` を `path` に保存する。`rotate_backups` が `Some(n)` なら、先にバックアップを n 個までずらす。
-/// 保存は別のスレッドで行う
-pub async fn save(
-    path: PathBuf,
-    state: Arc<GameState>,
-    rotate_backups: Option<usize>,
-) -> anyhow::Result<()> {
-    tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
-        if let Some(keep) = rotate_backups {
-            storage::rotate_backups(&path, keep)?;
-        }
-        storage::save(&path, &state)?;
-        Ok(())
-    })
-    .await?
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use hakoniwa_core::GameConfig;
     use rand::SeedableRng;
 
+    fn test_store(dir: &std::path::Path) -> Store {
+        let game = GameState::new_game(1_000_000, &GameConfig::default());
+        let data = DataDir::create(dir, &game).unwrap();
+        Store::new(game, StdRng::seed_from_u64(0), data)
+    }
+
     #[tokio::test]
     async fn readers_keep_their_snapshot_while_a_writer_publishes() {
-        let store = Store::new(
-            GameState::new_game(1_000_000, &GameConfig::default()),
-            StdRng::seed_from_u64(0),
-        );
+        let tmp = tempfile::tempdir().unwrap();
+        let store = test_store(tmp.path());
         let before = store.snapshot();
         let mut w = store.write().await;
         // 書き込み中でも読める
@@ -115,10 +122,8 @@ mod tests {
 
     #[tokio::test]
     async fn writers_wait_in_order() {
-        let store = Arc::new(Store::new(
-            GameState::new_game(1_000_000, &GameConfig::default()),
-            StdRng::seed_from_u64(0),
-        ));
+        let tmp = tempfile::tempdir().unwrap();
+        let store = Arc::new(test_store(tmp.path()));
         let first = store.write().await;
         let order = Arc::new(std::sync::Mutex::new(Vec::new()));
         let mut tasks = Vec::new();

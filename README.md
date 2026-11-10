@@ -26,13 +26,17 @@ cargo run -p hako-convert -- --settings path/to/hako-main.cgi path/to/perl/data 
 
 # サーバーを起動する (http://127.0.0.1:8080)。データが無ければ新しいゲームを始める
 cargo run -p hakoniwa-server -- --config data/hakoniwa.toml
+
+# セーブデータを JSON に書き出す (中身を確かめるとき、データの形式が変わるとき)
+cargo run -p hakoniwa-server -- --config data/hakoniwa.toml --export-json backup.json
 ```
 
 設定ファイルの例 (書かなかった項目は Perl 版の既定値になる):
 
 ```toml
 bind = "127.0.0.1:8080"
-state_path = "data/state.json"
+state_path = "data/state.json"  # 最初の起動で読み込む JSON (hako-convert が書くもの)
+# data_dir = "data/store"       # セーブデータの置き場所 (省略時は state_path と同じ場所の store)
 tick_secs = 10                # ターンの時刻を確かめる間隔
 secure_cookie = false         # HTTPS で公開するなら true
 trust_forwarded = false       # リバースプロキシの後ろなら true

@@ -31,7 +31,8 @@
 hako-convert --settings path/to/hako-main.cgi path/to/data-copy new/state.json
 ```
 
-- `new/state.json` — 移植版のセーブデータ
+- `new/state.json` — 移植版のセーブデータ (JSON)。サーバーは最初の起動のときにこれを読み込み、
+  データディレクトリ (既定では `new/store/`) に移す。以後はデータディレクトリだけを使う
 - `new/hakoniwa.toml` — サーバーの設定ファイル (`--config-out` で場所を変えられる)。
   Perl 版の設定を移したもの。**パスワードが平文で入る**ので、ファイルの権限に気をつける
 - 読めなかった値や形式の違うデータは「警告」として出る。島の数・ターン数が合っているか確かめる
@@ -49,7 +50,8 @@ hako-convert --settings path/to/hako-main.cgi path/to/data-copy new/state.json
 
 ```toml
 bind = "127.0.0.1:8080"        # 待ち受けるアドレス
-state_path = "new/state.json"  # セーブデータ
+state_path = "new/state.json"  # 最初の起動で読み込む JSON のセーブデータ
+# data_dir = "new/store"       # データディレクトリ (省略時は state_path と同じ場所の store)
 tick_secs = 10                 # ターンの時刻を確かめる間隔 (秒)
 secure_cookie = true           # HTTPS で公開するなら true (ログインのクッキーに Secure を付ける)
 trust_forwarded = true         # リバースプロキシの後ろに置くなら true (X-Forwarded-For を接続元にする)
@@ -81,8 +83,18 @@ User=hakoniwa
 Restart=on-failure
 ```
 
-保存は `state.json` を書き換えるだけなので、動かしたまま複製してバックアップを取れる
-(ターン処理ではさらに `state.bak<N>.json` を `$HbackupTurn` ターンおきに `$HbackupTimes` 個まで残す)。
+保存はデータディレクトリ (`data_dir`) に行う ([SCALING.md](SCALING.md) の手順 3):
+
+- `snapshot.bin` — 状態のスナップショット (ターンのたびに書き直す)
+- `journal-<世代>.bin` — そのあとの画面の操作の差分 (操作のたびに追記する)
+- `logs/` — ターンごとのログ
+- `backup<N>/` — ターン処理で `$HbackupTurn` ターンおきに `$HbackupTimes` 個まで残すバックアップ
+
+動かしたままディレクトリを複製すると、スナップショットと差分の組が合わないことがある。
+外にバックアップを取るときは `backup<N>/` を複製するか、JSON に書き出す
+(`hakoniwa-server --config ... --export-json backup.json`。動かしたままでも読める)。
+書き出した JSON は、データディレクトリを消して `state_path` に置けば次の起動で読み込まれる
+(移植版を新しい版にしてデータの形式が変わったときも、この手順で移す)。
 
 ## 6. 確かめる
 

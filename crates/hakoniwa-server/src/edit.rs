@@ -10,7 +10,7 @@ use hakoniwa_core::actions::ActionError;
 use hakoniwa_core::model::GameState;
 use rand::rngs::StdRng;
 
-use crate::{AppState, store};
+use crate::AppState;
 
 #[derive(Debug, thiserror::Error)]
 pub enum EditError {
@@ -34,7 +34,9 @@ pub async fn edit<T>(
     // Perl 版は次に読み込むときに空の出品の品物を決め直す (入札の値が壊れたときなど)
     hakoniwa_core::model::reroll_empty_lots(&mut next.world.auction_lots, rng);
     let next = Arc::new(next);
-    store::save(app.state_path.clone(), next.clone(), None)
+    let (prev, saved) = (writer.current(), next.clone());
+    writer
+        .with_data(move |data| Ok(data.record(&prev, &saved)?))
         .await
         .map_err(EditError::Save)?;
     writer.publish(next);

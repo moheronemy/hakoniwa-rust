@@ -9,6 +9,10 @@
 //!     --fixture size-128-1 --islands 1000 --turns 3 --max-turn-secs 10
 //! ```
 //!
+//! `--persist DIR` を付けると、データディレクトリ ([`hakoniwa_core::persist`]) への保存を測る
+//! (最初のスナップショット、ターンごとのスナップショット、画面の操作 1 件の差分、読み込み)。
+//! `DIR` の中身は消して作り直す。
+//!
 //! `--save PATH` を付けると、複製して作った (ターンを進める前の) 状態を `state.json` の形で保存する
 //! (サーバーを目標の規模で動かして確かめるため)。
 //!
@@ -21,6 +25,7 @@ use std::time::Instant;
 
 use hakoniwa_core::GameConfig;
 use hakoniwa_core::legacy::{self, ImportOptions};
+use hakoniwa_core::persist::DataDir;
 use hakoniwa_core::turn::run_turn;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
@@ -31,6 +36,7 @@ struct Args {
     turns: usize,
     max_turn_secs: Option<f64>,
     save: Option<std::path::PathBuf>,
+    persist: Option<std::path::PathBuf>,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -40,6 +46,7 @@ fn parse_args() -> Result<Args, String> {
         turns: 3,
         max_turn_secs: None,
         save: None,
+        persist: None,
     };
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
@@ -52,10 +59,24 @@ fn parse_args() -> Result<Args, String> {
                 args.max_turn_secs = Some(value()?.parse().map_err(|e| format!("{a}: {e}"))?)
             }
             "--save" => args.save = Some(value()?.into()),
+            "--persist" => args.persist = Some(value()?.into()),
             _ => return Err(format!("知らない引数 {a}")),
         }
     }
     Ok(args)
+}
+
+fn dir_size(dir: &Path) -> u64 {
+    std::fs::read_dir(dir)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|e| match e.metadata() {
+            Ok(m) if m.is_dir() => dir_size(&e.path()),
+            Ok(m) => m.len(),
+            Err(_) => 0,
+        })
+        .sum()
 }
 
 fn main() -> ExitCode {
@@ -106,6 +127,17 @@ fn main() -> ExitCode {
         println!("{} に保存しました", path.display());
     }
 
+    let mut data = args.persist.as_ref().map(|dir| {
+        let _ = std::fs::remove_dir_all(dir);
+        let t = Instant::now();
+        let data = DataDir::create(dir, &game).expect("データディレクトリを作れません");
+        println!(
+            "データディレクトリ: 最初のスナップショット {:.3} 秒",
+            t.elapsed().as_secs_f64()
+        );
+        data
+    });
+
     let mut rng = StdRng::seed_from_u64(1);
     let mut worst: f64 = 0.0;
     for _ in 0..args.turns {
@@ -119,6 +151,49 @@ fn main() -> ExitCode {
             report.turn,
             game.world.islands.len()
         );
+        if let Some(data) = &mut data {
+            let t = Instant::now();
+            data.snapshot(&game).expect("スナップショットを書けません");
+            println!(
+                "            スナップショット {:.3} 秒",
+                t.elapsed().as_secs_f64()
+            );
+        }
+    }
+
+    if let (Some(data), Some(dir)) = (&mut data, &args.persist) {
+        // 画面の操作 1 件: コメントの変更 (地図は変わらない) と、地図の 1 マスの変更
+        let mut times = Vec::new();
+        for n in 0..20 {
+            let mut next = game.clone();
+            let island = &mut next.world.islands[n * 37 % args.islands];
+            if n % 2 == 0 {
+                island.comment = format!("負荷テスト{n}");
+            } else {
+                island.map.get_mut(1, 1).expect("1,1").value += 1;
+            }
+            let t = Instant::now();
+            data.record(&game, &next).expect("差分を書けません");
+            times.push(t.elapsed().as_secs_f64());
+            game = next;
+        }
+        times.sort_by(f64::total_cmp);
+        println!(
+            "画面の操作の差分 20 件: 中央 {:.1} ms、最大 {:.1} ms",
+            times[10] * 1e3,
+            times[19] * 1e3
+        );
+        let t = Instant::now();
+        let (_, back) = DataDir::open(dir)
+            .expect("読み込めません")
+            .expect("データがありません");
+        println!(
+            "読み込み (スナップショット + 差分 20 件): {:.3} 秒",
+            t.elapsed().as_secs_f64()
+        );
+        assert_eq!(back.world.islands.len(), game.world.islands.len());
+        assert_eq!(back.world.islands[37].map, game.world.islands[37].map);
+        println!("ディスク: {:.1} MB", dir_size(dir) as f64 / 1e6);
     }
 
     let t = Instant::now();
