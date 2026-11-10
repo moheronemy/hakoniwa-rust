@@ -1670,3 +1670,31 @@ fn phase4_migrate_4_matches_perl_with_rand_02734375() {
 fn phase4_migrate_4_matches_perl_with_rand_50() {
     check_fixture_at("phase4-migrate-4", "50");
 }
+
+/// 島全体の処理まで含めたターンを 2 回 (tools/fixtures/phase4_mix.py)
+macro_rules! phase4_mix_tests {
+    ($($name:ident => $fixture:literal,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                check_fixture_at($fixture, "50");
+                check_fixture_at($fixture, "75");
+                check_fixture_at($fixture, "96875");
+            }
+        )*
+    };
+}
+
+phase4_mix_tests! {
+    phase4_mix_1_matches_perl => "phase4-mix-1",
+    phase4_mix_2_matches_perl => "phase4-mix-2",
+    phase4_mix_3_matches_perl => "phase4-mix-3",
+    phase4_mix_4_matches_perl => "phase4-mix-4",
+    phase4_mix_5_matches_perl => "phase4-mix-5",
+    phase4_mix_6_matches_perl => "phase4-mix-6",
+    // 島全体の処理だけ (政策の調整・維持費・あふれの上限)
+    phase4_policy_1_matches_perl => "phase4-policy-1",
+    phase4_policy_2_matches_perl => "phase4-policy-2",
+    phase4_policy_3_matches_perl => "phase4-policy-3",
+    phase4_policy_4_matches_perl => "phase4-policy-4",
+}
