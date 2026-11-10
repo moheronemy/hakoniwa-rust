@@ -4,7 +4,7 @@ use std::fmt::Write;
 use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::{Path, State};
+use axum::extract::{Path, Query, State};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use hakoniwa_core::GameConfig;
@@ -120,10 +120,18 @@ fn visitor_lbbs(config: &GameConfig, island: &Island, csrf: Option<&str>) -> Str
     h
 }
 
+/// 地図の出し方 (`?map=table` なら大きな地図も表で出す)
+#[derive(Debug, serde::Deserialize)]
+pub struct MapQuery {
+    #[serde(default)]
+    map: String,
+}
+
 pub async fn island_page(
     State(app): State<Arc<AppState>>,
     headers: HeaderMap,
     Path(id): Path<i64>,
+    Query(q): Query<MapQuery>,
 ) -> Response {
     let login = login_of(&app, &headers).await;
     let body = {
@@ -152,7 +160,12 @@ pub async fn island_page(
             // コメントは保存の時点でエスケープ済み
             comment = island.comment,
             info = crate::render::info_html(&view.info),
-            map = crate::render::map_html(&view, app.options.image_dir.is_some(), false),
+            map = crate::render::map_html(
+                &view,
+                app.options.image_dir.is_some(),
+                false,
+                q.map == "table"
+            ),
         );
         let recent = crate::render::recent_html(
             &island.name,

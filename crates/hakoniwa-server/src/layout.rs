@@ -93,6 +93,12 @@ table.islands td.sub { border-bottom: 2px solid var(--line); font-size: .9em; }
 .paging a { margin-right: 8px; }
 table.info th { width: 8em; white-space: nowrap; color: var(--muted); font-weight: 500; }
 .map .axis { color: var(--muted); font-size: 10px; }
+.map-canvas { color: var(--muted); }
+.map-tools { margin: 4px 0; }
+.map-scroll { position: relative; overflow: auto; max-width: 100%; max-height: 80vh; border: 1px solid var(--line); }
+.map-scroll canvas { display: block; }
+.map-tip { position: absolute; z-index: 2; pointer-events: none; white-space: pre-line; max-width: 280px;
+  background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
 @media (max-width: 480px) { .map .cell, .map .cell img, .map .cell .tile { width: 24px; height: 24px; font-size: 9px; } }
 "#;
 

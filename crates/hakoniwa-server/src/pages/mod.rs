@@ -586,6 +586,66 @@ mod tests {
         assert!(top.contains("続きと、それより前の出来事"), "{top}");
     }
 
+    /// 大きな地図は canvas で描き (データは JSON で埋め込む)、`?map=table` なら表で出す
+    #[tokio::test]
+    async fn large_maps_are_drawn_on_a_canvas() {
+        let (state, _dir) = crate::tests::test_app_with(hakoniwa_core::GameConfig {
+            island_size: 40,
+            ..Default::default()
+        });
+        let id = crate::edit::edit(&state, |game, rng| {
+            hakoniwa_core::actions::create::new_island(
+                game,
+                &state.config,
+                hakoniwa_core::actions::Request {
+                    now: 1_794_250_000,
+                    remote_addr: "10.0.0.9",
+                },
+                rng,
+                &hakoniwa_core::actions::create::NewIslandInput {
+                    name: "大地",
+                    owner_name: "o",
+                    password: "pw",
+                    password2: "pw",
+                    message: "m",
+                },
+            )
+        })
+        .await
+        .unwrap();
+
+        let page = body(send(&state, get(&format!("/island/{id}"), None)).await).await;
+        assert!(
+            page.contains("data-map") && page.contains("<canvas"),
+            "{page}"
+        );
+        assert!(!page.contains("role=\"grid\""));
+        let json = page
+            .split("<script type=\"application/json\" class=\"map-data\">")
+            .nth(1)
+            .unwrap()
+            .split("</script>")
+            .next()
+            .unwrap();
+        let data: serde_json::Value = serde_json::from_str(json).unwrap();
+        assert_eq!(data["size"], 40);
+        assert_eq!(data["t"].as_array().unwrap().len(), 1600);
+        assert_eq!(data["l"].as_array().unwrap().len(), 1600);
+        assert_eq!(data["owner"], false);
+        // 辞書の番号は辞書の中を指す
+        let tiles = data["tiles"].as_array().unwrap().len() as u64;
+        assert!(
+            data["t"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|v| v.as_u64().unwrap() < tiles)
+        );
+
+        let page = body(send(&state, get(&format!("/island/{id}?map=table"), None)).await).await;
+        assert!(page.contains("role=\"grid\"") && !page.contains("<canvas"));
+    }
+
     #[tokio::test]
     async fn admin_flow() {
         let (mut state, _dir) = legacy_app();

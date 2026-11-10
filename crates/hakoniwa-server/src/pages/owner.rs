@@ -31,6 +31,9 @@ pub struct OwnerQuery {
     n: Option<usize>,
     #[serde(default)]
     lamount1: String,
+    /// `table` なら大きな地図も表で出す
+    #[serde(default)]
+    map: String,
 }
 
 fn options(choices: &[view::owner::Choice], selected_value: Option<i64>) -> String {
@@ -195,7 +198,12 @@ pub async fn owner_page(
                 &view::recent_logs(&game, &app.config, island.id, true)
             ),
             name = esc(&island.name),
-            map = crate::render::map_html(&iv, app.options.image_dir.is_some(), true),
+            map = crate::render::map_html(
+                &iv,
+                app.options.image_dir.is_some(),
+                true,
+                q.map == "table"
+            ),
             form = command_form(&screen, csrf, q.n),
             plans = plan_list(&screen),
             info = crate::render::info_html(&iv.info),

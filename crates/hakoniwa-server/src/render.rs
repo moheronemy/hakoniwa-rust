@@ -103,8 +103,15 @@ fn tile_colors(kind: u8, value: Option<i64>) -> (&'static str, &'static str) {
     }
 }
 
-/// 地図。`owner` なら計画の印を出し、マスをクリックすると計画の座標に入る
-pub fn map_html(view: &IslandView, use_images: bool, owner: bool) -> String {
+/// これより大きい地図は canvas で描く (HTML の表だと 1 マス 1 要素で重くなる)
+pub const CANVAS_ABOVE: usize = 32;
+
+/// 地図。`owner` なら計画の印を出し、マスをクリックすると計画の座標に入る。
+/// 大きな地図は canvas で描く ([`CANVAS_ABOVE`])。`table` なら大きさにかかわらず表で出す
+pub fn map_html(view: &IslandView, use_images: bool, owner: bool, table: bool) -> String {
+    if view.size > CANVAS_ABOVE && !table {
+        return map_canvas(view, use_images, owner);
+    }
     let n = view.size;
     let mut h = format!(
         "<div class=\"table-scroll\"><div class=\"map\" style=\"grid-template-columns: 20px repeat({n}, auto)\" role=\"grid\" aria-label=\"{}島の地図\">\n<span></span>",
@@ -126,17 +133,179 @@ pub fn map_html(view: &IslandView, use_images: bool, owner: bool) -> String {
     h
 }
 
-fn cell_html(cell: &CellView, use_images: bool, owner: bool) -> String {
-    let mut title = format!("({}, {}) {}", cell.x, cell.y, plain(&cell.alt));
+/// マスの説明 (座標を除く): 名前、人口などの説明、開発画面なら計画
+fn cell_label(cell: &CellView, owner: bool) -> String {
+    let mut label = plain(&cell.alt);
     let detail = plain(&cell.detail);
     if !detail.trim().is_empty() {
-        title.push('\n');
-        title.push_str(detail.trim());
+        label.push('\n');
+        label.push_str(detail.trim());
     }
     if owner && !cell.planned.is_empty() {
-        title.push('\n');
-        title.push_str(&plain(&cell.planned_text()));
+        label.push('\n');
+        label.push_str(&plain(&cell.planned_text()));
     }
+    label
+}
+
+/// タイルの見た目 (背景, 文字の色, 文字, 画像)
+fn cell_tile(cell: &CellView, use_images: bool) -> (&'static str, &'static str, String, String) {
+    let (bg, fg) = tile_colors(cell.kind, cell.value);
+    let glyph: String = plain(&cell.alt)
+        .chars()
+        .next()
+        .map(String::from)
+        .unwrap_or_default();
+    let image = if use_images {
+        cell.image.clone()
+    } else {
+        String::new()
+    };
+    (bg, fg, glyph, image)
+}
+
+/// 大きな地図: マスの見た目と説明を辞書にして JSON で埋め込み、ブラウザが canvas に描く
+/// (`MAP_SCRIPT`)。マウスを乗せると説明が出て、開発画面ではクリックで計画の座標に入る
+fn map_canvas(view: &IslandView, use_images: bool, owner: bool) -> String {
+    use std::collections::HashMap;
+    let n = view.size;
+    let mut tiles: Vec<(&str, &str, String, String)> = Vec::new();
+    let mut tile_ids: HashMap<(&str, &str, String, String), usize> = HashMap::new();
+    let mut labels: Vec<String> = Vec::new();
+    let mut label_ids: HashMap<String, usize> = HashMap::new();
+    let mut t = Vec::with_capacity(n * n);
+    let mut l = Vec::with_capacity(n * n);
+    let mut plans = Vec::new();
+    for (i, cell) in view.map.iter().enumerate() {
+        let tile = cell_tile(cell, use_images);
+        let next = tile_ids.len();
+        let id = *tile_ids.entry(tile.clone()).or_insert_with(|| {
+            tiles.push(tile);
+            next
+        });
+        t.push(id);
+        let label = cell_label(cell, owner);
+        let next = label_ids.len();
+        let id = *label_ids.entry(label.clone()).or_insert_with(|| {
+            labels.push(label);
+            next
+        });
+        l.push(id);
+        if owner && let Some(p) = cell.planned.first() {
+            plans.push((i, p.number));
+        }
+    }
+    let data = serde_json::json!({
+        "size": n,
+        "owner": owner,
+        "tiles": tiles,
+        "t": t,
+        "labels": labels,
+        "l": l,
+        "plans": plans,
+    });
+    // <script> の中に置くので、< をすべて \u003c にする (</script> で閉じられないように)
+    let json = data.to_string().replace('<', "\\u003c");
+    format!(
+        "<div class=\"map-canvas\" data-map>\n\
+         <p class=\"map-tools\"><button type=\"button\" class=\"secondary\" data-zoom=\"-1\">縮小</button> \
+         <button type=\"button\" class=\"secondary\" data-zoom=\"1\">拡大</button> \
+         <a href=\"?map=table\">表で見る</a> <small class=\"muted\">{n}×{n}。マスにマウスを乗せると説明が出ます{pick}</small></p>\n\
+         <div class=\"map-scroll\"><canvas role=\"img\" aria-label=\"{name}島の地図 ({n}×{n})\"></canvas><div class=\"map-tip\" hidden></div></div>\n\
+         <script type=\"application/json\" class=\"map-data\">{json}</script>\n</div>\n{MAP_SCRIPT}",
+        name = esc(&view.name),
+        pick = if owner {
+            "。クリックすると計画の座標に入ります"
+        } else {
+            ""
+        },
+    )
+}
+
+/// 大きな地図を canvas に描くスクリプト (画面にいくつあっても 1 回だけ動く)
+const MAP_SCRIPT: &str = r#"<script>
+(function () {
+  if (window.hakoMap) return; window.hakoMap = true;
+  document.querySelectorAll('[data-map]').forEach(function (root) {
+    var d = JSON.parse(root.querySelector('.map-data').textContent);
+    var n = d.size, canvas = root.querySelector('canvas'), tip = root.querySelector('.map-tip');
+    var ctx = canvas.getContext('2d'), px = 12, axis = 20, picked = -1, images = {};
+    var plans = {}; d.plans.forEach(function (p) { plans[p[0]] = p[1]; });
+    function image(name) {
+      if (!name) return null;
+      if (!(name in images)) {
+        var img = new Image(); images[name] = img;
+        img.onload = schedule; img.src = '/img/' + encodeURIComponent(name);
+      }
+      var img = images[name]; return img.complete && img.naturalWidth ? img : null;
+    }
+    var pending = false;
+    function schedule() { if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; draw(); }); } }
+    function draw() {
+      var dpr = window.devicePixelRatio || 1, w = axis + n * px;
+      canvas.width = w * dpr; canvas.height = w * dpr;
+      canvas.style.width = w + 'px'; canvas.style.height = w + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, w);
+      ctx.fillStyle = getComputedStyle(root).color; ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      var step = px >= 24 ? 1 : px >= 12 ? 4 : 8;
+      for (var a = 0; a < n; a += step) {
+        ctx.fillText(a, axis + a * px + px / 2, axis / 2);
+        ctx.fillText(a, axis / 2, axis + a * px + px / 2);
+      }
+      ctx.font = Math.max(8, Math.floor(px * 0.6)) + 'px sans-serif';
+      for (var i = 0; i < n * n; i++) {
+        var x = i % n, y = (i / n) | 0, cx = axis + x * px, cy = axis + y * px;
+        var t = d.tiles[d.t[i]], img = image(t[3]);
+        if (img) { ctx.drawImage(img, cx, cy, px, px); }
+        else {
+          ctx.fillStyle = t[0]; ctx.fillRect(cx, cy, px, px);
+          if (px >= 12 && t[2]) { ctx.fillStyle = t[1]; ctx.fillText(t[2], cx + px / 2, cy + px / 2); }
+        }
+        if (i in plans && px >= 12) {
+          ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(cx + px / 2, cy + px / 2, px / 2, px / 2);
+          ctx.fillStyle = '#fff'; ctx.font = Math.floor(px * 0.4) + 'px sans-serif';
+          ctx.fillText(plans[i], cx + px * 3 / 4, cy + px * 3 / 4);
+          ctx.font = Math.max(8, Math.floor(px * 0.6)) + 'px sans-serif';
+        }
+      }
+      if (picked >= 0) {
+        ctx.strokeStyle = '#f5a623'; ctx.lineWidth = 2;
+        ctx.strokeRect(axis + (picked % n) * px + 1, axis + ((picked / n) | 0) * px + 1, px - 2, px - 2);
+      }
+    }
+    function at(ev) {
+      var r = canvas.getBoundingClientRect();
+      var x = Math.floor((ev.clientX - r.left - axis) / px), y = Math.floor((ev.clientY - r.top - axis) / px);
+      return x >= 0 && y >= 0 && x < n && y < n ? { x: x, y: y, i: y * n + x } : null;
+    }
+    canvas.addEventListener('mousemove', function (ev) {
+      var c = at(ev);
+      if (!c) { tip.hidden = true; canvas.style.cursor = ''; return; }
+      tip.textContent = '(' + c.x + ', ' + c.y + ') ' + d.labels[d.l[c.i]];
+      tip.style.left = (ev.offsetX + 14) + 'px'; tip.style.top = (ev.offsetY + 14) + 'px';
+      tip.hidden = false; canvas.style.cursor = d.owner ? 'pointer' : '';
+    });
+    canvas.addEventListener('mouseleave', function () { tip.hidden = true; });
+    canvas.addEventListener('click', function (ev) {
+      var c = at(ev); if (!c || !d.owner) return;
+      var fx = document.getElementById('px'), fy = document.getElementById('py');
+      if (fx && fy) { fx.value = c.x; fy.value = c.y; }
+      picked = c.i; draw();
+    });
+    root.querySelectorAll('[data-zoom]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        px = Math.min(32, Math.max(4, b.dataset.zoom > 0 ? px * 2 : px / 2)); draw();
+      });
+    });
+    draw();
+  });
+})();
+</script>"#;
+
+fn cell_html(cell: &CellView, use_images: bool, owner: bool) -> String {
+    let title = format!("({}, {}) {}", cell.x, cell.y, cell_label(cell, owner));
     let mark = match (owner, cell.planned.first()) {
         (true, Some(p)) => format!("<span class=\"plan\">{}</span>", p.number),
         _ => String::new(),

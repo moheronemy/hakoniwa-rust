@@ -454,6 +454,7 @@ dependencies = [
  "http-body-util",
  "rand",
  "serde",
+ "serde_json",
  "tempfile",
  "thiserror",
  "tokio",
