@@ -89,10 +89,11 @@ tools/
 | `encode`, `checkPassword` | パスワード照合 | 未 (下記「パスワード」) |
 | `turnMain` | `core::turn::run_turn` | 一部 (下記「フェーズ 1」) |
 | `estimate`, `income` | `core::turn::estimate`, `core::turn::income` | 済 (Perl 版と突き合わせ済み) |
-| `doIslandunemployed` | `core::turn` | 未 |
+| `doIslandunemployed` | `core::turn::island::migrate` | 済 (Perl 版と突き合わせ済み) |
 | `doEachHex` | `core::turn::hex` (地形の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
 | `doCommand` | `core::turn::command` (計画の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
-| `doIslandProcess`, `wideDamageli` | `core::turn::island`, `core::disaster` | 未 |
+| `doIslandProcess` | `core::turn::island` (段階ごとに分割) | 済 (Perl 版と突き合わせ済み) |
+| `wideDamageli` | `core::turn::command::attack::wide_damage_li` | 済 (核ミサイルだけが使う) |
 | `wideDamage` | `core::turn::hex::monster::wide_damage` | 済 |
 | `makeRandomPointArray`, `randomArray`, `monsterSpec` | `core::turn` | 済 |
 | `countAround`, `countGrow`, `landName` | `core::land`, `core::turn::hex::town` | 済 |
@@ -153,7 +154,8 @@ DES の値はログイン成功時に置き換える。
    (`tests/fixtures/<名前>/`) を作る。元にするのは Perl 版で作った `legacy-turn3`
 2. `tools/perl-harness/run-harness.sh <名前> <段階>` が、`hako-main.cgi` (設定と関数だけ) と
    `hako-turn.cgi` を読み込み、`rand()` の値と座標の並びを固定して、指定した段階
-   (`estimate`, `income`, `commands`, `eachhex` を並べたもの) を島ごとに動かす。
+   (`estimate`, `income`, `commands`, `eachhex`, `process` を並べたもの。`process` は全島の
+   doIslandProcess と doIslandunemployed) を島ごとに動かす。
    段階ごとにすべての値とログを `*.expected.json.gz` に書き出す (`rand()` を 0 と 0.5 に固定した 2 通り)
 3. `turn::perl_compat_tests` が同じ条件で移植版を動かし、島の値・一時値・地形の値・
    計画・ログが 1 つ残らず一致することを確かめる
@@ -166,6 +168,9 @@ DES の値はログイン成功時に置き換える。
 | `phase2-badfields` | estimate, income, commands, eachhex, estimate | 複合値が正規表現に一致しないとき |
 | `phase3-land`, `phase3-build-*`, `phase3-city*`, `phase3-ops-*`, `phase3-attack*`, `phase3-magic*` | estimate, income, commands × n, estimate | doCommand の系統ごと |
 | `phase3-mix-1`〜`8` | estimate, income, commands, eachhex, ... (2〜3 ターン分) | 全地形の島に全種類の計画をランダムに入れたもの。rand は 0, 1/32, 1/2, 31/32 |
+| `phase4-migrate-*`, `phase4-disaster1*`, `phase4-disaster2-*`, `phase4-upkeep*`, `phase4-auction-*`, `phase4-ending` | process または estimate, income, commands, eachhex, process, estimate | doIslandProcess の段階ごと |
+| `phase4-mix-1`〜`6` | estimate, income, commands, eachhex, process, estimate (2 ターン分) | 政策・人工衛星・お守りも入れた全地形の島に全種類の計画。rand は 1/2, 3/4, 31/32 |
+| `phase4-policy-1`〜`4` | process | 政策の調整・維持費・食料と資金のあふれの上限 |
 | `phase2-mix-1`〜`6` | estimate, income, commands, eachhex, estimate, eachhex, estimate | 全地形を混ぜた島 (系統をまたぐ相互作用)。5, 6 は複合値も壊してある。rand は 0, 1/32, 1/2, 31/32 |
 
 比べているのは、島の保存される値と一時値、全マスの地形の種類と値、計画、ログ、記録ログ。
@@ -199,7 +204,7 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
       ログの保存とローテーション、バックアップ、サーバーでの定時実行 (詳細は下記)
 - [x] **2. 地形ごとの処理** — `doEachHex` を地形の種類ごとに分けて移植 (詳細は下記)
 - [x] **3. 計画の実行** — `doCommand` を計画の種類ごとに分けて移植 (詳細は下記)
-- [ ] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)
+- [x] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)、`doIslandunemployed` (詳細は下記)
 - [ ] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング
 - [ ] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能
 - [ ] **7. 移行** — パスワードの互換、本番データの変換手順、Perl 版との比較テスト
@@ -212,9 +217,9 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
 |---|---|
 | 最終更新時刻・ターン番号・座標の並び・処理順の決定 | 済 |
 | 収入・消費 (`estimate` → `income`) | 済 |
-| 計画の実行 (`doCommand`) | 共通部分 (費用の計算と確認)、資金繰り (援助金、連続資金繰り数、自動放棄)、放棄のみ |
-| 成長と単ヘックス災害 (`doEachHex`) | フェーズ 2 |
-| 島全体の処理 (`doIslandProcess`, `doIslandunemployed`) | フェーズ 4 |
+| 計画の実行 (`doCommand`) | 済 (フェーズ 3) |
+| 成長と単ヘックス災害 (`doEachHex`) | 済 (フェーズ 2) |
+| 島全体の処理 (`doIslandProcess`, `doIslandunemployed`) | 済 (フェーズ 4) |
 | 部門賞 (20 部門の並べ替え) | 済 |
 | 2 回目の `estimate` と死滅判定 | 済 |
 | ポイント順の並べ替え、ターン杯 (神殿・神社の祭りを含む) | 済 |
@@ -357,3 +362,54 @@ doCommand が書き、島全体の処理 (フェーズ 4)・turnMain の付加�
   終わりに書き戻す。turnMain のハコオクの処理が読む
 - `ctx.globals.etc7` (`$msjotai`, `$nokotan`, `$msid`): doIslandProcess も代入する
 - `scratch.propaganda` (誘致活動): doEachHex が読む (済)
+
+## フェーズ 4 (島全体の処理 doIslandProcess) の内容
+
+`doIslandProcess` (Perl 版 2,600 行) と `doIslandunemployed` をすべて移植した。Perl 版は 1 本の長い関数なので、
+処理の段階ごとに `turn/island/` のファイルに分け、`mod.rs` から Perl 版と同じ順に呼ぶ。どれも元の
+Perl コードとの突き合わせで一致し、全地形・全計画を入れた `phase4-mix-*` でも、ターン全体
+(計画・地形ごとの処理・島全体の処理) を 2 ターン続けて一致する。
+
+| ファイル | Perl 版の行 | 内容 |
+|---|---|---|
+| `mod.rs` | 14570〜14634 | 前置き (政策の分解、怪獣派遣の残りターン、Hakoniwa Cup の開幕、ハイテク企業の維持費、お守りの分解)、段階の呼び出し、共通の文面 |
+| `migrate.rs` | 14388〜14569, 14635〜14849 | 失業者の移民・暴動・デモ (doIslandunemployed)、リゾートに飽きた住民の移住 |
+| `disaster1.rs` | 14850〜15247 | 地震・重税への反発・食料不足 (宇宙ステーション)・津波・怪獣の出現 |
+| `disaster2.rs` | 15248〜15665 | 地盤沈下・台風・巨大隕石・巨大ミサイル・隕石・噴火 |
+| `upkeep.rs` | 15666〜15787 | 人工衛星の消耗・イレギュラーの攻撃・宇宙ステーションの維持・天空城 |
+| `auction.rs` | 15788〜16957 | ハコオクの落札 (3 枠を 1 つの関数にまとめた) と連続 1 位の賞品 |
+| `ending.rs` | 16958〜17143 | 政策の調整と維持費、食料・資金のあふれ (大使館への寄付)、`estimate`、繁栄賞・災難賞、神殿・神社の祭り |
+
+### Perl 版の挙動をそのまま再現しているもの (主なもの)
+
+- `$migrate2` (移民の人数) はグローバル変数で、最初は未定義 (ログに空で出る)。暴動・デモのログは前の島の値を出す
+- 上限を超えたマスへの移住は `rand` に負の数を渡すので、移民の数が負になり、元の島の家の値が増える
+- 関所で移住を断っても、最初のマスへの移住の処理は走る (平地が値 0 の町になる)
+- 金山の地震の被害は、地形ではなくグローバル変数 `$kind` を見ている
+- 地盤沈下は沈むマスをいったん -1 にしてから浅瀬にする (マスを見る順で結果が変わる)
+- 隕石が防衛施設・改に守られるかは、島の外のマスを未定義の `$kind` と比べて数える
+  (`$kind` が 0 = 海なら、島の端に落ちた隕石は必ず守られる)
+- 隕石のくり返しは `random(2) == 0` を先に評価するので、1 回目にも乱数を引く
+- 天空城の電力の判定はループの前の 1 回だけで、消し飛ばした跡の荒地の値は 1
+- ハコオクは最高額と同じ額を入れた島がどれも落札する。補助金の残り `$auc9c3` は 3 枠を通して計算し直さない
+- 大使館への寄付は読み込み時の島の位置 (`%HidToNumber`) で相手を探す (並べ替えのあとは別の島になる)
+- 賞の判定は `prize` の複合値の正規表現が一致しないと、最後に成功したマッチの値を使う
+- 神殿・神社の祭りのログは、前の処理が `$point` に入れた座標を島名の後ろに出す
+
+一覧は各ファイルの先頭とコメントにある。
+
+### 突き合わせで通っていない道筋
+
+- `rand` を 0 に固定すると Perl 版が終わらない道筋がある (隕石のくり返し、イレギュラーのある島など)。
+  そのため島全体の処理を含むデータは、多くを 1/2 以上の固定値で突き合わせている
+- 隕石が防衛施設・改を壊す・隕石のあとの記念碑・2 回以上の隕石は、「1 回目は小さく、2 回目は大きい」
+  乱数が要るので通せない
+- 文部科学省 (大学 77) は doEachHex の条件 (大学 0〜8・宇宙ステーション 100 万人・rena) を満たさないと
+  役所に戻るので、政策の値が残る道筋は `phase4-policy-*` (島全体の処理だけを回す) で確かめている
+- リゾートの移住で `$migrate <= 0` を 1 にする行は、条件の組み合わせ上どちらの分岐でも起きない
+
+### 後のフェーズに渡す値
+
+- `ctx.globals.process.auction` と `World::auction_lots`: turnMain のハコオクの出品の入れ替え (フェーズ 6)
+- `logs.hcup` (`logHcup`) と `logs.auction` (`logAuc`): Hakoniwa Cup とハコオクの記録の画面 (フェーズ 5・6)
+- `IslandScratch::typhoon`, `roudenflag`: estimate と doEachHex も読む (済)
