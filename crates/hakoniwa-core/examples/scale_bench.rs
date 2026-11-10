@@ -193,7 +193,8 @@ fn main() -> ExitCode {
         let mut times = Vec::new();
         for n in 0..20 {
             let mut next = game.clone();
-            let island = &mut next.world.islands[n * 37 % args.islands];
+            let count = next.world.islands.len();
+            let island = &mut next.world.islands[n * 37 % count];
             if n % 2 == 0 {
                 island.comment = format!("負荷テスト{n}");
             } else {
@@ -219,7 +220,8 @@ fn main() -> ExitCode {
             t.elapsed().as_secs_f64()
         );
         assert_eq!(back.world.islands.len(), game.world.islands.len());
-        assert_eq!(back.world.islands[37].map, game.world.islands[37].map);
+        let i = 37 % game.world.islands.len();
+        assert_eq!(back.world.islands[i].map, game.world.islands[i].map);
         println!("ディスク: {:.1} MB", dir_size(dir) as f64 / 1e6);
     }
 
