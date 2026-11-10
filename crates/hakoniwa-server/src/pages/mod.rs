@@ -2,6 +2,7 @@
 
 pub mod admin;
 pub mod auth;
+pub mod extras;
 pub mod history;
 pub mod images;
 pub mod island;
@@ -582,5 +583,82 @@ mod tests {
         .await;
         assert_eq!(res.status(), 303);
         assert_eq!(state.game.read().await.world.islands.len(), 3);
+    }
+
+    #[tokio::test]
+    async fn extras_flow() {
+        let (state, _dir) = legacy_app();
+        let (cookie, csrf) = login(&state, 1, "pass1").await;
+        let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
+        assert!(page.contains("援助射撃"), "{page}");
+        // 援助射撃の許可を島 2 に申請し、島 2 が許可する
+        let res = send(
+            &state,
+            post(
+                "/owner/extra",
+                Some(&cookie),
+                &[
+                    ("csrf", &csrf),
+                    ("action", "ms-request"),
+                    ("target", "2"),
+                    ("amount", "3"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        assert_eq!(
+            state
+                .game
+                .read()
+                .await
+                .world
+                .islands
+                .iter()
+                .find(|i| i.id == 1)
+                .unwrap()
+                .etc_raw[2],
+            "1,3,2"
+        );
+        let (cookie2, csrf2) = login(&state, 2, "pass2").await;
+        let res = send(
+            &state,
+            post(
+                "/owner/extra",
+                Some(&cookie2),
+                &[
+                    ("csrf", &csrf2),
+                    ("action", "ms-grant"),
+                    ("target", "1"),
+                    ("amount", "3"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        assert_eq!(
+            state
+                .game
+                .read()
+                .await
+                .world
+                .islands
+                .iter()
+                .find(|i| i.id == 1)
+                .unwrap()
+                .etc_raw[2],
+            "2,3,2"
+        );
+        // アンケートは設定で無効
+        let res = send(
+            &state,
+            post(
+                "/survey",
+                Some(&cookie),
+                &[("csrf", &csrf), ("choice", "1")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 404);
     }
 }

@@ -264,6 +264,23 @@ pub fn top(
             "</ul>\n<p class=\"muted\">投票率 {}%</p>",
             s.turnout_percent
         );
+        if let Some(csrf) = csrf {
+            let _ = write!(
+                h,
+                "<form method=\"post\" action=\"/survey\" class=\"card\">{}",
+                csrf_field(csrf)
+            );
+            for (i, c) in s.choices.iter().enumerate() {
+                let _ = write!(
+                    h,
+                    "<label><input type=\"radio\" name=\"choice\" value=\"{}\"> {}．{}</label>",
+                    i + 1,
+                    esc(c.label),
+                    esc(&plain(&c.text))
+                );
+            }
+            h.push_str("<p><button>投票する</button></p></form>\n");
+        }
     }
 
     if !page.auction.lots.is_empty() {

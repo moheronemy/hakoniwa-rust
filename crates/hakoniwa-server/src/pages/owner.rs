@@ -188,7 +188,8 @@ pub async fn owner_page(
              <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf_f}\n\
              <label for=\"message\">島のコメント</label>\n\
              <input id=\"message\" type=\"text\" name=\"message\" value=\"{comment}\" maxlength=\"80\" size=\"60\">\n\
-             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{recent}{change}{script}",
+             <p><button>コメントを変える</button></p>\n</form>\n{extras}{lbbs}{recent}{change}{script}",
+            extras = super::extras::owner_sections(&screen, island, csrf),
             recent = crate::render::recent_html(
                 &island.name,
                 &view::recent_logs(&game, &app.config, island.id, true)

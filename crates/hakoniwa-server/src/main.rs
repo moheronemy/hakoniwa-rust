@@ -113,6 +113,8 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/owner/command", post(pages::owner::command))
         .route("/owner/policy", post(pages::owner::policy))
         .route("/owner/lbbs", post(pages::owner::lbbs))
+        .route("/owner/extra", post(pages::extras::extra))
+        .route("/survey", post(pages::extras::vote))
         .route("/island/{id}", get(pages::island::island_page))
         .route("/island/{id}/lbbs", post(pages::island::visitor_lbbs_post))
         .route("/img/{name}", get(pages::images::image))
