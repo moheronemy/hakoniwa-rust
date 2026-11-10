@@ -29,8 +29,17 @@ pub async fn owner_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
         else {
             return require_login(&app).await;
         };
+        let idx = actions::island_index(&game.world, island.id).unwrap_or_default();
+        let view = hakoniwa_core::view::island_view(
+            &game.world,
+            &app.config,
+            idx,
+            hakoniwa_core::view::Viewer::Owner {
+                master: login.session.master,
+            },
+        );
         format!(
-            "<h1>{name}島開発計画</h1>\n\
+            "<h1>{name}島開発計画</h1>\n{info}{map}\n\
              <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf}\n\
              <label for=\"message\">島のコメント</label>\n\
              <input id=\"message\" type=\"text\" name=\"message\" value=\"{comment}\" maxlength=\"80\" size=\"60\">\n\
@@ -42,6 +51,8 @@ pub async fn owner_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
                 String::new()
             },
             name = esc(&island.name),
+            info = crate::render::info_html(&view.info),
+            map = crate::render::map_html(&view, app.options.image_dir.is_some(), true),
             csrf = csrf_field(&login.session.csrf),
             // コメントは保存の時点でエスケープ済み (Perl 版と同じ)。入力欄に戻すときは元の文字に戻す
             comment = esc(&unescape(&island.comment)),

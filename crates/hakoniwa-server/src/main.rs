@@ -6,6 +6,7 @@
 mod edit;
 mod layout;
 mod pages;
+mod render;
 mod session;
 mod turns;
 

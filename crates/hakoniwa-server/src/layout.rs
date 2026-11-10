@@ -73,9 +73,14 @@ button.secondary { background: transparent; color: var(--accent); border: 1px so
 .map { display: grid; gap: 0; width: max-content; max-width: 100%; overflow-x: auto; }
 .map .cell { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
   font-size: 11px; line-height: 1; overflow: hidden; position: relative; }
-.map .cell img { width: 32px; height: 32px; display: block; }
+.map .cell img, .map .cell .tile { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.map .cell[data-x] { cursor: pointer; }
+.map .cell[data-x]:focus, .map .cell.picked { outline: 2px solid var(--warn); outline-offset: -2px; }
+.map .plan { position: absolute; right: 0; bottom: 0; font-size: 9px; background: rgba(0,0,0,.65); color: #fff; padding: 0 2px; }
+.pre { white-space: pre-line; }
+table.info th { width: 8em; white-space: nowrap; color: var(--muted); font-weight: 500; }
 .map .axis { color: var(--muted); font-size: 10px; }
-@media (max-width: 480px) { .map .cell, .map .cell img { width: 24px; height: 24px; font-size: 9px; } }
+@media (max-width: 480px) { .map .cell, .map .cell img, .map .cell .tile { width: 24px; height: 24px; font-size: 9px; } }
 "#;
 
 /// 画面全体を組み立てる

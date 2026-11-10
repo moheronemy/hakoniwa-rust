@@ -138,11 +138,21 @@ pub async fn island_page(
             )
             .await;
         };
+        let view = match hakoniwa_core::view::sightseeing(&game, &app.config, id) {
+            Ok(v) => v,
+            Err(e) => {
+                drop(game);
+                return error_page(&app, login.as_ref(), StatusCode::NOT_FOUND, &e.to_string())
+                    .await;
+            }
+        };
         let mut h = format!(
-            "<h1>「{name}島」へようこそ！！</h1>\n<p>{comment}</p>\n",
+            "<h1>「{name}島」へようこそ！！</h1>\n<p>{comment}</p>\n{info}{map}",
             name = esc(&island.name),
             // コメントは保存の時点でエスケープ済み
             comment = island.comment,
+            info = crate::render::info_html(&view.info),
+            map = crate::render::map_html(&view, app.options.image_dir.is_some(), false),
         );
         if app.config.lbbs.enabled {
             h.push_str(&visitor_lbbs(
