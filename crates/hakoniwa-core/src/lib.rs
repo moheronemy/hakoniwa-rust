@@ -8,6 +8,7 @@
 //! - [`land`] — 地形の名前と周囲の数え上げ
 //! - [`legacy`] — Perl 版のセーブデータの読み込み
 //! - [`turn`] — ターン処理
+//! - [`view`] — 画面に出す内容 (トップページなど)
 //! - [`log`] — ターン処理のログ
 //! - [`perl`] — Perl の挙動を再現するヘルパー
 //!
@@ -23,6 +24,7 @@ pub mod perl;
 pub mod storage;
 pub mod tables;
 pub mod turn;
+pub mod view;
 
 pub use config::GameConfig;
 pub use model::GameState;

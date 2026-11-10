@@ -1,0 +1,771 @@
+Content-type: text/html
+
+<HTML>
+<HEAD>
+<TITLE>
+☆Hakoniwa R.A.☆
+</TITLE>
+<BASE HREF="http://www.xxxxxxxx/cgi-bin/hako/hakoimg/">
+
+<STYLE type="text/css">
+<!--
+
+	A:link.type1 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type1 { color:#800080; text-decoration: none; }
+
+	A:hover.type1, A:focus.type1 { color:#0000FF; text-decoration: underline; }
+
+	A:action.type1 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type2 { color:#0000FF; text-decoration: underline; }
+
+	A:visited.type2 { color:#800080; text-decoration: underline; }
+
+	A:hover.type2, A:focus.type2 { color:#FF00FF; text-decoration: underline; }
+
+	A:action.type2 { color:#FF0000; text-decoration: underline; }
+
+
+
+	A:link.type3 { color:#0000FF; text-decoration: none; }
+
+	A:visited.type3 { color:#800080; text-decoration: none; }
+
+	A:hover.type3, A:focus.type3 { background-color: pink; color: #FFFFFF; text-decoration: none; }
+
+	A:action.type3 { color:#FF0000; text-decoration: none; }
+
+
+	/* 観光画面ナビゲータ・ウィンドウ */
+	#NaviView{
+	  visibility: hidden;
+	  z-index:1;
+	  position:absolute;
+	  background-color: #000000;
+	  border: solid #4169E1;
+	  border-width: 10px 1px 1px 1px;
+	  margin-top : -224px;
+	}
+	.NaviTitle {
+	  color: #ffffff;
+	  font-size: 11pt;
+	}
+	.NaviImg {
+	  margin : 1px;
+	}
+	.NaviText {
+	  color: #ffffff;
+	  font-size: 9pt;
+	}
+	TD.M {
+	  cursor:default;
+	  border-style:outset;
+	  border-width:0px;
+	  border-color:#CCCCFF;
+	}
+
+	body{ scrollbar-3dlight-color:royalblue;
+	scrollbar-arrow-color:royalblue;
+	scrollbar-darkshadow-color:lemonchiffon;
+	scrollbar-face-color:lemonchiffon;
+	scrollbar-highlight-color:lemonchiffon;
+	scrollbar-shadow-color:royalblue;
+	scrollbar-track-color:lemonchiffon;
+
+-->
+
+</STYLE>
+
+</HEAD>
+<BODY BGCOLOR="lemonchiffon">
+[<A CLASS="type3" HREF="http://t.pos.to/hako/" target="_blank">箱庭諸島スクリプト配布元</A>] [<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/" target="_blank">Hakoniwa R.A.スクリプト配布元</A>] [<A CLASS="type3" HREF="http://">トップページ</A>]<HR>
+
+<hr WIDTH="100%">
+<FONT SIZE=7 COLOR="#8888ff">☆Hakoniwa R.A.☆</FONT>
+<H1><FONT COLOR="#4444ff">ターン3</FONT></H1>
+<FORM name="RemainForm"><INPUT name="RemainTime" size="30" type="text" readonly></FORM><SCRIPT language="JavaScript">
+<!--
+nextTurn = 21599; loadDate = new Date();
+timerID = setTimeout('dispRemainTime()', 100);
+function dispRemainTime() { clearTimeout(timerID);
+document.RemainForm.RemainTime.value = getRemainTime();
+timerID = setTimeout('dispRemainTime()', 1000);}
+function getRemainTime() {
+now = new Date();msec = now.getTime() - loadDate.getTime();
+msec -= msec % 1000; msec /= 1000;msec = nextTurn - msec;
+if (msec < 0) {msec = 0;}
+sec = msec % 60; msec = (msec - sec) / 60;
+min = msec % 60; hour = (msec - min) / 60;
+if (hour < 10) {hour = "0" + hour;}
+if (min < 10) {min = "0" + min;}
+if (sec < 10) {sec = "0" + sec;}
+return "次のターンまで残り" + hour + ":" + min + ":" + sec;}
+//-->
+</SCRIPT>
+<HR>
+<H1><FONT COLOR="#4444ff">自分の島へ</FONT></H1>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+あなたの島の名前は？<BR>
+<SELECT NAME="ISLANDID">
+<OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" >テスト島
+<OPTION VALUE="2" >Alpha島
+
+</SELECT><BR>
+
+パスワードをどうぞ！！<BR>
+<INPUT TYPE="password" NAME="PASSWORD" VALUE="" SIZE=32 MAXLENGTH=32><BR>
+<INPUT TYPE="submit" VALUE="開発しに行く" NAME="OwnerButton"><BR>
+</FORM>
+
+
+<br>
+<HR>
+
+<H1><FONT COLOR="#4444ff">各部門別ＮＯ.１</FONT></H1>
+<P>
+目指せ<B>ＡＬＬ ＮＯ.１!!</B>各部門でNO.1になると諸島の状況に部門賞が表示されます。
+</P>
+<TABLE ALIGN="center" width="100%"><tr><td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>人口NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">790000人</TD></TR>
+</TABLE><td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>農場NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2" "alt="ID=2"><FONT COLOR="#a06040"><B>Alpha島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">600000人規模</TD></TR>
+</TABLE><td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>職場NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1"><FONT COLOR="#a06040"><B>テスト島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">800000人規模</TD></TR>
+</TABLE><td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>採掘場NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">10000人規模</TD></TR>
+</TABLE><td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>森林NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">3600本</TD></TR>
+</TABLE>
+</TABLE>
+<br>
+<TABLE ALIGN="center" width="100%">
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>にわとり数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">5万羽</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>ぶた数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1"><FONT COLOR="#a06040"><B>テスト島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">4万頭</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>うし数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">2万頭</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>怪獣出現＆捕獲数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">33匹</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>怪獣退治数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">7匹</TD></TR>
+</TABLE>
+</TABLE>
+<br>
+<TABLE ALIGN="center" width="100%">
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>生物大学能力NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">合計26pts.</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>通算観光客NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">1234500人</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>ユニーク地形数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">12種類/12ヶ所</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>記念碑数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1"><FONT COLOR="#a06040"><B>テスト島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">0ヶ所</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>軍事技術NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1"><FONT COLOR="#a06040"><B>テスト島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">Ｌｖ11</TD></TR>
+</TABLE>
+</TABLE>
+<br>
+<TABLE ALIGN="center" width="100%">
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>ＨＣ通算勝率NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3"><FONT COLOR="#a06040"><B>箱庭島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">62％(5勝1敗2分)</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>ＨＣ優勝回数NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2" "alt="ID=2"><FONT COLOR="#a06040"><B>Alpha島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">4回</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>サッカーチーム力NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2" "alt="ID=2"><FONT COLOR="#a06040"><B>Alpha島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">合計300pts.</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>鉄道NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2" "alt="ID=2"><FONT COLOR="#a06040"><B>Alpha島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">15ｋｍ＋移動</TD></TR>
+</TABLE>
+<td width="9%"><TABLE BORDER=1 width="100%">
+<TR><TD BGCOLOR="lightsteelblue" ALIGN="center" COLSPAN="2">
+<FONT COLOR="#ffffff"><B>電力NO.1</B></FONT></TD></TR>
+<TR><TD ALIGN="center"><A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1"><FONT COLOR="#a06040"><B>テスト島</B></FONT></TD></TR>
+<TR><TD ALIGN="center">90万ｋＷ</TD></TR>
+</TABLE>
+</TABLE>
+</table>
+
+<SCRIPT Language="JavaScript">
+<!--
+
+function MM_displayStatusMsg(msgStr) {
+    window.status=msgStr;
+}
+
+function Navi(jj, img, title, title2, text, exp) {
+	StyElm = document.getElementById("NaviView");
+	StyElm.style.visibility = "visible";
+
+		    StyElm.style.marginLeft = 0;
+		    StyElm.style.marginTop = -115+jj*102;
+
+	    StyElm.innerHTML = "<table WIDTH=100%><tr><td class='M'><img class='NaviImg' src=" + img + "></td><td class='M'><div class='NaviText'><div class='NaviTitle'>" + title + " </div><hr>" + title2 + " </div></td></tr></table>";
+
+}
+function NaviClose() {
+	StyElm = document.getElementById("NaviView");
+	StyElm.style.visibility = "hidden";
+}
+
+
+//-->
+</SCRIPT>
+
+<hr>
+<H1><FONT COLOR="#4444ff">諸島の状況(1位～3位)</FONT></H1>
+
+<P>
+島の名前をクリックすると、<B>観光</B>することができます。
+</P>
+
+
+<TABLE BORDER>
+<TR>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>島</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>人口</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>面積</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>資金</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>食料</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>農場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>職場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>採掘場</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>発電力</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>軍事技術</B></FONT></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=4 align=center nowrap=nowrap HEIGHT=100><NOBR><FONT COLOR="#800000"><B>1</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=4 valign="middle" align="left" nowrap=nowrap>
+<div id="NaviView"></div>
+<center>
+<NOBR>
+<A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=3" "alt="ID=3">
+<FONT COLOR="#808080"><B>箱庭島(23)</B></FONT>
+</A>
+<br>
+<font color="MEDIUMSEAGREEN" font size="-1">首都：東京シティー<br></font>
+<NOBR>ID:(<font color="SALMON"><B>3</B></font>) <font color="royalblue">60000</font>pts.</NOBR><br>
+<NOBR><font size="-1">失業率</font>:(<font color="red">86.08%</font>)</NOBR><br>
+<NOBR><font color="lightseagreen" font size="-1">通算観光者数123万人<br></font></NOBR>
+<NOBR><font color="hotpink" font size="-2">(前ターン-3pts.＋000人＋12億円)</font></NOBR>
+</center>
+</TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>790000人</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>3200万坪</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>推定2000億円＋<IMG SRC="auc.gif" ALT="へそくり" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('へそくり/貯金…5兆円<br>Auction補助金…3兆円<hr>合計…12兆円'); Navi('1', 'auc.gif', 'へそくり', '貯金…5兆円<br>Auction補助金…3兆円<hr>合計…12兆円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>18500トン</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR><p onMouseOver="MM_displayStatusMsg('収入見込み/普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円'); Navi('1', 'black.gif', '収入見込み', '普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">30000人</p></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR><p onMouseOver="MM_displayStatusMsg('収入見込み/普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円'); Navi('1', 'black.gif', '収入見込み', '普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">70000人</p></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR><p onMouseOver="MM_displayStatusMsg('収入見込み/普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円'); Navi('1', 'black.gif', '収入見込み', '普通職場…50000人<br>ＨＴ職場…20000人<hr>食料＋60000トン<br>資金＋180億円<br>補助金＋20億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">10000人</p></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>万ｋＷ</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>Ｌｖ1</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=9 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>　info：<font size="-1"><IMG SRC="sc.gif" ALT="優勝！(攻(10)守(20)KP(30)チーム成績(勝点7/2勝0敗1分/通算5勝1敗2分/優勝1回)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('優勝！/攻撃力(10)<br>守備力(20)<br>キーパー能力(30)<br>チーム成績(勝点7/2勝0敗1分/通算5勝1敗2分/優勝1回)'); Navi('1', 'sc.gif', '優勝！', '攻撃力(10)<br>守備力(20)<br>キーパー能力(30)<br>チーム成績(勝点7/2勝0敗1分/通算5勝1敗2分/優勝1回)', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> <font color="MEDIUMSEAGREEN"><IMG SRC="prize10.gif" ALT="入手の難しいユニーク地形：[首都][天使ミカエルor幸福の女神像][古代遺跡][壊れた侵略者][王蟲の脱け殻][炎石][氷石][地石][風石][光石][闇石][天空城or魔塔]／Complete!!" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('ユニーク地形/<font color = red>Complete!!</font><br>[首都][天使ミカエルor幸福の女神像][古代遺跡][壊れた侵略者][王蟲の脱け殻][炎石][氷石][地石][風石][光石][闇石][天空城or魔塔]'); Navi('1', 'prize11.gif', 'ユニーク地形', '<font color = red>Complete!!</font><br>[首都][天使ミカエルor幸福の女神像][古代遺跡][壊れた侵略者][王蟲の脱け殻][炎石][氷石][地石][風石][光石][闇石][天空城or魔塔]', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 12ヶ所 </font><font color="SALMON"><IMG SRC="house10.gif" ALT="オーナー3の魔塔" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('オーナー3の魔塔/税率10％(8690億円)'); Navi('1', 'house10.gif', 'オーナー3の魔塔', '税率10％(8690億円)', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> </font><IMG SRC="monster5.gif" ALT="[怪獣いのら] [怪獣サンジラ] " WIDTH=16 HEIGHT=16 onMouseOver="MM_displayStatusMsg('2種類2匹出現中！/[怪獣いのら] [怪獣サンジラ] '); Navi('1', 'monster5.gif', '2種類2匹出現中！', '[怪獣いのら] [怪獣サンジラ] ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> <font color="hotpink">出現中！</font><IMG SRC="tet.gif" ALT="超神獣テトラ(HP5.AP6.DP7.SP8/3匹撃破/経験値100)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('超神獣テトラ/HP 5　AP 6<br>DP 7　SP 8<br>3匹撃破<br>経験値100'); Navi('1', 'tet.gif', '超神獣テトラ', 'HP 5　AP 6<br>DP 7　SP 8<br>3匹撃破<br>経験値100', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">Sum(26)<IMG SRC="niwatori.gif" ALT="にわとり" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('にわとり/5万羽<br>生産力500トン<br>売値50億円'); Navi('1', 'niwatori.gif', 'にわとり', '5万羽<br>生産力500トン<br>売値50億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">5万羽<IMG SRC="ushi.gif" ALT="うし" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('うし/2万頭<br>生産力600トン<br>売値100億円'); Navi('1', 'ushi.gif', 'うし', '2万頭<br>生産力600トン<br>売値100億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">2万頭<IMG SRC="kisho.gif" ALT="気象衛星" WIDTH=16 HEIGHT="16">50%<IMG SRC="geigeki.gif" ALT="迎撃衛星" WIDTH=16 HEIGHT="16">30%<IMG SRC="ire.gif" ALT="イレギュラー" WIDTH=16 HEIGHT="16">10%<IMG SRC="cst.gif" ALT="宇宙ステーション／1234500人滞在" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('宇宙ステーション/1234500人滞在<br>人口維持ロケット数…2個<br>人口維持コスト…12345億円'); Navi('1', 'cst.gif', '宇宙ステーション', '1234500人滞在<br>人口維持ロケット数…2個<br>人口維持コスト…12345億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">68%</font><IMG SRC="ele.gif" ALT="使用状況(消費3万ｋＷ／過不足-3万ｋＷ)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('使用状況/消費3万ｋＷ<br>過不足-3万ｋＷ'); Navi('1', 'ele.gif', '使用状況', '消費3万ｋＷ<br>過不足-3万ｋＷ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"><font color=red>不足中！</font></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=5 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>Prize：<font size="-1"><IMG SRC="prize11.gif" ALT="[人口][採掘場][森林][にわとり数][うし数][怪獣出現＆捕獲数][怪獣退治数][生物大学能力][通算観光客][ユニーク地形数][ＨＣ通算勝率]" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('部門賞/[人口][採掘場][森林][にわとり数][うし数][怪獣出現＆捕獲数][怪獣退治数][生物大学能力][通算観光客][ユニーク地形数][ＨＣ通算勝率]'); Navi('1', 'prize11.gif', '部門賞', '[人口][採掘場][森林][にわとり数][うし数][怪獣出現＆捕獲数][怪獣退治数][生物大学能力][通算観光客][ユニーク地形数][ＨＣ通算勝率]', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 11冠 <IMG SRC="prize0.gif" ALT="100ターン杯 200ターン杯 " WIDTH=16 HEIGHT=16> <IMG SRC="prize1.gif" ALT="繁栄賞" WIDTH=16 HEIGHT=16> <IMG SRC="prize3.gif" ALT="究極繁栄賞" WIDTH=16 HEIGHT=16> <IMG SRC="monster28.gif" ALT="[人造メカいのら] [超神獣テトラ] " WIDTH=16 HEIGHT=16 onMouseOver="MM_displayStatusMsg('2種類7匹退治/[人造メカいのら] [超神獣テトラ] '); Navi('1', 'monster28.gif', '2種類7匹退治', '[人造メカいのら] [超神獣テトラ] ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 2種類7匹<IMG SRC="omamori.gif" ALT="toto的中回数(0)/お守り残数(3)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('お守り/toto的中回数…0回<br>お守り残数…3個'); Navi('1', 'omamori.gif', 'お守り', 'toto的中回数…0回<br>お守り残数…3個', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">残り(3)</font></NOBR></TD>
+<TD BGCOLOR="WHITE" COLSPAN=4 align=left nowrap=nowrap><NOBR><font size="-1"><FONT COLOR="royalblue"><B>予想１：</B></FONT>1-0</font></NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="WHITE" COLSPAN=9 align=left nowrap=nowrap><NOBR><font color=#0000ff>オーナー3 : </font><font color=red><B>Alpha島への援助射撃許可を申請中(残り3ターン)</B></font></NOBR></TD>
+</TR>
+
+
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=4 align=center nowrap=nowrap HEIGHT=100><NOBR><FONT COLOR="#800000"><B>2</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=4 valign="middle" align="left" nowrap=nowrap>
+<div id="NaviView"></div>
+<center>
+<NOBR>
+<A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=2" "alt="ID=2">
+<FONT COLOR="#808080"><B>Alpha島(23)</B></FONT>
+</A>
+<br>
+<font color="MEDIUMSEAGREEN" font size="-1"></font>
+<NOBR>ID:(<font color="SALMON"><B>2</B></font>) <font color="royalblue">15000</font>pts.</NOBR><br>
+<NOBR><font size="-1">失業率</font>:(<font color="royalblue">-5.26%</font>)</NOBR><br>
+<NOBR><font color="lightseagreen" font size="-1">通算観光者数１万人未満<br></font></NOBR>
+<NOBR><font color="hotpink" font size="-2">(前ターン＋5pts.＋10000人-50億円)</font></NOBR>
+</center>
+</TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>570000人</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>3100万坪</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>推定2000億円＋<IMG SRC="auc.gif" ALT="へそくり" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('へそくり/貯金…0兆円<br>Auction補助金…0兆円<hr>合計…4兆円'); Navi('2', 'auc.gif', 'へそくり', '貯金…0兆円<br>Auction補助金…0兆円<hr>合計…4兆円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>18600トン</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR><p onMouseOver="MM_displayStatusMsg('収入見込み/普通職場…保有せず<br>ＨＴ職場…保有せず<hr>食料＋1140000トン<br>資金見込みなし<br>補助金見込みなし'); Navi('2', 'black.gif', '収入見込み', '普通職場…保有せず<br>ＨＴ職場…保有せず<hr>食料＋1140000トン<br>資金見込みなし<br>補助金見込みなし', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">600000人</p></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>10万ｋＷ</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>Ｌｖ4</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=9 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>　info：<font size="-1"><IMG SRC="sc.gif" ALT="予選落ち(攻(100)守(100)KP(100)チーム成績(勝点0/0勝0敗0分/通算3勝2敗1分/優勝4回)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('予選落ち/攻撃力(100)<br>守備力(100)<br>キーパー能力(100)<br>チーム成績(勝点0/0勝0敗0分/通算3勝2敗1分/優勝4回)'); Navi('2', 'sc.gif', '予選落ち', '攻撃力(100)<br>守備力(100)<br>キーパー能力(100)<br>チーム成績(勝点0/0勝0敗0分/通算3勝2敗1分/優勝4回)', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> <font color="MEDIUMSEAGREEN"></font><font color="SALMON"><IMG SRC="house0.gif" ALT="オーナー2の小屋" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('オーナー2の小屋/税率5％(285億円)'); Navi('2', 'house0.gif', 'オーナー2の小屋', '税率5％(285億円)', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> </font><font color="hotpink"></font><IMG SRC="ms.gif" ALT="マスコットいのら(HP3.AP1.DP1.SP1/0匹撃破/経験値9)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('マスコットいのら/HP 3　AP 1<br>DP 1　SP 1<br>0匹撃破<br>経験値9'); Navi('2', 'ms.gif', 'マスコットいのら', 'HP 3　AP 1<br>DP 1　SP 1<br>0匹撃破<br>経験値9', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">Sum(6)<IMG SRC="niwatori.gif" ALT="にわとり" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('にわとり/1万羽<br>生産力100トン<br>売値10億円'); Navi('2', 'niwatori.gif', 'にわとり', '1万羽<br>生産力100トン<br>売値10億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">1万羽<IMG SRC="kansoku.gif" ALT="観測衛星" WIDTH=16 HEIGHT="16">200%</font><IMG SRC="ele.gif" ALT="使用状況(消費50万ｋＷ／過不足-40万ｋＷ)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('使用状況/消費50万ｋＷ<br>過不足-40万ｋＷ'); Navi('2', 'ele.gif', '使用状況', '消費50万ｋＷ<br>過不足-40万ｋＷ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"><font color=red>不足中！</font></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=5 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>Prize：<font size="-1"><IMG SRC="prize11.gif" ALT="[農場][ＨＣ優勝回数][サッカーチーム力][鉄道]" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('部門賞/[農場][ＨＣ優勝回数][サッカーチーム力][鉄道]'); Navi('2', 'prize11.gif', '部門賞', '[農場][ＨＣ優勝回数][サッカーチーム力][鉄道]', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 4冠 <IMG SRC="prize3.gif" ALT="究極繁栄賞" WIDTH=16 HEIGHT=16> </font></NOBR></TD>
+<TD BGCOLOR="WHITE" COLSPAN=4 align=left nowrap=nowrap><NOBR><font size="-1"><FONT COLOR="royalblue"><B>予想１：</B></FONT>2-2</font></NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="WHITE" COLSPAN=9 align=left nowrap=nowrap><NOBR><font color=#0000ff>オーナー2 : </font><font color=seagreen><B>箱庭島への援助射撃が可能(残り4ターン)</B></font></NOBR></TD>
+</TR>
+
+
+<TR>
+<TD BGCOLOR="LAVENDER" ROWSPAN=4 align=center nowrap=nowrap HEIGHT=100><NOBR><FONT COLOR="#800000"><B>3</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" ROWSPAN=4 valign="middle" align="left" nowrap=nowrap>
+<div id="NaviView"></div>
+<center>
+<NOBR>
+<A CLASS="type3" HREF="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi?Sight=1" "alt="ID=1">
+<FONT COLOR="#808080"><B>テスト島(3)</B></FONT>
+</A>
+<br>
+<font color="MEDIUMSEAGREEN" font size="-1"></font>
+<NOBR>ID:(<font color="SALMON"><B>1</B></font>) <font color="royalblue">15000</font>pts.</NOBR><br>
+<NOBR><font size="-1">失業率</font>:(<font color="royalblue">-11.11%</font>)</NOBR><br>
+<NOBR><font color="lightseagreen" font size="-1">通算観光者数１万人未満<br></font></NOBR>
+<NOBR><font color="hotpink" font size="-2">(前ターン＋0pts.-20000人-7億円)</font></NOBR>
+</center>
+</TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>720000人</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>3300万坪</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>推定2000億円＋<IMG SRC="auc.gif" ALT="へそくり" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('へそくり/貯金…1兆円<br>Auction補助金…2兆円<hr>合計…7兆円'); Navi('3', 'auc.gif', 'へそくり', '貯金…1兆円<br>Auction補助金…2兆円<hr>合計…7兆円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>18700トン</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR><p onMouseOver="MM_displayStatusMsg('収入見込み/普通職場…保有せず<br>ＨＴ職場…800000人<hr>食料見込みなし<br>資金見込みなし<br>補助金＋720億円'); Navi('3', 'black.gif', '収入見込み', '普通職場…保有せず<br>ＨＴ職場…800000人<hr>食料見込みなし<br>資金見込みなし<br>補助金＋720億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">800000人</p></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>保有せず</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>90万ｋＷ</NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=right nowrap=nowrap><NOBR>Ｌｖ11</NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=9 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>　info：<font size="-1"><font color="MEDIUMSEAGREEN"><IMG SRC="prize10.gif" ALT="入手の難しいユニーク地形：[首都]／全12種類" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('ユニーク地形/全12種類中1種類<br>[首都]'); Navi('3', 'prize11.gif', 'ユニーク地形', '全12種類中1種類<br>[首都]', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 800ヶ所 </font><font color="SALMON"></font><font color="hotpink"></font><IMG SRC="buta.gif" ALT="ぶた" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('ぶた/4万頭<br>生産力800トン<br>売値80億円'); Navi('3', 'buta.gif', 'ぶた', '4万頭<br>生産力800トン<br>売値80億円', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">4万頭<IMG SRC="kisho.gif" ALT="気象衛星" WIDTH=16 HEIGHT="16">199%</font><IMG SRC="ele.gif" ALT="使用状況(消費30万ｋＷ／過不足60万ｋＷ)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('使用状況/消費30万ｋＷ<br>過不足60万ｋＷ'); Navi('3', 'ele.gif', '使用状況', '消費30万ｋＷ<br>過不足60万ｋＷ', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" COLSPAN=5 align=left nowrap=nowrap><NOBR><FONT COLOR="royalblue"><B>Prize：<font size="-1"><IMG SRC="prize11.gif" ALT="[職場][ぶた数][記念碑数][軍事技術][電力]" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('部門賞/[職場][ぶた数][記念碑数][軍事技術][電力]'); Navi('3', 'prize11.gif', '部門賞', '[職場][ぶた数][記念碑数][軍事技術][電力]', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false"> 5冠 <IMG SRC="omamori.gif" ALT="toto的中回数(2)/お守り残数(0)" WIDTH=16 HEIGHT="16" onMouseOver="MM_displayStatusMsg('お守り/toto的中回数…2回<br>お守り残数…0個'); Navi('3', 'omamori.gif', 'お守り', 'toto的中回数…2回<br>お守り残数…0個', '', ''); return true" onMouseOut="MM_displayStatusMsg(''); NaviClose(); return false">残り(0)</font></NOBR></TD>
+<TD BGCOLOR="WHITE" COLSPAN=4 align=left nowrap=nowrap><NOBR><font size="-1"><FONT COLOR="royalblue"><B>予想１：</B></FONT>(未登録)</font></NOBR></TD>
+</TR>
+<TR>
+<TD BGCOLOR="WHITE" COLSPAN=9 align=left nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>コメント : </B></FONT>ひとこと&lt;b&gt;</NOBR></TD>
+</TR>
+
+
+</TABLE>
+
+<HR>
+<H1><FONT COLOR="#4444ff">新しい島を探す</FONT></H1>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+どんな名前をつける予定？<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>島<BR>
+オーナー名は？<BR>
+<INPUT TYPE="text" NAME="OWNERNAME" SIZE=32 MAXLENGTH=32><BR>
+パスワードは？<BR>
+<INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
+念のためパスワードをもう一回<BR>
+<INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
+参加にあたっての意気込み<BR>
+<INPUT TYPE=text NAME=MESSAGE SIZE=80><BR>
+<INPUT TYPE="submit" VALUE="探しに行く" NAME="NewIslandButton">
+</FORM>
+<HR>
+<H1><FONT COLOR="#4444ff">島の名前とパスワードの変更</FONT></H1>
+<P>
+(注意)名前の変更には500億円かかります。
+</P>
+<FORM action="http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi" method="POST">
+どの島ですか？<BR>
+<SELECT NAME="ISLANDID">
+<OPTION VALUE="3" >箱庭島
+<OPTION VALUE="1" >テスト島
+<OPTION VALUE="2" >Alpha島
+
+</SELECT>
+<BR>
+どんな名前に変えますか？(変更する場合のみ)<BR>
+<INPUT TYPE="text" NAME="ISLANDNAME" SIZE=32 MAXLENGTH=32>島<BR>
+オーナー名は？(変更する場合のみ)<BR>
+<INPUT TYPE="text" NAME="OWNERNAME" SIZE=32 MAXLENGTH=32><BR>
+パスワードは？(必須)<BR>
+<INPUT TYPE="password" NAME="OLDPASS" SIZE=32 MAXLENGTH=32><BR>
+新しいパスワードは？(変更する時のみ)<BR>
+<INPUT TYPE="password" NAME="PASSWORD" SIZE=32 MAXLENGTH=32><BR>
+念のためパスワードをもう一回(変更する時のみ)<BR>
+<INPUT TYPE="password" NAME="PASSWORD2" SIZE=32 MAXLENGTH=32><BR>
+
+<INPUT TYPE="submit" VALUE="変更する" NAME="ChangeInfoButton">
+<INPUT TYPE="submit" VALUE="(・∀・)" NAME="IPInfoButton">
+</FORM>
+
+
+</TD>
+
+<TD VALIGN=TOP WIDTH=350>
+<H1><FONT COLOR="#4444ff">画像のローカル設定</FONT></H1>
+現在の設定<B>[</b> <FONT COLOR=RED>未設定</FONT> <B>]</B>
+　　<A CLASS="type3" HREF=e.html target=_BLANK><FONT SIZE=+1> 説 明 </FONT></A>
+<form action=http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi method=POST>
+<INPUT TYPE=file NAME="IMGLINE">
+<INPUT TYPE="submit" VALUE="設定" name=IMGSET>
+</form>
+
+<form action=http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi method=POST>
+Macユーザー用<BR>
+<INPUT TYPE=text NAME="IMGLINEMAC">
+<INPUT TYPE="submit" VALUE="設定" name=IMGSET><BR>
+<FONT SIZE=-1>Macの方は、こちらを使用して下さい。</FONT>
+</form>
+</TD></TR>
+
+<TR HEIGHT=100><TD ALIGN=CENTER>
+<form action=http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgi method=POST>
+<INPUT TYPE=hidden NAME="IMGLINE" value="deletemodenow">
+<INPUT TYPE="submit" VALUE="設定を解除する" name=IMGSET>
+</form>
+</TD></TR>
+</TABLE>
+<HR>
+
+
+<H1><FONT COLOR="#4444ff">Hakoniwa Auction100</FONT></H1>
+
+<TABLE BORDER>
+
+<TR>
+<TD><NOBR>
+
+
+
+<TABLE border="0" cellpadding="0" cellspacing="0" width=100%>
+<TR>
+<TD>
+
+<TABLE border="1" cellpadding="1" cellspacing="1" width=100%>
+<TR>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" COLSPAN=2 align=center nowrap=nowrap><NOBR><B>１．<font color="MEDIUMSEAGREEN">出品島の品</font></B><font color="royalblue">(残り12ターン)</font></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>1</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">300兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>2</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">300兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>3</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">100兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>4</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>5</B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+</TABLE>
+</TD>
+
+<TD>
+<TABLE border="1" cellpadding="1" cellspacing="1" width=100%>
+<TR>
+<TH BGCOLOR="LAVENDER" COLSPAN=2 align=center nowrap=nowrap><NOBR><B>２．<font color="MEDIUMSEAGREEN">海あみゅ2000人規模</font></B><font color="hotpink">(落札済み)</font></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">50兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+</TABLE>
+</TD>
+
+<TD>
+<TABLE border="1" cellpadding="1" cellspacing="1" width=100%>
+<TR>
+<TH BGCOLOR="LAVENDER" COLSPAN=2 align=center nowrap=nowrap><NOBR><B>３．<font color="MEDIUMSEAGREEN">お守り2000個</font></B><font color="royalblue">(残り15ターン)</font></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">40兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>？？？島</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">40兆円</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>－</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">－</font></B></FONT></NOBR></TD>
+</TR>
+
+</TABLE>
+</TD>
+
+</TR>
+</TABLE>
+
+
+
+</NOBR></TD>
+</TR>
+
+
+
+<TR>
+<TD>
+<TABLE border="0" cellpadding="0" cellspacing="0">
+<TR>
+<TD>
+<TABLE border="1" cellpadding="1" cellspacing="1">
+<TR>
+<TH BGCOLOR="MOCCASIN" COLSPAN=6 align=center nowrap=nowrap><NOBR><B><font color="royalblue">高額落札ランキング</font></B></NOBR></TH>
+</TR>
+<TR>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札価格</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札島名</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札品名</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>セクション</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>ボーナス</B></FONT></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>1</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">1200兆円</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>箱庭島</B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="MEDIUMSEAGREEN">お守り4個</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="black">2</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>+<font color="red">5000</font>pts.</B></FONT></NOBR></TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>2</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">800兆円</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>テスト島</B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="MEDIUMSEAGREEN">テスト品</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="black">1</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>+<font color="red">4000</font>pts.</B></FONT></NOBR></TD>
+</TR>
+
+</TABLE>
+</TD>
+<TD width=100% align=center>
+
+<TABLE border="0" cellpadding="5" cellspacing="0" width=100%>
+<TR>
+<TD width=100% align=center>
+<font color="royalblue"><b>高額落札ランキング１位</b></font>
+<br><FONT COLOR="#a06040"><B>箱庭島</B></FONT>
+<br>１位（2回）賞品まで（3/5）
+</TD>
+</TR>
+<TR>
+<TD width=100% align=center>
+<font color="hotpink">5連続ランキング１位の賞品を<br>
+3回もらうと殿堂入りとなります。</font>
+</TD>
+</TR>
+</TABLE>
+
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+
+
+
+
+<TR>
+<TD>
+<TABLE border="0" cellpadding="0" cellspacing="0" width=100%>
+<TR>
+<TD>
+<TABLE border="1" cellpadding="1" cellspacing="1" width=100%>
+<TR>
+<TH BGCOLOR="MOCCASIN" COLSPAN=6 align=center nowrap=nowrap><NOBR><B><font color="royalblue">殿堂入り</font></B></NOBR></TH>
+</TR>
+<TR>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>順位</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札価格</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札島名</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>落札品名</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>セクション</B></FONT></NOBR></TH>
+<TH BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B>１位保守回数</B></FONT></NOBR></TH>
+</TR>
+
+<TR>
+<TD BGCOLOR="LAVENDER" align=center nowrap=nowrap><NOBR><FONT COLOR="#800000"><B>1</B></FONT></NOBR></TD>
+<TD BGCOLOR="MOCCASIN" align=center nowrap=nowrap><NOBR><FONT COLOR="#C00000"><B><font color="black">5000兆円</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="LAVENDERBLUSH" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>テスト島</B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="MEDIUMSEAGREEN">海あみゅ5000人規模</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B><font color="black">3</font></B></FONT></NOBR></TD>
+<TD BGCOLOR="WHITE" align=center nowrap=nowrap><NOBR><FONT COLOR="#a06040"><B>2回</B></FONT></NOBR></TD>
+</TR>
+
+</TABLE>
+</TD>
+</TR>
+</TABLE>
+</TD>
+</TR>
+
+
+
+
+
+<TR>
+<TD width=100%><font color="red" size="+1">(注)品番３は21位以下の島のみ入札可能です。</font><br><NOBR>
+<NOBR>オークションの新しい記録</NOBR><BR>
+<NOBR>オークションの古い記録</NOBR><BR>
+</NOBR></TD>
+</TR>
+
+</TABLE>
+
+<H1><FONT COLOR="#4444ff">Hakoniwa Cup0</FONT></H1>
+<NOBR><FONT COLOR="#800000"><B>ターン3</B></FONT>：カップの新しい記録</NOBR><BR>
+<NOBR><FONT COLOR="#800000"><B>ターン2</B></FONT>：カップの古い記録</NOBR><BR>
+<H1><FONT COLOR="#4444ff">最近の出来事</FONT></H1>
+<NOBR><FONT COLOR="#800000"><B>ターン3</B></FONT>：<SMALL>負荷計測</SMALL></NOBR><BR>
+<NOBR><FONT COLOR="#800000"><B>ターン3</B></FONT>：公開の<B>ログ</B></NOBR><BR>
+<H1><FONT COLOR="#4444ff">発見の記録</FONT></H1>
+<NOBR><FONT COLOR="#800000"><B>ターン1</B></FONT>：<FONT COLOR="#a06040"><B>箱庭島</B></FONT>が発見される。</NOBR><BR>
+<NOBR><FONT COLOR="#800000"><B>ターン1</B></FONT>：<FONT COLOR="#a06040"><B>Alpha島</B></FONT>が発見される。</NOBR><BR>
+<NOBR><FONT COLOR="#800000"><B>ターン1</B></FONT>：<FONT COLOR="#a06040"><B>テスト島</B></FONT>が発見される。</NOBR><BR>
+<HR>
+<P align=center>
+管理者:管理人(<A CLASS="type3" HREF="mailto:めあど">めあど</A>)<BR>
+掲示板(<A CLASS="type3" HREF="掲示板">掲示板</A>)<BR>
+トップページ(<A CLASS="type3" HREF="http://">http://</A>)<BR>
+箱庭諸島のページ(<A CLASS="type3" HREF="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html">http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html</A>)<BR>
+Hakoniwa R.A.のページ(<A CLASS="type3" HREF="http://www5b.biglobe.ne.jp/~k-e-i/">http://www5b.biglobe.ne.jp/~k-e-i/</A>)
+<br>
+
+</P>
+<DIV align="right">
+<SMALL>CPU(0.02) : user(0.02) system(0)</SMALL>
+</DIV>
+</BODY>
+</HTML>

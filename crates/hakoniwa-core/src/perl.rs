@@ -22,6 +22,56 @@ pub fn int(s: &str) -> i64 {
     if neg { -value } else { value }
 }
 
+/// 文字列を数値として使ったときの Perl の値 (`$s == 0` などの比較に使う)。
+///
+/// 先頭の空白を読み飛ばし、符号・数字・小数部・指数部の並びを読む (`"12abc"` は 12、
+/// `"0.5"` は 0.5、`"東京"` は 0)。`inf`/`infinity`/`nan` (大文字小文字を問わない) は
+/// 無限大・NaN になる
+pub fn num(s: &str) -> f64 {
+    let s = s.trim_start_matches([' ', '\t', '\n', '\r', '\x0b', '\x0c']);
+    let b = s.as_bytes();
+    let mut i = 0;
+    if matches!(b.first(), Some(b'+' | b'-')) {
+        i = 1;
+    }
+    let neg = b.first() == Some(&b'-');
+    let rest = s[i..].to_ascii_lowercase();
+    if rest.starts_with("inf") {
+        return if neg {
+            f64::NEG_INFINITY
+        } else {
+            f64::INFINITY
+        };
+    }
+    if rest.starts_with("nan") {
+        return f64::NAN;
+    }
+    let digits = |from: usize| b[from..].iter().take_while(|c| c.is_ascii_digit()).count();
+    let int_len = digits(i);
+    let mut end = i + int_len;
+    let mut frac_len = 0;
+    if b.get(end) == Some(&b'.') {
+        frac_len = digits(end + 1);
+        if int_len + frac_len > 0 {
+            end += 1 + frac_len;
+        }
+    }
+    if int_len + frac_len == 0 {
+        return 0.0;
+    }
+    if matches!(b.get(end), Some(b'e' | b'E')) {
+        let mut j = end + 1;
+        if matches!(b.get(j), Some(b'+' | b'-')) {
+            j += 1;
+        }
+        let exp_len = digits(j);
+        if exp_len > 0 {
+            end = j + exp_len;
+        }
+    }
+    s[..end].parse().unwrap_or(0.0)
+}
+
 /// Perl の `$x == ''` 相当 (数値比較)。
 ///
 /// 空文字列は数値として 0 なので、`$x` の数値が 0 なら真になる。
@@ -46,16 +96,21 @@ pub fn random<R: rand::Rng + ?Sized>(rng: &mut R, n: i64) -> i64 {
 /// マッチしなければ `None`。Perl 版はマッチ失敗時に前回の `$1`.. や代入先の変数を
 /// そのまま使うので、呼び出し側は [`Captures::update`] で「前回値」を保持する。
 pub fn fields<const N: usize>(s: &str) -> Option<[i64; N]> {
+    fields_raw::<N>(s).map(|v| v.map(int))
+}
+
+/// [`fields`] の欄を文字列のまま返す (`"007"` は `"007"`、空欄は `""`)
+pub fn fields_raw<const N: usize>(s: &str) -> Option<[&str; N]> {
     // Perl の `$` は末尾の改行の直前にもマッチする
     let s = s.strip_suffix('\n').unwrap_or(s);
-    let mut out = [0i64; N];
+    let mut out = [""; N];
     let mut parts = s.split(',');
     for slot in out.iter_mut() {
         let p = parts.next()?;
         if !p.bytes().all(|b| b.is_ascii_digit()) {
             return None;
         }
-        *slot = int(p);
+        *slot = p;
     }
     if parts.next().is_some() {
         return None;
@@ -84,26 +139,34 @@ pub fn join(values: &[i64]) -> String {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct MatchScope {
     caps: Vec<i64>,
+    /// `$1`.. の文字列 (画面に埋め込むとき用。数字の並びのまま、`""` もある)
+    texts: Vec<String>,
 }
 
 impl MatchScope {
     /// `$s =~ /^([0-9]*),...$/; ($a, $b, ...) = ($1, $2, ...);` の右辺。
     /// 一致すればその値 (そして以後の `$1`..)、しなければ最後に成功したマッチの値
     pub fn fields<const N: usize>(&mut self, s: &str) -> [i64; N] {
-        match fields::<N>(s) {
-            Some(v) => {
-                self.caps = v.to_vec();
-                v
-            }
+        match self.try_fields::<N>(s) {
+            Some(v) => v,
             None => self.current(),
         }
     }
 
     /// 一致したかどうかが要るとき (`if ($s =~ /.../)`)。一致すれば `$1`.. を更新する
     pub fn try_fields<const N: usize>(&mut self, s: &str) -> Option<[i64; N]> {
-        let v = fields::<N>(s)?;
+        let raw = fields_raw::<N>(s)?;
+        self.texts = raw.iter().map(|t| t.to_string()).collect();
+        let v = raw.map(int);
         self.caps = v.to_vec();
         Some(v)
+    }
+
+    /// [`MatchScope::fields`] の文字列版: 画面に `"$a"` と埋め込むときの値。
+    /// 最後のマッチに無い `$n` (未定義) は空文字列になる
+    pub fn fields_text<const N: usize>(&mut self, s: &str) -> [String; N] {
+        self.try_fields::<N>(s);
+        self.current_text()
     }
 
     /// いまの `$1`..`$N`
@@ -111,9 +174,21 @@ impl MatchScope {
         std::array::from_fn(|i| self.caps.get(i).copied().unwrap_or(0))
     }
 
+    /// いまの `$1`..`$N` の文字列 (未定義は空文字列)
+    pub fn current_text<const N: usize>(&self) -> [String; N] {
+        std::array::from_fn(|i| self.texts.get(i).cloned().unwrap_or_default())
+    }
+
     /// 数字の欄に限らない正規表現が成功したとき (`$1`.. をその値にする)
     pub fn set(&mut self, caps: Vec<i64>) {
+        self.texts = caps.iter().map(i64::to_string).collect();
         self.caps = caps;
+    }
+
+    /// [`MatchScope::set`] の文字列版 (数値としては [`int`] で読んだ値)
+    pub fn set_text(&mut self, texts: Vec<String>) {
+        self.caps = texts.iter().map(|t| int(t)).collect();
+        self.texts = texts;
     }
 }
 
@@ -205,6 +280,22 @@ mod tests {
     }
 
     #[test]
+    fn num_matches_perl() {
+        assert_eq!(num(""), 0.0);
+        assert_eq!(num("東京シティー"), 0.0);
+        assert_eq!(num("555"), 555.0);
+        assert_eq!(num(" 12abc"), 12.0);
+        assert_eq!(num("0.5"), 0.5);
+        assert_eq!(num("-.5x"), -0.5);
+        assert_eq!(num("1e3"), 1000.0);
+        assert_eq!(num("1e"), 1.0);
+        assert_eq!(num("."), 0.0);
+        assert_eq!(num("+7"), 7.0);
+        assert!(num("NaN").is_nan());
+        assert_eq!(num("-Infinity"), f64::NEG_INFINITY);
+    }
+
+    #[test]
     fn num_eq_empty_matches_perl() {
         assert!(num_eq_empty(""));
         assert!(num_eq_empty("0,0,0,0,0"));
@@ -236,6 +327,19 @@ mod tests {
             assert_eq!(inner.fields::<1>("9"), [9]);
         }
         assert_eq!(m.current::<1>(), [4]);
+    }
+
+    #[test]
+    fn match_texts_keep_the_digits_and_undefined_is_empty() {
+        let mut m = MatchScope::default();
+        assert_eq!(m.fields_text::<3>("007,,3"), ["007", "", "3"]);
+        assert_eq!(m.current::<3>(), [7, 0, 3]);
+        // 失敗すると最後のマッチ。そこに無い $4 は未定義 (空)
+        assert_eq!(m.fields_text::<4>("-1,2,3,4"), ["007", "", "3", ""]);
+        m.set_text(vec!["5".into(), "12,3,".into()]);
+        assert_eq!(m.current::<2>(), [5, 12]);
+        assert_eq!(m.current_text::<2>(), ["5", "12,3,"]);
+        assert_eq!(fields_raw::<2>("1,02"), Some(["1", "02"]));
     }
 
     #[test]
