@@ -12,6 +12,8 @@ thiserror.workspace = true
 encoding_rs.workspace = true
 rand.workspace = true
 pwhash = "1"
+bincode.workspace = true
+zstd.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

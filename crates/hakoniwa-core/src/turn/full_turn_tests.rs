@@ -26,7 +26,9 @@ pub(crate) fn check_turn_with(
         |want| {
             // 移植版は Perl 版の負荷計測のログを出さない (このターンに出たものだけ取り除く)
             if let Some(turn) = want.logs.turns.first_mut() {
-                std::sync::Arc::make_mut(turn).retain(|e| !e.message.contains("負荷計測"));
+                *turn = std::sync::Arc::new(
+                    turn.map_entries(|v| v.retain(|e| !e.message.contains("負荷計測"))),
+                );
             }
             fix_want(want);
         },
@@ -138,9 +140,9 @@ fn turn_cup_opening_without_teams_matches_perl() {
 fn stadium_dash(want: &mut GameState) {
     let fix = |m: &mut String| *m = m.replace('－', "−");
     want.logs.hcup.iter_mut().for_each(|m| fix(&mut m.message));
-    std::sync::Arc::make_mut(&mut want.logs.turns[0])
-        .iter_mut()
-        .for_each(|e| fix(&mut e.message));
+    want.logs.turns[0] = std::sync::Arc::new(
+        want.logs.turns[0].map_entries(|v| v.iter_mut().for_each(|e| fix(&mut e.message))),
+    );
 }
 
 /// ターン 100: toto (切り捨てた無人島の ID が正解に入る、8 点と 6 点、7 点の率の繰り越し) と

@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use crate::config::{GameConfig, HideMoneyMode};
 use crate::tables::{CommandKind, LandKind};
 use crate::turn::IslandScratch;
+use crate::turn_log::TurnLog;
 
 /// 保存データの形式バージョン
 pub const FORMAT_VERSION: u32 = 1;
@@ -360,8 +361,8 @@ impl PlannedCommand {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Logs {
     /// ターンごとのログ。`turns[0]` が最新 (`hakojima.log0`)。
-    /// 済んだターンのログは変わらないので、複製のあいだで共有する
-    pub turns: Vec<Arc<Vec<LogEntry>>>,
+    /// 1 ターン分は圧縮して持ち ([`TurnLog`])、済んだターンのログは変わらないので複製のあいだで共有する
+    pub turns: Vec<Arc<TurnLog>>,
     /// 発見の記録 (`hakojima.his`)。古い順
     pub history: Vec<TurnMessage>,
     /// Hakoniwa Cup のログ (`hakojima.lhc`)。古い順

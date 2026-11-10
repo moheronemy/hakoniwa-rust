@@ -440,7 +440,10 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     let mut auction = std::mem::take(&mut ctx.log.auction);
     let (entries, history) = ctx.log.flush();
     let logs = &mut state.logs;
-    logs.turns.insert(0, std::sync::Arc::new(entries));
+    logs.turns.insert(
+        0,
+        std::sync::Arc::new(crate::turn_log::TurnLog::new(entries)),
+    );
     logs.turns.truncate(config.log_max + 1);
     logs.history.extend(history);
     logs.hcup.append(&mut hcup);

@@ -24,7 +24,7 @@ pub async fn history_page(State(app): State<Arc<AppState>>, headers: HeaderMap) 
             .logs
             .turns
             .iter()
-            .flat_map(|t| t.iter())
+            .flat_map(|t| t.entries())
             .filter(|e| !e.secret)
         {
             let _ = writeln!(

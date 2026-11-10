@@ -134,6 +134,24 @@ fn main() -> ExitCode {
         json.len() as f64 / 1e6
     );
 
+    let packed: usize = game.logs.turns.iter().map(|t| t.packed_bytes()).sum();
+    println!(
+        "ターンのログ {} ターン分 (圧縮後 {:.1} MB)",
+        game.logs.turns.len(),
+        packed as f64 / 1e6
+    );
+    // いちばん多く使ったメモリ (Linux のみ)
+    if let Some(line) = std::fs::read_to_string("/proc/self/status")
+        .ok()
+        .and_then(|s| {
+            s.lines()
+                .find(|l| l.starts_with("VmHWM"))
+                .map(str::to_string)
+        })
+    {
+        println!("{}", line.split_whitespace().collect::<Vec<_>>().join(" "));
+    }
+
     match args.max_turn_secs {
         Some(limit) if worst > limit => {
             println!("失敗: いちばん遅いターン {worst:.3} 秒 > 上限 {limit} 秒");

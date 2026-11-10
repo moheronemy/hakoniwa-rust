@@ -110,13 +110,14 @@ pub struct RecentLog {
 /// 機密のログは、持ち主 (`owner`) が見ていて、その島が 1 番目の島のときだけ出す
 pub fn recent_logs(game: &GameState, config: &GameConfig, id: i64, owner: bool) -> Vec<RecentLog> {
     let mut out = Vec::new();
-    for entry in game
-        .logs
-        .turns
-        .iter()
-        .take(config.log_max)
-        .flat_map(|t| t.iter())
-    {
+    // 島 0 は全部の島 (Perl 版でも id 0 なら絞らない)。それ以外は、その島が関わる行だけを展開する
+    for entry in game.logs.turns.iter().take(config.log_max).flat_map(|t| {
+        if id == 0 {
+            t.entries()
+        } else {
+            t.entries_for(id)
+        }
+    }) {
         if entry.secret && (!owner || entry.island1 != Some(id)) {
             continue;
         }

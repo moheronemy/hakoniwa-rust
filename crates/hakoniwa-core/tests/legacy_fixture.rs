@@ -85,11 +85,11 @@ fn reads_logs() {
     let import = import();
     let logs = &import.state.logs;
     assert_eq!(logs.turns.len(), 2);
-    assert_eq!(logs.turns[0][0].turn, 3);
-    assert_eq!(logs.turns[1][0].turn, 2);
-    assert!(!logs.turns[0][0].secret);
-    assert_eq!(logs.turns[0][0].island1, Some(0));
-    assert_eq!(logs.turns[0][0].island2, None);
+    assert_eq!(logs.turns[0].entries()[0].turn, 3);
+    assert_eq!(logs.turns[1].entries()[0].turn, 2);
+    assert!(!logs.turns[0].entries()[0].secret);
+    assert_eq!(logs.turns[0].entries()[0].island1, Some(0));
+    assert_eq!(logs.turns[0].entries()[0].island2, None);
 
     assert_eq!(logs.history.len(), 3);
     assert_eq!(logs.history[0].turn, 1);

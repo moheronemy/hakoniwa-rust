@@ -11,6 +11,7 @@
 //! - [`turn`] — ターン処理
 //! - [`view`] — 画面に出す内容 (トップページ、観光画面・開発画面の島の情報・地図・計画の一覧)
 //! - [`log`] — ターン処理のログ
+//! - [`turn_log`] — 1 ターン分のログを圧縮して持つ型
 //! - [`perl`] — Perl の挙動を再現するヘルパー
 //!
 //! ゲームのルールは移植の途中。進み具合は `docs/PORTING.md` を参照。
@@ -26,6 +27,7 @@ pub mod perl;
 pub mod storage;
 pub mod tables;
 pub mod turn;
+pub mod turn_log;
 pub mod view;
 
 pub use config::GameConfig;

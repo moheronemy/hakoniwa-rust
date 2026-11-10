@@ -853,7 +853,7 @@ pub fn top_page(game: &GameState, config: &GameConfig, now: i64, view: ViewRange
             .turns
             .iter()
             .take(config.top_log_turns)
-            .flat_map(|t| t.iter())
+            .flat_map(|t| t.entries())
             .filter(|e| !e.secret)
             .map(|e| TurnMessage {
                 turn: e.turn,

@@ -70,11 +70,17 @@ fn idle_islands_are_abandoned_like_perl() {
     assert_eq!(abandoned, expected);
     // 失業者の暴動などは乱数しだいで出るので、放棄のログだけ数える
     let giveups = state.logs.turns[0]
+        .entries()
         .iter()
         .filter(|e| e.message.contains("は放棄され"))
         .count();
     assert_eq!(giveups, 3);
-    assert!(state.logs.turns[0].iter().all(|e| e.turn == 5 && !e.secret));
+    assert!(
+        state.logs.turns[0]
+            .entries()
+            .iter()
+            .all(|e| e.turn == 5 && !e.secret)
+    );
 }
 
 #[test]

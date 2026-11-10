@@ -419,9 +419,10 @@ fn read_logs(dir: &Path, warnings: &mut Vec<String>) -> Result<Logs, LegacyError
         let Some(lines) = read_lines(&dir.join(format!("hakojima.log{i}")), warnings)? else {
             break;
         };
-        logs.turns.push(std::sync::Arc::new(
-            lines.iter().filter_map(|l| parse_log_entry(l)).collect(),
-        ));
+        logs.turns
+            .push(std::sync::Arc::new(crate::turn_log::TurnLog::new(
+                lines.iter().filter_map(|l| parse_log_entry(l)).collect(),
+            )));
     }
     let turn_messages = |name: &str, warnings: &mut Vec<String>| -> Result<_, LegacyError> {
         Ok(read_lines(&dir.join(name), warnings)?
