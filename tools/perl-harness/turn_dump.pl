@@ -9,6 +9,7 @@
 #   income    income($island)
 #   commands  while (doCommand($island) == 0) {}
 #   eachhex   doEachHex($island)
+#   process   doIslandProcess($i, $island); doIslandunemployed($i, $island)
 # After every step the islands (persisted values, transient values, land values and
 # planned commands) and the log pools so far (in logFlush order) are dumped.
 #   MAIN.pl  : hako-main.cgi without its top-level main code (see run-phase1.sh)
@@ -32,10 +33,12 @@ for my $f ($main_pl, $turn_cgi) {
 }
 
 # logHistory appends to a file; collect the lines instead
-our @history;
+our (@history, @hcup, @auc);
 {
     no warnings 'redefine';
     *main::logHistory = sub { push @history, "$HislandTurn,$_[0]" };
+    *main::logHcup = sub { push @hcup, "$HislandTurn,$_[0]" };
+    *main::logAuc = sub { push @auc, "$HislandTurn,$_[0]" };
 }
 
 $HdirName = $dir;
@@ -97,6 +100,8 @@ sub pass {
         logs => [map { str($_) }
             reverse(@HsecretLogPool), reverse(@HlateLogPool), reverse(@HlogPool)],
         history => [map { str($_) } @history],
+        hcup => [map { str($_) } @hcup],
+        auclog => [map { str($_) } @auc],
     };
 }
 
@@ -105,6 +110,11 @@ my %step = (
     income   => sub { income($Hislands[$_[0]]) },
     commands => sub { while (doCommand($Hislands[$_[0]]) == 0) {} },
     eachhex  => sub { doEachHex($Hislands[$_[0]]) },
+    # turnMain と同じく、島ごとに doIslandProcess のあと doIslandunemployed
+    process  => sub {
+        doIslandProcess($_[0], $Hislands[$_[0]]);
+        doIslandunemployed($_[0], $Hislands[$_[0]]);
+    },
 );
 my @passes;
 for my $name (split /,/, ($ENV{STEPS} // 'estimate')) {

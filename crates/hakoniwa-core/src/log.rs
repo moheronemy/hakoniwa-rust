@@ -31,6 +31,10 @@ pub struct TurnLog {
     secret: Vec<LogEntry>,
     /// 発見の記録 (`hakojima.his` に追記するもの)
     pub history: Vec<TurnMessage>,
+    /// Hakoniwa Cup の記録 (`logHcup`、`hakojima.lhc` に追記するもの)
+    pub hcup: Vec<TurnMessage>,
+    /// ハコオクの記録 (`logAuc`、`hakojima.auc` に追記するもの)
+    pub auction: Vec<TurnMessage>,
 }
 
 impl TurnLog {
@@ -69,6 +73,16 @@ impl TurnLog {
     /// `logHistory`
     pub fn history(&mut self, turn: i64, message: String) {
         self.history.push(TurnMessage { turn, message });
+    }
+
+    /// `logHcup`
+    pub fn hcup(&mut self, turn: i64, message: String) {
+        self.hcup.push(TurnMessage { turn, message });
+    }
+
+    /// `logAuc`
+    pub fn auction(&mut self, turn: i64, message: String) {
+        self.auction.push(TurnMessage { turn, message });
     }
 
     /// ここまでのログを `flush` と同じ順で複製する (テスト用)

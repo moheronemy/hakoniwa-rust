@@ -60,8 +60,6 @@ pub struct Globals {
     pub yushounamber2: i64,
     /// `$hcturn`
     pub hcturn: i64,
-    /// `logHcup` で `hakojima.lhc` に追記する行。run_turn の最後で `logs.hcup` に移す
-    pub hcup_log: Vec<TurnMessage>,
 }
 
 /// この系統で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
@@ -485,12 +483,7 @@ fn add_auc9(caps: &mut Captures<5>, auc9: &mut String, value: i64, scope: &Group
 
 /// `logHcup` (`hakojima.lhc` に追記)
 fn hcup(ctx: &mut TurnContext, message: String) {
-    let turn = ctx.turn;
-    ctx.globals
-        .hex
-        .stadium
-        .hcup_log
-        .push(TurnMessage { turn, message });
+    ctx.log.hcup(ctx.turn, message);
 }
 
 fn team(name: &str) -> String {

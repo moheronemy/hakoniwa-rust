@@ -21,7 +21,12 @@ use crate::log::TurnLog;
 use crate::model::Island;
 
 use super::{
-    Globals, TurnContext, command::do_command, estimate::estimate, hex::do_each_hex, income::income,
+    Globals, TurnContext,
+    command::do_command,
+    estimate::estimate,
+    hex::do_each_hex,
+    income::income,
+    island::{do_island_process, do_island_unemployed},
 };
 
 fn fixture_dir() -> std::path::PathBuf {
@@ -267,6 +272,10 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
                 "income" => income(&mut ctx, &mut islands[i]),
                 "commands" => while !do_command(&mut ctx, &mut islands, i) {},
                 "eachhex" => do_each_hex(&mut ctx, &mut islands, i),
+                "process" => {
+                    do_island_process(&mut ctx, &mut islands, i);
+                    do_island_unemployed(&mut ctx, &mut islands, i);
+                }
                 other => panic!("unknown step {other}"),
             }
         }
@@ -395,6 +404,25 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
             .collect();
         if got != want {
             mismatches.push(format!("{step}: history: rust {got:?} perl {want:?}"));
+        }
+        // Hakoniwa Cup・ハコオクの記録 (期待値に入っているときだけ比べる)
+        for (key, lines) in [("hcup", &ctx.log.hcup), ("auclog", &ctx.log.auction)] {
+            let Some(want) = exp.get(key) else {
+                continue;
+            };
+            let got: Vec<String> = lines
+                .iter()
+                .map(|h| format!("{},{}", h.turn, h.message))
+                .collect();
+            let want: Vec<&str> = want
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_str().unwrap())
+                .collect();
+            if got != want {
+                mismatches.push(format!("{step}: {key}: rust {got:?} perl {want:?}"));
+            }
         }
 
         // ハコオクの出品 3 枠 ($auction1..3)。古い期待値には無い

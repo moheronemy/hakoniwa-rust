@@ -8,6 +8,7 @@ pub(crate) mod command;
 mod estimate;
 pub(crate) mod hex;
 mod income;
+pub(crate) mod island;
 mod ranking;
 
 #[cfg(test)]
@@ -158,6 +159,8 @@ pub struct IslandScratch {
     pub hex: hex::Scratch,
     /// doCommand の系統ごとの値
     pub command: command::Scratch,
+    /// 島全体の処理の段階ごとの値
+    pub process: island::Scratch,
     /// 地形の値の小数部分 (座標 → 小数)。Perl 版はコンデンサの充電で値が小数になり、
     /// ターンの間はそのまま使われる (保存時に切り捨て)。地形の値を書き換えるときは
     /// `hex::town::set` などを使って消すこと
@@ -199,6 +202,8 @@ pub(crate) struct Globals {
     pub hex: hex::HexGlobals,
     /// doCommand だけで使うグローバル変数
     pub command: command::CommandGlobals,
+    /// doIslandProcess / doIslandunemployed だけで使うグローバル変数
+    pub process: island::ProcessGlobals,
 }
 
 /// ターン処理全体で共有する状態
@@ -336,7 +341,11 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         hex::do_each_hex(&mut ctx, islands, i);
     }
 
-    // TODO(フェーズ4): 島全体処理 (doIslandProcess, doIslandunemployed)
+    // 島全体処理
+    for &i in &order {
+        island::do_island_process(&mut ctx, islands, i);
+        island::do_island_unemployed(&mut ctx, islands, i);
+    }
     // TODO(フェーズ6): Hakoniwa Cup のシード (ターン % 100 == 41)
 
     // 部門賞
@@ -395,14 +404,17 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     let backup_due = config.backup_every_turns > 0 && turn % config.backup_every_turns == 0;
 
     // ログ書き出し (Perl 版の負荷計測ログは出さない)
+    // Hakoniwa Cup・ハコオクの記録 (Perl 版は logHcup・logAuc でファイルに直接追記する)
+    let mut hcup = std::mem::take(&mut ctx.log.hcup);
+    let mut auction = std::mem::take(&mut ctx.log.auction);
     let (entries, history) = ctx.log.flush();
     let logs = &mut state.logs;
     logs.turns.insert(0, entries);
     logs.turns.truncate(config.log_max + 1);
     logs.history.extend(history);
+    logs.hcup.append(&mut hcup);
+    logs.auction.append(&mut auction);
     trim_front(&mut logs.history, config.history_max);
-    // Hakoniwa Cup のログ (Perl 版は logHcup で hakojima.lhc に直接追記する)
-    logs.hcup.append(&mut ctx.globals.hex.stadium.hcup_log);
     trim_front(&mut logs.hcup, config.hcup_log_max);
     trim_front(&mut logs.auction, 10);
 
