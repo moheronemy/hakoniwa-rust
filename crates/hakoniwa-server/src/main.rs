@@ -8,6 +8,7 @@ mod layout;
 mod pages;
 mod render;
 mod session;
+mod sets;
 mod store;
 mod turns;
 
@@ -18,7 +19,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
 use axum::Router;
-use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::{get, post};
@@ -28,6 +28,7 @@ use hakoniwa_core::{GameConfig, GameState, storage};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use serde::Deserialize;
+use sets::{Set, Sets};
 
 #[derive(Parser)]
 #[command(version, about = "Hakoniwa R.A. Rust 版のサーバー")]
@@ -40,6 +41,9 @@ struct Args {
     /// データディレクトリを消して `state_path` に置けば、次の起動で読み込まれる)
     #[arg(long, value_name = "PATH")]
     export_json: Option<PathBuf>,
+    /// `--export-json` で書き出すセットの ID (`sets_dir` の下のディレクトリ名)。省略時は既定のセット
+    #[arg(long, value_name = "ID", requires = "export_json")]
+    set: Option<String>,
 }
 
 /// サーバーの設定ファイル
@@ -58,8 +62,47 @@ struct ServerConfig {
     /// 画面まわりの設定
     #[serde(flatten)]
     options: ServerOptions,
+    /// ゲームの設定 (既定のセット)
+    game: GameConfig,
+    /// 既定のセットを動かすか (`[game]`・`state_path`・`data_dir` のゲーム)。
+    /// どのセットのホスト名にも当たらない要求はこのセットに来る。false なら 404
+    default_set: bool,
+    /// 複数のゲーム (セット) を置くディレクトリ。`<ID>/hakoniwa.toml` ([`SetConfig`]) があるものを
+    /// すべて読み込む (docs/MULTISET.md)
+    sets_dir: Option<PathBuf>,
+}
+
+/// セットごとの設定ファイル (`sets_dir/<ID>/hakoniwa.toml`)
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+struct SetConfig {
+    /// このセットのホスト名 (`set1.example.com` など。ポートは書かない)
+    hosts: Vec<String>,
+    /// 最初の起動で読み込む JSON。省略時は `<ID>/state.json`
+    state_path: Option<PathBuf>,
+    /// データディレクトリ。省略時は `<ID>/store`
+    data_dir: Option<PathBuf>,
     /// ゲームの設定
     game: GameConfig,
+}
+
+impl SetConfig {
+    fn read(dir: &std::path::Path) -> Result<Self> {
+        let path = dir.join("hakoniwa.toml");
+        let text = std::fs::read_to_string(&path)
+            .with_context(|| format!("{} を読めません", path.display()))?;
+        toml::from_str(&text).with_context(|| format!("{} の形式が違います", path.display()))
+    }
+
+    /// (state_path, data_dir)
+    fn paths(&self, dir: &std::path::Path) -> (PathBuf, PathBuf) {
+        (
+            self.state_path
+                .clone()
+                .unwrap_or_else(|| dir.join("state.json")),
+            self.data_dir.clone().unwrap_or_else(|| dir.join("store")),
+        )
+    }
 }
 
 /// 画面まわりの設定 (ゲームのルールに関係しないもの)
@@ -101,8 +144,90 @@ impl Default for ServerConfig {
             tick_secs: 10,
             options: ServerOptions::default(),
             game: GameConfig::default(),
+            default_set: true,
+            sets_dir: None,
         }
     }
+}
+
+impl ServerConfig {
+    /// 既定のセットのデータディレクトリ
+    fn data_dir(&self) -> PathBuf {
+        self.data_dir.clone().unwrap_or_else(|| {
+            self.state_path
+                .parent()
+                .unwrap_or(std::path::Path::new("."))
+                .join("store")
+        })
+    }
+
+    /// `sets_dir` の下のセット (ID とディレクトリ。ID の順)
+    fn set_dirs(&self) -> Result<Vec<(String, PathBuf)>> {
+        let Some(root) = &self.sets_dir else {
+            return Ok(Vec::new());
+        };
+        let mut out = Vec::new();
+        for entry in
+            std::fs::read_dir(root).with_context(|| format!("{} を読めません", root.display()))?
+        {
+            let path = entry?.path();
+            if path.join("hakoniwa.toml").is_file() {
+                let id = path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_default();
+                out.push((id, path));
+            }
+        }
+        out.sort();
+        Ok(out)
+    }
+}
+
+/// 1 つのセットを読み込む (データディレクトリが無ければ作る)
+fn open_set(
+    state_path: &std::path::Path,
+    data_dir: PathBuf,
+    game: GameConfig,
+    options: ServerOptions,
+) -> Result<Arc<AppState>> {
+    let (data, state) = open_data(&data_dir, state_path, &game)?;
+    Ok(Arc::new(AppState {
+        config: game,
+        options,
+        sessions: Default::default(),
+        data_dir,
+        game: store::Store::new(state, StdRng::from_entropy(), data),
+    }))
+}
+
+/// 設定ファイルのセット (既定のセットと `sets_dir` の下) をすべて読み込む
+fn open_sets(config: &ServerConfig) -> Result<Sets> {
+    let mut sets = Sets::default();
+    if config.default_set {
+        sets.set_default(open_set(
+            &config.state_path,
+            config.data_dir(),
+            config.game.clone(),
+            config.options.clone(),
+        )?);
+    }
+    for (id, dir) in config.set_dirs()? {
+        let set = SetConfig::read(&dir)?;
+        if set.hosts.is_empty() {
+            anyhow::bail!("セット {id} にホスト名 (hosts) がありません");
+        }
+        let (state_path, data_dir) = set.paths(&dir);
+        let app = open_set(&state_path, data_dir, set.game, config.options.clone())
+            .with_context(|| format!("セット {id} を読み込めません"))?;
+        sets.add(&id, &set.hosts, app)?;
+    }
+    if sets.default_set().is_none() && sets.list().is_empty() {
+        anyhow::bail!(
+            "動かすゲームがありません (default_set = false で、sets_dir にセットもありません)"
+        );
+    }
+    Ok(sets)
 }
 
 pub struct AppState {
@@ -122,7 +247,14 @@ pub fn now_unix() -> i64 {
         .unwrap_or(0)
 }
 
+/// 1 つのゲームだけを動かすサーバー (テストと、これまでの形)
+#[cfg(test)]
 pub fn app(state: Arc<AppState>) -> Router {
+    router(Arc::new(Sets::single(state)))
+}
+
+/// 要求のホスト名でセットを選んで画面を出すサーバー
+pub fn router(sets: Arc<Sets>) -> Router {
     Router::new()
         .route("/", get(top_page))
         .route(
@@ -155,14 +287,10 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/admin/reset", post(pages::admin::reset))
         .route("/healthz", get(|| async { "ok" }))
         .route("/debug/turn", post(debug_turn))
-        .with_state(state)
+        .with_state(sets)
 }
 
-async fn top_page(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    uri: axum::http::Uri,
-) -> Response {
+async fn top_page(Set(app): Set, headers: HeaderMap, uri: axum::http::Uri) -> Response {
     let login = pages::login_of(&app, &headers).await;
     let body = {
         let game = app.game.read().await;
@@ -181,7 +309,7 @@ async fn top_page(
 }
 
 /// デバッグモードの「ターンを進める」
-async fn debug_turn(State(app): State<Arc<AppState>>) -> Response {
+async fn debug_turn(Set(app): Set) -> Response {
     if !app.config.debug {
         return StatusCode::NOT_FOUND.into_response();
     }
@@ -257,40 +385,46 @@ async fn main() -> Result<()> {
         None => ServerConfig::default(),
     };
 
-    let data_dir = config.data_dir.clone().unwrap_or_else(|| {
-        config
-            .state_path
-            .parent()
-            .unwrap_or(std::path::Path::new("."))
-            .join("store")
-    });
     if let Some(out) = &args.export_json {
+        let data_dir = match &args.set {
+            None => config.data_dir(),
+            Some(id) => {
+                let dir = config
+                    .set_dirs()?
+                    .into_iter()
+                    .find(|(i, _)| i == id)
+                    .map(|(_, d)| d)
+                    .with_context(|| format!("セット {id} がありません"))?;
+                SetConfig::read(&dir)?.paths(&dir).1
+            }
+        };
         let (_, game) = DataDir::open(&data_dir)?
             .with_context(|| format!("{} にセーブデータがありません", data_dir.display()))?;
         storage::save(out, &game)?;
         tracing::info!(path = %out.display(), turn = game.world.turn, "JSON に書き出しました");
         return Ok(());
     }
-    let (data, game) = open_data(&data_dir, &config.state_path, &config.game)?;
 
-    let state = Arc::new(AppState {
-        config: config.game,
-        options: config.options,
-        sessions: Default::default(),
-        data_dir,
-        game: store::Store::new(game, StdRng::from_entropy(), data),
-    });
-    tokio::spawn(turns::scheduler(
-        state.clone(),
-        Duration::from_secs(config.tick_secs.max(1)),
-    ));
+    let sets = Arc::new(open_sets(&config)?);
+    let every = Duration::from_secs(config.tick_secs.max(1));
+    if let Some(app) = sets.default_set() {
+        tokio::spawn(turns::scheduler(app.clone(), every, "既定".into()));
+    }
+    for (id, app) in sets.list() {
+        tokio::spawn(turns::scheduler(app.clone(), every, id.clone()));
+    }
+    tracing::info!(
+        default = sets.default_set().is_some(),
+        sets = sets.list().len(),
+        "ゲームを読み込みました"
+    );
     let listener = tokio::net::TcpListener::bind(&config.bind)
         .await
         .with_context(|| format!("{} で待ち受けできません", config.bind))?;
     tracing::info!("http://{} で待ち受けています", listener.local_addr()?);
     axum::serve(
         listener,
-        app(state).into_make_service_with_connect_info::<SocketAddr>(),
+        router(sets).into_make_service_with_connect_info::<SocketAddr>(),
     )
     .with_graceful_shutdown(async {
         let _ = tokio::signal::ctrl_c().await;
@@ -325,6 +459,134 @@ mod tests {
 
     pub(crate) fn test_app() -> (Arc<AppState>, tempfile::TempDir) {
         test_app_with(GameConfig::default())
+    }
+
+    fn with_host(mut req: Request<Body>, host: &str) -> Request<Body> {
+        req.headers_mut()
+            .insert(axum::http::header::HOST, host.parse().unwrap());
+        req
+    }
+
+    fn register_req(name: &str) -> Request<Body> {
+        let body = format!("name={name}&owner=o&password=pw&password2=pw&message=m");
+        Request::post("/register")
+            .header(
+                axum::http::header::CONTENT_TYPE,
+                "application/x-www-form-urlencoded",
+            )
+            .body(Body::from(body))
+            .unwrap()
+    }
+
+    /// 要求のホスト名でセットが決まり、セットどうしは状態もログインも混ざらない
+    #[tokio::test]
+    async fn sets_are_chosen_by_host() {
+        let (a, _da) = test_app();
+        let (b, _db) = test_app();
+        let mut sets = Sets::default();
+        sets.add("a", &["a.example.com".into()], a.clone()).unwrap();
+        sets.add("b", &["b.example.com".into()], b.clone()).unwrap();
+        let server = router(Arc::new(sets));
+
+        // セット a に島を登録する (ポートと大文字は無視する)
+        let res = server
+            .clone()
+            .oneshot(with_host(register_req("alpha"), "A.Example.com:8080"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::SEE_OTHER);
+        let cookie = res.headers()[axum::http::header::SET_COOKIE]
+            .to_str()
+            .unwrap()
+            .split(';')
+            .next()
+            .unwrap()
+            .to_string();
+        assert_eq!(a.game.snapshot().world.islands.len(), 1);
+        assert_eq!(b.game.snapshot().world.islands.len(), 0);
+
+        // a のログインは a でだけ通る
+        let owner = |host: &str| {
+            with_host(
+                Request::get("/owner")
+                    .header(axum::http::header::COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+                host,
+            )
+        };
+        let res = server
+            .clone()
+            .oneshot(owner("a.example.com"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let res = server
+            .clone()
+            .oneshot(owner("b.example.com"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
+
+        // 既定のセットが無ければ、知らないホストは 404
+        let get = |host: &str| with_host(Request::get("/").body(Body::empty()).unwrap(), host);
+        let res = server.clone().oneshot(get("c.example.com")).await.unwrap();
+        assert_eq!(res.status(), StatusCode::NOT_FOUND);
+
+        // 既定のセットがあれば、知らないホストはそこに来る
+        let (d, _dd) = test_app();
+        let mut sets = Sets::default();
+        sets.add("a", &["a.example.com".into()], a.clone()).unwrap();
+        sets.set_default(d.clone());
+        let server = router(Arc::new(sets));
+        let res = server
+            .clone()
+            .oneshot(with_host(register_req("delta"), "c.example.com"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::SEE_OTHER);
+        assert_eq!(d.game.snapshot().world.islands.len(), 1);
+        assert_eq!(a.game.snapshot().world.islands.len(), 1);
+    }
+
+    /// `sets_dir` の下の `<ID>/hakoniwa.toml` をすべて読み込む
+    #[test]
+    fn sets_are_loaded_from_sets_dir() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().join("sets");
+        let write = |id: &str, toml: &str| {
+            std::fs::create_dir_all(root.join(id)).unwrap();
+            std::fs::write(root.join(id).join("hakoniwa.toml"), toml).unwrap();
+        };
+        write("s1", "hosts = [\"s1.test\"]\n[game]\nisland_size = 20\n");
+        write("s2", "hosts = [\"s2.test\", \"other.test\"]\n");
+        // 設定ファイルの無いディレクトリは読まない
+        std::fs::create_dir_all(root.join("notes")).unwrap();
+        let config = ServerConfig {
+            default_set: false,
+            sets_dir: Some(root.clone()),
+            ..ServerConfig::default()
+        };
+        let sets = open_sets(&config).unwrap();
+        let ids: Vec<&str> = sets.list().iter().map(|(id, _)| id.as_str()).collect();
+        assert_eq!(ids, ["s1", "s2"]);
+        assert!(sets.default_set().is_none());
+        let s1 = sets.find("s1.test").unwrap();
+        assert_eq!(s1.config.island_size, 20);
+        assert!(Arc::ptr_eq(
+            &sets.find("other.test").unwrap(),
+            sets.get("s2").unwrap()
+        ));
+        assert!(sets.find("nobody.test").is_none());
+        // データディレクトリは <ID>/store に作られている
+        assert!(root.join("s1/store/snapshot.bin").exists());
+
+        // ホスト名が重なる・書いていないのはエラー
+        write("s3", "hosts = [\"S1.test\"]\n");
+        assert!(open_sets(&config).is_err());
+        write("s3", "");
+        let e = open_sets(&config).err().unwrap().to_string();
+        assert!(e.contains("s3"), "{e}");
     }
 
     #[tokio::test]

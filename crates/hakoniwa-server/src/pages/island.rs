@@ -1,10 +1,9 @@
 //! 観光画面 (Perl 版の `printIslandMain`) と、ほかの島の掲示板への書き込み。
 
 use std::fmt::Write;
-use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::{Path, Query, State};
+use axum::extract::{Path, Query};
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use hakoniwa_core::GameConfig;
@@ -16,9 +15,9 @@ use hakoniwa_core::model::Island;
 use serde::Deserialize;
 
 use super::{csrf_ok, error_page, login_of, redirect_with_flash, render};
-use crate::AppState;
 use crate::edit::{EditError, edit};
 use crate::layout::{csrf_field, esc};
+use crate::sets::Set;
 
 /// 掲示板の一覧 (Perl 版の `tempLbbsContents`)。`delete_csrf` があれば削除のボタンを付ける
 pub fn lbbs_list(posts: &[LbbsPost], delete_csrf: Option<&str>) -> String {
@@ -128,7 +127,7 @@ pub struct MapQuery {
 }
 
 pub async fn island_page(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Path(id): Path<i64>,
     Query(q): Query<MapQuery>,
@@ -200,7 +199,7 @@ pub struct VisitorLbbsForm {
 
 /// ほかの島の掲示板への書き込み (公開・極秘はログインしている島が払う。匿名はログイン不要)
 pub async fn visitor_lbbs_post(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Path(id): Path<i64>,
     peer: Option<axum::Extension<axum::extract::ConnectInfo<std::net::SocketAddr>>>,

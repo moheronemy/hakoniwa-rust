@@ -3,10 +3,8 @@
 //! `auction`, `toto`, `dispatch`, `survey`、表示する中身は `view::owner` / `view::top`。
 
 use std::fmt::Write;
-use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
 use hakoniwa_core::actions;
@@ -17,10 +15,10 @@ use serde::Deserialize;
 use super::auth::require_login;
 use super::owner::finish;
 use super::{csrf_ok, error_page, login_of, redirect_with_flash};
-use crate::AppState;
 use crate::edit::edit;
 use crate::layout::{csrf_field, esc};
 use crate::render::plain;
+use crate::sets::Set;
 
 fn options(choices: &[Choice]) -> String {
     choices
@@ -127,11 +125,7 @@ pub struct ExtraForm {
     target: String,
 }
 
-pub async fn extra(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<ExtraForm>,
-) -> Response {
+pub async fn extra(Set(app): Set, headers: HeaderMap, Form(form): Form<ExtraForm>) -> Response {
     let Some(login) = login_of(&app, &headers).await else {
         return require_login(&app).await;
     };
@@ -209,11 +203,7 @@ pub struct VoteForm {
 }
 
 /// アンケートの投票 (ログインしている島で 1 票)
-pub async fn vote(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<VoteForm>,
-) -> Response {
+pub async fn vote(Set(app): Set, headers: HeaderMap, Form(form): Form<VoteForm>) -> Response {
     let Some(login) = login_of(&app, &headers).await else {
         return require_login(&app).await;
     };

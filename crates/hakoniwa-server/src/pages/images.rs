@@ -3,13 +3,11 @@
 //! 画像は移植元の著作物で再配布できないので、リポジトリには入れていない。持っている運営者が
 //! 設定の `image_dir` に置いたときだけ使い、無ければ地図は色と文字のタイルで描く。
 
-use std::sync::Arc;
-
-use axum::extract::{Path, State};
+use axum::extract::Path;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 
-use crate::AppState;
+use crate::sets::Set;
 
 /// 出してよい画像の名前 (英数字と `_` `-` だけの `.gif`)
 pub fn valid_name(name: &str) -> bool {
@@ -23,7 +21,7 @@ pub fn valid_name(name: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || b == b'_' || b == b'-')
 }
 
-pub async fn image(State(app): State<Arc<AppState>>, Path(name): Path<String>) -> Response {
+pub async fn image(Set(app): Set, Path(name): Path<String>) -> Response {
     let Some(dir) = &app.options.image_dir else {
         return StatusCode::NOT_FOUND.into_response();
     };

@@ -56,18 +56,18 @@ pub async fn force_turn(app: &AppState) -> Result<i64> {
     run_one(app, &mut writer).await
 }
 
-/// 定期的にターンの時刻を確かめる
-pub async fn scheduler(app: Arc<AppState>, every: Duration) {
+/// 定期的にターンの時刻を確かめる。`set` はログに出すセットの名前
+pub async fn scheduler(app: Arc<AppState>, every: Duration, set: String) {
     let mut interval = tokio::time::interval(every);
     interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
     loop {
         interval.tick().await;
         match run_due_turns(&app, now_unix()).await {
             Ok(turns) if !turns.is_empty() => {
-                tracing::info!(?turns, "ターンを処理しました");
+                tracing::info!(set, ?turns, "ターンを処理しました");
             }
             Ok(_) => {}
-            Err(e) => tracing::error!("ターン処理に失敗しました: {e:#}"),
+            Err(e) => tracing::error!(set, "ターン処理に失敗しました: {e:#}"),
         }
     }
 }

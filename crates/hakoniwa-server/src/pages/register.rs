@@ -2,10 +2,8 @@
 //! (`changeMain`, `changeOwner`)。
 
 use std::fmt::Write;
-use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use hakoniwa_core::actions::{self, ActionError};
@@ -16,6 +14,7 @@ use super::owner::finish;
 use super::{csrf_ok, error_page, login_of, redirect_with_cookie, render};
 use crate::edit::{EditError, edit};
 use crate::layout::{csrf_field, esc};
+use crate::sets::Set;
 use crate::{AppState, now_unix, session, turns};
 
 fn register_form(app: &AppState, error: Option<&str>, f: &RegisterForm) -> String {
@@ -60,7 +59,7 @@ pub struct RegisterForm {
     message: String,
 }
 
-pub async fn register_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+pub async fn register_page(Set(app): Set, headers: HeaderMap) -> Response {
     let login = login_of(&app, &headers).await;
     let body = register_form(&app, None, &RegisterForm::default());
     render(&app, login.as_ref(), "新しい島", &body)
@@ -69,7 +68,7 @@ pub async fn register_page(State(app): State<Arc<AppState>>, headers: HeaderMap)
 }
 
 pub async fn register(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     peer: Option<axum::Extension<axum::extract::ConnectInfo<std::net::SocketAddr>>>,
     Form(form): Form<RegisterForm>,
@@ -175,11 +174,7 @@ pub struct ChangeForm {
     password2: String,
 }
 
-pub async fn change(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<ChangeForm>,
-) -> Response {
+pub async fn change(Set(app): Set, headers: HeaderMap, Form(form): Form<ChangeForm>) -> Response {
     let Some(login) = login_of(&app, &headers).await else {
         return require_login(&app).await;
     };
@@ -209,7 +204,7 @@ pub async fn change(
 }
 
 pub async fn change_owner(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Form(form): Form<ChangeForm>,
 ) -> Response {

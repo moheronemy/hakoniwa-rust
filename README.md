@@ -54,6 +54,28 @@ debug = false                 # true でトップページに「ターンを進�
 master = "..."                # 管理画面 (/admin) とすべての島へのログイン。無ければ管理画面も無い
 ```
 
+### 1 つのサーバーで複数のゲームを動かす
+
+`sets_dir` の下に `<ID>/hakoniwa.toml` を置くと、それぞれを別のゲーム (セット) として動かし、要求のホスト名で
+振り分ける ([docs/MULTISET.md](docs/MULTISET.md))。リバースプロキシを置くときは `Host` をそのまま渡すこと。
+
+```toml
+# サーバーの設定ファイル
+bind = "127.0.0.1:8080"
+sets_dir = "sets"
+default_set = false           # true (既定) なら、どのホスト名にも当たらない要求は [game] のゲームに来る
+```
+
+```toml
+# sets/alpha/hakoniwa.toml (データは sets/alpha/store に置かれる)
+hosts = ["alpha.example.com"]
+
+[game]
+title = "アルファ諸島"
+```
+
+セットのデータを JSON に書き出すには `--export-json backup.json --set alpha`。
+
 ## ライセンス
 
 移植元の使用条件 (`hako-r-a_FE/hako-readme.txt`、`hako-r-a_FE/read-renas.txt`) に従う。

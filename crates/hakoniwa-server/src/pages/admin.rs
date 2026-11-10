@@ -10,7 +10,6 @@ use std::fmt::Write;
 use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Redirect, Response};
 use hakoniwa_core::model::GameState;
@@ -22,6 +21,7 @@ use super::{
 };
 use crate::layout::{csrf_field, esc};
 use crate::session::{self, ADMIN_ISLAND};
+use crate::sets::Set;
 use crate::{AppState, now_unix};
 
 /// UTC の日時 (`YYYY-MM-DD hh:mm:ss`)
@@ -77,7 +77,7 @@ fn summary(title: &str, turn: i64, last_time: i64, islands: usize) -> String {
     )
 }
 
-pub async fn admin_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+pub async fn admin_page(Set(app): Set, headers: HeaderMap) -> Response {
     if app.config.passwords.master.is_none() {
         return StatusCode::NOT_FOUND.into_response();
     }
@@ -188,10 +188,7 @@ pub struct AdminLogin {
     password: String,
 }
 
-pub async fn admin_login(
-    State(app): State<Arc<AppState>>,
-    Form(form): Form<AdminLogin>,
-) -> Response {
+pub async fn admin_login(Set(app): Set, Form(form): Form<AdminLogin>) -> Response {
     let Some(master) = &app.config.passwords.master else {
         return StatusCode::NOT_FOUND.into_response();
     };
@@ -284,11 +281,7 @@ async fn done(
     }
 }
 
-pub async fn set_time(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<AdminForm>,
-) -> Response {
+pub async fn set_time(Set(app): Set, headers: HeaderMap, Form(form): Form<AdminForm>) -> Response {
     let login = match guard(&app, &headers, &form.csrf).await {
         Ok(l) => l,
         Err(r) => return r,
@@ -305,11 +298,7 @@ pub async fn set_time(
     done(&app, &login, result, "最終更新時刻を変更しました").await
 }
 
-pub async fn restore(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<AdminForm>,
-) -> Response {
+pub async fn restore(Set(app): Set, headers: HeaderMap, Form(form): Form<AdminForm>) -> Response {
     let login = match guard(&app, &headers, &form.csrf).await {
         Ok(l) => l,
         Err(r) => return r,
@@ -336,7 +325,7 @@ pub async fn restore(
 }
 
 pub async fn delete_backup(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Form(form): Form<AdminForm>,
 ) -> Response {
@@ -362,11 +351,7 @@ pub async fn delete_backup(
     .await
 }
 
-pub async fn reset(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<AdminForm>,
-) -> Response {
+pub async fn reset(Set(app): Set, headers: HeaderMap, Form(form): Form<AdminForm>) -> Response {
     let login = match guard(&app, &headers, &form.csrf).await {
         Ok(l) => l,
         Err(r) => return r,

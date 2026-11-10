@@ -1,11 +1,9 @@
 //! 開発画面 (Perl 版の `ownerMain` / `tempOwner`) と、そこからの操作。
 
-use std::sync::Arc;
-
 use axum::Form;
 use std::fmt::Write;
 
-use axum::extract::{Query, State};
+use axum::extract::Query;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use hakoniwa_core::actions::{self, ActionError};
@@ -17,6 +15,7 @@ use super::{csrf_ok, error_page, login_of, redirect_with_flash, render};
 use crate::AppState;
 use crate::edit::{EditError, edit};
 use crate::layout::{csrf_field, esc};
+use crate::sets::Set;
 
 /// 開発画面の URL に付ける、前回の計画の入力 (選択の初期値)
 #[derive(Deserialize, Default)]
@@ -155,7 +154,7 @@ document.querySelectorAll('.plan-no').forEach(function (b) {
 </script>"#;
 
 pub async fn owner_page(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Query(q): Query<OwnerQuery>,
 ) -> Response {
@@ -286,11 +285,7 @@ pub async fn finish(
     }
 }
 
-pub async fn comment(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<CommentForm>,
-) -> Response {
+pub async fn comment(Set(app): Set, headers: HeaderMap, Form(form): Form<CommentForm>) -> Response {
     let Some(login) = login_of(&app, &headers).await else {
         return require_login(&app).await;
     };
@@ -354,7 +349,7 @@ pub struct CommandForm {
 
 /// 計画の入力 (Perl 版の `commandMain`)
 pub async fn command(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     peer: Option<axum::Extension<axum::extract::ConnectInfo<std::net::SocketAddr>>>,
     Form(form): Form<CommandForm>,
@@ -433,11 +428,7 @@ pub struct PolicyForm {
 }
 
 /// 政策の予算 (Perl 版の `shoueneMain` など)
-pub async fn policy(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<PolicyForm>,
-) -> Response {
+pub async fn policy(Set(app): Set, headers: HeaderMap, Form(form): Form<PolicyForm>) -> Response {
     use actions::policy::Policy;
     let login = match guard(&app, &headers, &form.csrf).await {
         Ok(l) => l,
@@ -481,11 +472,7 @@ pub struct LbbsForm {
 }
 
 /// 自分の島の掲示板への書き込みと削除
-pub async fn lbbs(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<LbbsForm>,
-) -> Response {
+pub async fn lbbs(Set(app): Set, headers: HeaderMap, Form(form): Form<LbbsForm>) -> Response {
     let login = match guard(&app, &headers, &form.csrf).await {
         Ok(l) => l,
         Err(r) => return r,

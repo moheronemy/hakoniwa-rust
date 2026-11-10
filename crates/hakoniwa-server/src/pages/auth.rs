@@ -4,10 +4,8 @@
 //! Perl 版から移した島の DES crypt は、ログインに成功したときに新しい形式で保存し直す。
 
 use std::fmt::Write;
-use std::sync::Arc;
 
 use axum::Form;
-use axum::extract::State;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse, Response};
 use hakoniwa_core::actions::password::{self, check_password, hash_password};
@@ -17,6 +15,7 @@ use super::{csrf_ok, error_page, login_of, redirect_with_cookie, render};
 use crate::edit::edit;
 use crate::layout::esc;
 use crate::session;
+use crate::sets::Set;
 use crate::{AppState, now_unix};
 
 /// 島を選ぶ `<option>` の並び (順位の順)
@@ -53,7 +52,7 @@ fn login_form(options: &str, error: Option<&str>) -> String {
     )
 }
 
-pub async fn login_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+pub async fn login_page(Set(app): Set, headers: HeaderMap) -> Response {
     let login = login_of(&app, &headers).await;
     let options = island_options(&app, login.as_ref().map(|l| l.session.island_id)).await;
     render(
@@ -72,7 +71,7 @@ pub struct LoginForm {
     password: String,
 }
 
-pub async fn login(State(app): State<Arc<AppState>>, Form(form): Form<LoginForm>) -> Response {
+pub async fn login(Set(app): Set, Form(form): Form<LoginForm>) -> Response {
     let now = now_unix();
     let (ok, master, legacy) = {
         let game = app.game.read().await;
@@ -125,11 +124,7 @@ pub struct CsrfForm {
     csrf: String,
 }
 
-pub async fn logout(
-    State(app): State<Arc<AppState>>,
-    headers: HeaderMap,
-    Form(form): Form<CsrfForm>,
-) -> Response {
+pub async fn logout(Set(app): Set, headers: HeaderMap, Form(form): Form<CsrfForm>) -> Response {
     match login_of(&app, &headers).await {
         Some(login) if csrf_ok(&login, &form.csrf) => {
             app.sessions.remove(&login.token);

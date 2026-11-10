@@ -5,18 +5,17 @@
 //! (`/history?turn=<何ターン前か>&from=<行の位置>`)。
 
 use std::fmt::Write;
-use std::sync::Arc;
 
-use axum::extract::{Query, State};
+use axum::extract::Query;
 use axum::http::HeaderMap;
 use axum::response::{IntoResponse, Response};
 use hakoniwa_core::view::logs::public_logs;
 use serde::Deserialize;
 
 use super::{login_of, render};
-use crate::AppState;
 use crate::layout::esc;
 use crate::render::plain;
+use crate::sets::Set;
 
 #[derive(Debug, Deserialize)]
 pub struct HistoryQuery {
@@ -29,7 +28,7 @@ pub struct HistoryQuery {
 }
 
 pub async fn history_page(
-    State(app): State<Arc<AppState>>,
+    Set(app): Set,
     headers: HeaderMap,
     Query(q): Query<HistoryQuery>,
 ) -> Response {
