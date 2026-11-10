@@ -135,6 +135,8 @@ fn field(island: &Island, name: &str) -> String {
         "ownfe" => n(sc.ownfe),
         "absent" => n(island.absent),
         "incomemoney" => n(sc.incomemoney),
+        "trainmoney" => n(sc.trainmoney),
+        "trainmoney2" => n(sc.trainmoney2),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -337,4 +339,14 @@ fn phase2_town_matches_perl_with_rand_0() {
 #[test]
 fn phase2_town_matches_perl_with_rand_half() {
     check_fixture("phase2-town", RAND_HALF);
+}
+
+#[test]
+fn phase2_train_matches_perl_with_rand_0() {
+    check_fixture("phase2-train", 0);
+}
+
+#[test]
+fn phase2_train_matches_perl_with_rand_half() {
+    check_fixture("phase2-train", RAND_HALF);
 }
