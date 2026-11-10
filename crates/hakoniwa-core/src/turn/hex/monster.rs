@@ -936,7 +936,11 @@ fn mascot(ctx: &mut TurnContext, island: &mut Island, h: &mut HexRun, mon: &mut 
             mut mswin,
             mut msexe,
             tet,
-        ] = ctx.globals.eisei5.update(&island.eisei_raw[2]);
+        ] = {
+            // 分岐の中のマッチ: 失敗すると doEachHex 冒頭の etc5 の $1.. が入る
+            let mut m = h.scope.clone();
+            ctx.globals.eisei5.assign(m.fields(&island.eisei_raw[2]))
+        };
         let t = t_kind as i64;
         let mut attack = ctx.random(msap - t);
         let mut counter = ctx.random(t - msdp);

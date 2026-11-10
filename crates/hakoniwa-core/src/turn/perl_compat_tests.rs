@@ -710,3 +710,53 @@ fn phase2_mix_4_matches_perl_with_rand_1_32() {
 fn phase2_mix_4_matches_perl_with_rand_31_32() {
     check_fixture_at("phase2-mix-4", "96875");
 }
+
+#[test]
+fn phase2_badfields_matches_perl_with_rand_0() {
+    check_fixture("phase2-badfields", 0);
+}
+
+#[test]
+fn phase2_badfields_matches_perl_with_rand_half() {
+    check_fixture("phase2-badfields", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_5_matches_perl_with_rand_0() {
+    check_fixture_at("phase2-mix-5", "0");
+}
+
+#[test]
+fn phase2_mix_5_matches_perl_with_rand_03125() {
+    check_fixture_at("phase2-mix-5", "03125");
+}
+
+#[test]
+fn phase2_mix_5_matches_perl_with_rand_50() {
+    check_fixture_at("phase2-mix-5", "50");
+}
+
+#[test]
+fn phase2_mix_5_matches_perl_with_rand_96875() {
+    check_fixture_at("phase2-mix-5", "96875");
+}
+
+#[test]
+fn phase2_mix_6_matches_perl_with_rand_0() {
+    check_fixture_at("phase2-mix-6", "0");
+}
+
+#[test]
+fn phase2_mix_6_matches_perl_with_rand_03125() {
+    check_fixture_at("phase2-mix-6", "03125");
+}
+
+#[test]
+fn phase2_mix_6_matches_perl_with_rand_50() {
+    check_fixture_at("phase2-mix-6", "50");
+}
+
+#[test]
+fn phase2_mix_6_matches_perl_with_rand_96875() {
+    check_fixture_at("phase2-mix-6", "96875");
+}

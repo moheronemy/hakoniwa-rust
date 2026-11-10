@@ -215,7 +215,15 @@ fn tourism(ctx: &mut TurnContext, islands: &mut [Island], idx: usize, h: &mut He
         return;
     };
     let t_pop = t_island.pop;
-    let ts = ctx.globals.hex.leisure.ts.update(&t_island.etc_raw[0]);
+    let ts = {
+        // 分岐の中のマッチ: 失敗すると doEachHex 冒頭の etc5 の $1.. が入る
+        let mut m = h.scope.clone();
+        ctx.globals
+            .hex
+            .leisure
+            .ts
+            .assign(m.fields(&t_island.etc_raw[0]))
+    };
     let ts06b = trunc(ts[6] as f64 / 5.0);
 
     let (x, y) = (h.x, h.y);

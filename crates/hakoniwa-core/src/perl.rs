@@ -72,10 +72,53 @@ pub fn join(values: &[i64]) -> String {
         .join(",")
 }
 
-/// Perl のグローバル変数に正規表現の結果を代入する箇所の再現。
+/// Perl の `$1`, `$2`, ... (いまのスコープから見て最後に成功したマッチの値)。
 ///
-/// `($a, $b, ...) = ($1, $2, ...)` は、マッチに失敗すると前回の値が残る。
-/// 同じ変数名の組を複数の関数・複数の島で使い回しているので、ターン処理の間は値を持ち越す。
+/// Perl では正規表現のマッチに失敗しても `$1`.. は変わらず、**最後に成功したマッチ**の値のまま。
+/// しかもその値はブロック単位の動的スコープで、ブロック (や sub) を出ると入る前の値に戻る。
+/// サブルーチンの中からは呼び出し元のマッチの値が見える。
+///
+/// 移植版では Perl の sub 1 回分 (またはブロック) ごとに `MatchScope` を持ち、
+/// 入れ子のブロックでは `clone()` したものを使って、ブロックを出たら捨てる。
+/// `$n` が最後のマッチに無ければ未定義なので 0 にする (文字列として埋め込むと Perl は空になる)。
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct MatchScope {
+    caps: Vec<i64>,
+}
+
+impl MatchScope {
+    /// `$s =~ /^([0-9]*),...$/; ($a, $b, ...) = ($1, $2, ...);` の右辺。
+    /// 一致すればその値 (そして以後の `$1`..)、しなければ最後に成功したマッチの値
+    pub fn fields<const N: usize>(&mut self, s: &str) -> [i64; N] {
+        match fields::<N>(s) {
+            Some(v) => {
+                self.caps = v.to_vec();
+                v
+            }
+            None => self.current(),
+        }
+    }
+
+    /// 一致したかどうかが要るとき (`if ($s =~ /.../)`)。一致すれば `$1`.. を更新する
+    pub fn try_fields<const N: usize>(&mut self, s: &str) -> Option<[i64; N]> {
+        let v = fields::<N>(s)?;
+        self.caps = v.to_vec();
+        Some(v)
+    }
+
+    /// いまの `$1`..`$N`
+    pub fn current<const N: usize>(&self) -> [i64; N] {
+        std::array::from_fn(|i| self.caps.get(i).copied().unwrap_or(0))
+    }
+
+    /// 数字の欄に限らない正規表現が成功したとき (`$1`.. をその値にする)
+    pub fn set(&mut self, caps: Vec<i64>) {
+        self.caps = caps;
+    }
+}
+
+/// 正規表現の結果を代入する先の Perl のグローバル変数の組 (`$s00`..`$s30` など)。
+/// 島や処理をまたいで値が残る
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Captures<const N: usize>(pub [i64; N]);
 
@@ -86,12 +129,10 @@ impl<const N: usize> Default for Captures<N> {
 }
 
 impl<const N: usize> Captures<N> {
-    /// `s` がマッチすれば値を更新する。更新後 (失敗時は前回) の値を返す
-    pub fn update(&mut self, s: &str) -> [i64; N] {
-        if let Some(v) = fields::<N>(s) {
-            self.0 = v;
-        }
-        self.0
+    /// `($a, $b, ...) = ($1, $2, ...)`: 値を代入して返す
+    pub fn assign(&mut self, values: [i64; N]) -> [i64; N] {
+        self.0 = values;
+        values
     }
 }
 
@@ -151,11 +192,19 @@ mod tests {
     }
 
     #[test]
-    fn captures_keep_previous_on_failure() {
-        let mut c = Captures::<2>::default();
-        assert_eq!(c.update("bad"), [0, 0]);
-        assert_eq!(c.update("4,5"), [4, 5]);
-        assert_eq!(c.update("bad"), [4, 5]);
+    fn failed_match_uses_last_successful_match() {
+        let mut m = MatchScope::default();
+        assert_eq!(m.fields::<2>("bad"), [0, 0]);
+        assert_eq!(m.fields::<3>("4,5,6"), [4, 5, 6]);
+        // 失敗すると、別の正規表現でも最後に成功したマッチの $1.. になる
+        assert_eq!(m.fields::<2>("-1,2"), [4, 5]);
+        assert_eq!(m.fields::<4>("x"), [4, 5, 6, 0]);
+        // 入れ子のブロックで成功しても、ブロックを出れば元に戻る
+        {
+            let mut inner = m.clone();
+            assert_eq!(inner.fields::<1>("9"), [9]);
+        }
+        assert_eq!(m.current::<1>(), [4]);
     }
 
     #[test]

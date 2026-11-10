@@ -9,7 +9,7 @@ use crate::tables::{CommandKind as C, HOUSE_LEVELS, LandKind};
 
 use super::TurnContext;
 use crate::log::msg;
-use crate::perl::trunc;
+use crate::perl::{MatchScope, trunc};
 
 /// `slideFront`: 先頭の計画を取り出して詰め、末尾を「資金繰り」で埋める
 fn take_first_command(island: &mut Island, command_max: usize) -> PlannedCommand {
@@ -47,7 +47,12 @@ fn is_costx_exempt(kind: Option<C>) -> bool {
 
 /// 計画の費用。正なら資金、負なら食料。
 /// Perl 版は途中で小数になることがあるので `f64` で返す
-pub(crate) fn command_cost(ctx: &mut TurnContext, island: &Island, kind_raw: u16) -> f64 {
+pub(crate) fn command_cost(
+    ctx: &mut TurnContext,
+    m: &mut MatchScope,
+    island: &Island,
+    kind_raw: u16,
+) -> f64 {
     let kind = C::from_u16(kind_raw);
     let pts = island.pts;
     let mut cost = kind.map_or(0, C::cost) as f64;
@@ -95,7 +100,7 @@ pub(crate) fn command_cost(ctx: &mut TurnContext, island: &Island, kind_raw: u16
     }
 
     // 政策による値引き
-    let s = ctx.globals.etc5.update(&island.etc_raw[0]);
+    let s = ctx.globals.etc5.assign(m.fields(&island.etc_raw[0]));
     let costseisaku: i64 = s[1..].iter().sum();
     let costseisaku2 = 0.9975f64.powf(costseisaku as f64).max(0.75);
     if s[0] > 0 && !exempt {
@@ -146,7 +151,9 @@ pub(crate) fn do_command(ctx: &mut TurnContext, islands: &mut [Island], idx: usi
 
     island.absent = 0;
 
-    let cost = command_cost(ctx, island, command.kind);
+    // doCommand の $1.. (turnMain のトップレベルからはマッチの無い状態で呼ばれる)
+    let mut m = MatchScope::default();
+    let cost = command_cost(ctx, &mut m, island, command.kind);
     let island = &mut islands[idx];
 
     // 費用の確認

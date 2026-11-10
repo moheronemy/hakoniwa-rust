@@ -58,7 +58,8 @@ fn fusion(ctx: &mut TurnContext, island: &mut Island, h: &mut HexRun) {
     let (id, turn) = (island.id, ctx.turn);
     let cell = island.map.get(x, y).unwrap_or_default();
     let l_name = land_name(cell.kind, cell.value);
-    let magic = ctx.globals.hex.etc9.update(&island.etc_raw[4]);
+    let mut m = h.scope.clone();
+    let magic = ctx.globals.hex.etc9.assign(m.fields(&island.etc_raw[4]));
     let (magica, magicl) = (magic[3], magic[5]);
     if magica == magicl {
         return;

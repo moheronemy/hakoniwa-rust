@@ -70,3 +70,17 @@ for seed in range(1, 5):
         f.main(island_id, money=rng.randrange(1000, 900000), food=rng.randrange(-100, 50000),
                eis1=rng.randrange(0, 5), eis5=rng.randrange(0, 60), eis7=rng.randrange(0, 2000))
     f.save()
+
+# 複合値が壊れている (負の数を含む) 島: 正規表現が一致しないときの $1.. の扱いを全体で確かめる
+for seed in (5, 6):
+    rng = random.Random(seed)
+    f = Fixture(f"phase2-mix-{seed}")
+    for island_id in (1, 2, 3):
+        f.map(island_id, island_map(rng, 0.3))
+        f.main(island_id, money=rng.randrange(1000, 900000), food=rng.randrange(-100, 50000),
+               eisei4=f"{rng.randrange(0, 300)},-{rng.randrange(1, 50)},5,1,0,0,2,1,0,0,0",
+               eisei5=f"{rng.randrange(1, 15)},-3,4,5,0,0,0")
+        f.ips(island_id, etc6=",".join(str(rng.randrange(-2, 5)) for _ in range(31)),
+              etc8=f"1,-{rng.randrange(1, 9)},0,0,0,0,0")
+        f.auction(island_id, auc9=f"-5,{rng.randrange(0, 9)},100,0,0", auc6="1,-1,0")
+    f.save()

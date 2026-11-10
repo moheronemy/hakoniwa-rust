@@ -28,7 +28,7 @@ mod train;
 
 use crate::log::tags::{self, wrap};
 use crate::model::Island;
-use crate::perl::trunc;
+use crate::perl::{MatchScope, trunc};
 use crate::tables::LandKind as L;
 
 use super::TurnContext;
@@ -59,6 +59,9 @@ pub struct HexRun {
     pub addpop2: i64,
     /// 怪獣の移動済みの印 (`@monsterMove`)
     pub monster: monster::RunState,
+    /// doEachHex のトップレベルの `$1`.. (冒頭の etc5 のマッチ)。
+    /// 分岐はブロックの中なので、正規表現を使うときはこれを `clone()` して使う
+    pub scope: MatchScope,
 }
 
 impl HexRun {
@@ -128,7 +131,12 @@ pub(crate) fn do_each_hex(ctx: &mut TurnContext, islands: &mut [Island], idx: us
         island.money = 0;
     }
 
-    let s = ctx.globals.etc5.update(&islands[idx].etc_raw[0]);
+    // doEachHex の $1..。冒頭の etc5 のマッチがそのまま各分岐から見える
+    let mut scope = MatchScope::default();
+    let s = ctx
+        .globals
+        .etc5
+        .assign(scope.fields(&islands[idx].etc_raw[0]));
     let g = &mut ctx.globals.hex;
     g.s06b = trunc(s[6] as f64 / 5.0);
     g.s08b = trunc(s[8] as f64 / 5.0);
@@ -168,6 +176,7 @@ pub(crate) fn do_each_hex(ctx: &mut TurnContext, islands: &mut [Island], idx: us
     let mut h = HexRun {
         addpop: 10,
         addpop2: 0,
+        scope,
         ..Default::default()
     };
     prologue_population(ctx, island, &mut h);

@@ -2,13 +2,14 @@
 
 use crate::log::msg;
 use crate::model::Island;
-use crate::perl::{self, trunc};
+use crate::perl::{self, MatchScope, trunc};
 
 use super::TurnContext;
 
-/// ハコオクの補助金 (`auc9`) の 3 番目の欄に `add` を足し、合計欄を計算し直す
-fn add_subsidy(ctx: &mut TurnContext, island: &mut Island, add: i64) {
-    let mut a9 = ctx.globals.auc9.update(&island.auction.auc9);
+/// ハコオクの補助金 (`auc9`) の 3 番目の欄に `add` を足し、合計欄を計算し直す。
+/// `m` はこの if ブロックの `$1`.. (income の factory のマッチを複製したもの)
+fn add_subsidy(ctx: &mut TurnContext, island: &mut Island, mut m: MatchScope, add: i64) {
+    let mut a9 = ctx.globals.auc9.assign(m.fields(&island.auction.auc9));
     a9[2] += add;
     let c2 = trunc(a9[2] as f64 / 10000.0);
     a9[0] = a9[1] + c2 + a9[3] + a9[4];
@@ -21,7 +22,9 @@ pub(crate) fn income(ctx: &mut TurnContext, island: &mut Island) {
     let pop = island.pop;
     let farm = island.farm * 10;
     let mountain = island.mountain;
-    let f = ctx.globals.factory.update(&island.factory);
+    // income の $1.. (turnMain のトップレベルからはマッチの無い状態で呼ばれる)
+    let mut m = MatchScope::default();
+    let f = ctx.globals.factory.assign(m.fields(&island.factory));
     let (factory1, factory2) = (f[0], f[1]);
 
     island.scratch.incomemoney = 0;
@@ -32,9 +35,11 @@ pub(crate) fn income(ctx: &mut TurnContext, island: &mut Island) {
 
         if factory2 * 10 > pop - farm {
             // ハイテク企業・改で働き口が足りている。資金ではなく補助金が増える
-            add_subsidy(ctx, island, trunc((pop - farm) as f64 / 10.0));
+            add_subsidy(ctx, island, m.clone(), trunc((pop - farm) as f64 / 10.0));
         } else {
-            let mut a9 = ctx.globals.auc9.update(&island.auction.auc9);
+            // if ブロックの中のマッチ。失敗すると factory の $1.. が入る (Perl 版のまま)
+            let mut inner = m.clone();
+            let mut a9 = ctx.globals.auc9.assign(inner.fields(&island.auction.auc9));
             a9[2] += factory2;
 
             let workers = (pop - farm - factory2 * 10) as f64;

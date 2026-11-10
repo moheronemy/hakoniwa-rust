@@ -5,10 +5,12 @@
 //! (保存時に `%03x` で切り捨てられる)。移植版は小数部分を `IslandScratch::land_frac` に持つ。
 //!
 //! 移植版の都合で変えた点:
+//! - 複合値が正規表現に一致しないとき (負の数が入っているときなど)、Perl 版は最後に成功した
+//!   マッチの `$1`.. を代入する。移植版は [`MatchScope`] で再現する。
 //! - 複合値の欄が空 (`"1,,3"`) のとき、Perl 版は空のまま書き戻すが、移植版は 0 を書く。
 
 use crate::model::Island;
-use crate::perl::{self, trunc};
+use crate::perl::{self, MatchScope, trunc};
 use crate::tables::{HOUSE_LEVELS, LandKind as L, MONSTERS};
 
 use super::TurnContext;
@@ -43,8 +45,10 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     let size = ctx.config.island_size;
     let island = &mut islands[idx];
     let sc = &mut *island.scratch;
+    // この estimate 呼び出しの $1.. (turnMain のトップレベルからはマッチの無い状態で呼ばれる)
+    let mut m = MatchScope::default();
 
-    let mut s = ctx.globals.etc5.update(&island.etc_raw[0]);
+    let mut s = ctx.globals.etc5.assign(m.fields(&island.etc_raw[0]));
 
     if sc.fukeikimoney < island.money {
         sc.fukeikimoney = island.money;
@@ -402,7 +406,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
         island.eisei[1] = 0;
     }
 
-    let st = ctx.globals.eisei4.update(&island.eisei_raw[1]);
+    let st = ctx.globals.eisei4.assign(m.fields(&island.eisei_raw[1]));
     sc.kachiten = st[3] * 3 + st[4];
     if c.ky2 == 0 {
         island.eisei_raw[1] =
@@ -413,7 +417,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     if c.co77 == 0 || perl::num_eq_empty(&island.etc_raw[0]) {
         island.etc_raw[0] = perl::join(&[0; 31]);
     }
-    s = ctx.globals.etc5.update(&island.etc_raw[0]);
+    s = ctx.globals.etc5.assign(m.fields(&island.etc_raw[0]));
     let mut etc5 = s;
     etc5[0] = c.co77;
     island.etc_raw[0] = perl::join(&etc5);
@@ -422,10 +426,9 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     if c.zoo == 0 {
         island.etc_raw[1] = perl::join(&[0; 31]);
     }
-    if let Some(z) = perl::fields::<31>(&island.etc_raw[1]) {
-        ctx.globals.zoo_estimate_low.copy_from_slice(&z[..10]);
-        ctx.globals.zoo[10..].copy_from_slice(&z[10..]);
-    }
+    let z = m.fields::<31>(&island.etc_raw[1]);
+    ctx.globals.zoo_estimate_low.copy_from_slice(&z[..10]);
+    ctx.globals.zoo[10..].copy_from_slice(&z[10..]);
     // Perl 版は $z0..$z9 (別の処理が最後に代入した値) と $z10..$z30 を足している
     let zookazu: i64 = ctx.globals.zoo.iter().sum();
     let mut etc6 = [0i64; 31];
@@ -438,7 +441,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     sc.monsterlive2 = monslive + zookazu;
 
     island.owner_stats.kei = c.kei;
-    let ms = ctx.globals.eisei5.update(&island.eisei_raw[2]);
+    let ms = ctx.globals.eisei5.assign(m.fields(&island.eisei_raw[2]));
     island.owner_stats.rena = rena + c.co2 * 100 + c.co3 * 500 + ms[5];
     island.owner_stats.fore = fore;
     island.owner_stats.tare = tare;
@@ -449,7 +452,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     if c.co4 == 0 && c.co99 == 0 && c.c28 == 0 {
         island.eisei_raw[2] = "0,0,0,0,0,0,0".into();
     }
-    let ms = ctx.globals.eisei5.update(&island.eisei_raw[2]);
+    let ms = ctx.globals.eisei5.assign(m.fields(&island.eisei_raw[2]));
     island.eisei_raw[2] = perl::join(&[ms[0], ms[1], ms[2], ms[3], ms[4], ms[5], c.tet]);
 
     island.eisei_raw[3] = perl::join(&[
@@ -466,23 +469,23 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
         .map(|(&base, &e)| if e >= 1 { base + e * 2 } else { 0 })
         .sum();
 
-    let toto = ctx.globals.etc8.update(&island.etc_raw[3]);
+    let toto = ctx.globals.etc8.assign(m.fields(&island.etc_raw[3]));
     island.etc_raw[3] = perl::join(&toto);
 
-    let a4 = ctx.globals.auc4.update(&island.auction.auc4);
+    let a4 = ctx.globals.auc4.assign(m.fields(&island.auction.auc4));
     island.auction.auc4 = perl::join(&a4);
-    let a0 = ctx.globals.auc0.update(&island.auction.auc0);
+    let a0 = ctx.globals.auc0.assign(m.fields(&island.auction.auc0));
     island.auction.auc0 = perl::join(&a0);
     sc.auc0c = a0[2];
-    let a5 = ctx.globals.auc5.update(&island.auction.auc5);
+    let a5 = ctx.globals.auc5.assign(m.fields(&island.auction.auc5));
     island.auction.auc5 = perl::join(&a5);
     sc.auc5c = a5[2];
-    let a6 = ctx.globals.auc6.update(&island.auction.auc6);
+    let a6 = ctx.globals.auc6.assign(m.fields(&island.auction.auc6));
     island.auction.auc6 = perl::join(&a6);
     if a6[0] == 1 {
         ctx.oyasumiritu += 1;
     }
-    let mut a9 = ctx.globals.auc9.update(&island.auction.auc9);
+    let mut a9 = ctx.globals.auc9.assign(m.fields(&island.auction.auc9));
     let auc9c2 = trunc(a9[2] as f64 / 10000.0);
     a9[1] = c.co95 * 25 + choki2;
     a9[0] = a9[1] + auc9c2 + a9[3] + a9[4];
@@ -498,7 +501,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
         island.survey_flag = 0;
     }
 
-    s = ctx.globals.etc5.update(&island.etc_raw[0]);
+    s = ctx.globals.etc5.assign(m.fields(&island.etc_raw[0]));
     let s12b = (trunc(s[12] as f64 / 5.0) + 1).min(10);
     let money = island.money as f64;
     let limit = 999_999.0 * s12b as f64;
@@ -539,7 +542,7 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
             + auc0es) as f64;
     island.pts = trunc(pts);
 
-    let st = ctx.globals.eisei4.update(&island.eisei_raw[1]);
+    let st = ctx.globals.eisei4.assign(m.fields(&island.eisei_raw[1]));
     sc.kachitent = st[6] * 3 + st[7];
     let siaisu = match st[6] + st[7] + st[8] {
         0 => 1,
@@ -549,10 +552,10 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
     sc.styusho = st[9];
     sc.teamforce = st[0] + st[1] + st[2];
 
-    let ms = ctx.globals.eisei5.update(&island.eisei_raw[2]);
+    let ms = ctx.globals.eisei5.assign(m.fields(&island.eisei_raw[2]));
     sc.force = ms[0] + ms[1] + ms[2] + ms[3];
 
-    let uni = ctx.globals.eisei6.update(&island.eisei_raw[3]);
+    let uni = ctx.globals.eisei6.assign(m.fields(&island.eisei_raw[3]));
     sc.uni = uni.iter().filter(|&&u| u != 0).count() as i64;
     sc.tuni = uni.iter().sum();
 
@@ -572,7 +575,9 @@ pub(crate) fn estimate(ctx: &mut TurnContext, islands: &mut [Island], idx: usize
             if cell.kind != k(L::House) {
                 continue;
             }
-            let toto = ctx.globals.etc8.update(&island.etc_raw[3]);
+            // if ブロックの中のマッチなので、外の $1.. には影響しない
+            let mut inner = m.clone();
+            let toto = ctx.globals.etc8.assign(inner.fields(&island.etc_raw[3]));
             let pts = island.pts;
             let new_value = if pts > HOUSE_LEVELS[8]
                 && c.m75 > 0

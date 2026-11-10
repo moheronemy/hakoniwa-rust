@@ -5,12 +5,12 @@
 //! 前の値が結果に影響しない。移植版では局所変数にしている。
 //! (`$value`, `$str` などは他の処理も同じ名前のグローバル変数として使う)
 
-use crate::land::{around, count_around, in_island, land_name, perl_get};
+use crate::land::{around, count_around, in_island, land_name};
 use crate::log::tags::{self, wrap};
 use crate::model::Island;
 use crate::perl::trunc;
 use crate::tables::{HOUSE_LEVELS, LandKind as L};
-use crate::turn::{TurnContext, monster_spec};
+use crate::turn::TurnContext;
 
 use super::town::{set, set_value, town_count};
 use super::{Flow, HexRun, k, msg};
@@ -363,104 +363,9 @@ pub(super) fn defence(
             Some(island.id),
             None,
         );
-        wide_damage(ctx, island, h.x, h.y);
+        super::monster::wide_damage(ctx, island, h.x as i64, h.y as i64);
     }
     Flow::Continue
-}
-
-/// `wideDamage`: 広域被害ルーチン (中心と隣は海に、その外側は荒地になる)
-pub(crate) fn wide_damage(ctx: &mut TurnContext, island: &mut Island, x: usize, y: usize) {
-    let (id, turn) = (island.id, ctx.turn);
-    for i in 0..19 {
-        let (sx, sy) = around(x as i64, y as i64, i);
-        // Perl 版は範囲を確かめる前に読む (名前を作るだけなので結果は変わらない)
-        let (kind, lv) = perl_get(&island.map, sx, sy);
-        let Some((sx, sy)) = in_island(&island.map, (sx, sy)) else {
-            continue;
-        };
-        let name = land_name(kind, lv);
-        let at = msg::island_at(&island.name, &format!("({sx}, {sy})"));
-        if i < 7 {
-            // 中心、および 1 ヘックス
-            if kind == k(L::Sea) {
-                set_value(island, sx, sy, 0);
-                continue;
-            } else if is_one_of(
-                kind,
-                &[
-                    L::Sbase,
-                    L::Seacity,
-                    L::Seatown,
-                    L::Umishuto,
-                    L::Fune,
-                    L::Ice,
-                    L::Frocity,
-                    L::Umiamu,
-                    L::Oil,
-                ],
-            ) {
-                ctx.log.out(
-                    turn,
-                    format!("{at}の<B>{name}</B>は跡形もなくなりました。"),
-                    Some(id),
-                    None,
-                );
-                set(island, sx, sy, L::Sea, 0);
-            } else {
-                if kind == k(L::Monster) {
-                    let (m_kind, _, _) = monster_spec(lv);
-                    if (m_kind == 20 || m_kind == 21) && i == 0 {
-                        continue;
-                    }
-                    ctx.log.out(
-                        turn,
-                        format!("{at}の陸地は<B>{name}</B>もろとも水没しました。"),
-                        Some(id),
-                        None,
-                    );
-                } else {
-                    ctx.log.out(
-                        turn,
-                        format!("{at}の<B>{name}</B>は<B>水没</B>しました。"),
-                        Some(id),
-                        None,
-                    );
-                }
-                // 中心は海、隣は浅瀬
-                set(island, sx, sy, L::Sea, if i == 0 { 0 } else { 1 });
-            }
-        } else {
-            // 2 ヘックス
-            if is_one_of(
-                kind,
-                &[
-                    L::Sea,
-                    L::Ice,
-                    L::Oil,
-                    L::Waste,
-                    L::Mountain,
-                    L::Gold,
-                    L::Onsen,
-                    L::Seacity,
-                    L::Umishuto,
-                    L::Seatown,
-                    L::Fune,
-                    L::Frocity,
-                    L::Umiamu,
-                    L::Sbase,
-                ],
-            ) {
-                continue;
-            }
-            let text = if kind == k(L::Monster) {
-                format!("{at}の<B>{name}</B>は消し飛びました。")
-            } else {
-                format!("{at}の<B>{name}</B>は一瞬にして<B>荒地</B>と化しました。")
-            };
-            ctx.log.out(turn, text, Some(id), None);
-            set(island, sx, sy, L::Waste, 0);
-        }
-    }
 }
 
 /// 海底油田: 収入 (ログは doEachHex の最後にまとめて出す) と枯渇

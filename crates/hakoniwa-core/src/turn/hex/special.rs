@@ -195,7 +195,11 @@ fn mascot(ctx: &mut TurnContext, island: &mut Island, h: &HexRun, kind: usize, n
             let c = island.map.get(ssx, ssy).unwrap_or_default();
             if ctx.globals.hex.special.take < 1 && c.kind == k(L::Waste) && island.scratch.c28 == 0
             {
-                let ms = ctx.globals.eisei5.update(&island.eisei_raw[2]);
+                let ms = {
+                    // 分岐の中のマッチ: 失敗すると doEachHex 冒頭の etc5 の $1.. が入る
+                    let mut m = h.scope.clone();
+                    ctx.globals.eisei5.assign(m.fields(&island.eisei_raw[2]))
+                };
                 let mshp = ms[0];
                 ctx.globals.hex.kind = kind as i64;
                 let spec = &MONSTERS[kind];
@@ -230,7 +234,11 @@ pub(super) fn ownf(
     let (x, y) = (h.x, h.y);
     let (id, turn) = (island.id, ctx.turn);
     let lv = h.lv;
-    let s = ctx.globals.etc5.update(&island.etc_raw[0]);
+    let s = {
+        // 分岐の中のマッチ: 失敗すると doEachHex 冒頭の etc5 の $1.. が入る
+        let mut m = h.scope.clone();
+        ctx.globals.etc5.assign(m.fields(&island.etc_raw[0]))
+    };
     let g = &mut ctx.globals.hex.special;
     g.ownfe = trunc(lv as f64 / 1000.0);
     g.shts = trunc(lv as f64 / 100.0).rem_euclid(10);
