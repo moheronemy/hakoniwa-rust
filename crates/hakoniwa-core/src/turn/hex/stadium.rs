@@ -98,15 +98,6 @@ enum Stage {
     Final,
 }
 
-/// `random($n)`。Perl 版は `int(rand(1) * $n)` なので、負の数なら 0 以下の値になる
-fn random_signed(ctx: &mut TurnContext, n: i64) -> i64 {
-    if n < 0 {
-        trunc(ctx.rand_f64(1.0) * n as f64)
-    } else {
-        ctx.random(n)
-    }
-}
-
 /// 多目的スタジアム
 pub(super) fn kyujokai(
     ctx: &mut TurnContext,
@@ -317,16 +308,12 @@ fn play(
     let mut goal = 0;
     let mut tgoal = 0;
     for _ in 0..(if knockout { 3 } else { 5 }) {
-        if random_signed(ctx, st[STO]) > random_signed(ctx, ts[STD])
-            && random_signed(ctx, st[STO]) > random_signed(ctx, ts[STK])
-        {
+        if ctx.random(st[STO]) > ctx.random(ts[STD]) && ctx.random(st[STO]) > ctx.random(ts[STK]) {
             goal += 1;
         }
     }
     for _ in 0..3 {
-        if random_signed(ctx, ts[STO]) > random_signed(ctx, st[STD])
-            && random_signed(ctx, ts[STO]) > random_signed(ctx, st[STK])
-        {
+        if ctx.random(ts[STO]) > ctx.random(st[STD]) && ctx.random(ts[STO]) > ctx.random(st[STK]) {
             tgoal += 1;
         }
     }

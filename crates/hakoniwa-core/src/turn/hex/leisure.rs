@@ -50,11 +50,6 @@ fn count(island: &Island, x: usize, y: usize, kind: L, range: usize) -> i64 {
     count_around(&island.map, x as i64, y as i64, kind, range)
 }
 
-/// Perl の `random($n)` (`int(rand(1) * $n)`)。`$n` が 0 でも乱数を 1 つ使う
-fn random_raw(ctx: &mut TurnContext, n: i64) -> i64 {
-    trunc(ctx.rand_f64(1.0) * n as f64)
-}
-
 /// リゾート地
 pub(super) fn rizort(
     ctx: &mut TurnContext,
@@ -405,8 +400,7 @@ pub(super) fn zoo(
             ctx.globals.hex.leisure.z[nk] -= 1;
             ctx.globals.hex.kind = nk as i64;
             // 外側の $lv を書き換える
-            h.lv =
-                ((nk as i64) << 4) + MONSTERS[nk].base_hp + random_raw(ctx, MONSTERS[nk].hp_range);
+            h.lv = ((nk as i64) << 4) + MONSTERS[nk].base_hp + ctx.random(MONSTERS[nk].hp_range);
             set(island, x, y, L::Monster, h.lv);
             let (_, m_name, _) = monster_spec(h.lv);
             ctx.log
@@ -465,9 +459,8 @@ pub(super) fn zoo(
                 nigeflag += 1;
                 ctx.globals.hex.leisure.z[nk] -= 1;
                 // この $kind と $lv は局所変数
-                let lv = ((nk as i64) << 4)
-                    + MONSTERS[nk].base_hp
-                    + random_raw(ctx, MONSTERS[nk].hp_range);
+                let lv =
+                    ((nk as i64) << 4) + MONSTERS[nk].base_hp + ctx.random(MONSTERS[nk].hp_range);
                 set(island, sx, sy, L::Monster, lv);
                 let (_, m_name, _) = monster_spec(lv);
                 ctx.log

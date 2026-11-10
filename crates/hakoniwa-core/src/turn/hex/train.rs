@@ -25,10 +25,6 @@ use crate::turn::TurnContext;
 
 use super::{Flow, HexRun, k, town};
 
-/// この系統で使う Perl 版のグローバル変数 (`$sx`, `$sy` は必ず代入してから使うので持たない)
-#[derive(Debug, Default)]
-pub struct Globals {}
-
 /// この系統で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Scratch {}

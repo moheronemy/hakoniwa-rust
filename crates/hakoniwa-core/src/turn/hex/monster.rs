@@ -91,16 +91,6 @@ fn point(x: impl std::fmt::Display, y: impl std::fmt::Display) -> String {
     format!("({x}, {y})")
 }
 
-/// Perl の `random($n)`。`$n` が負なら `int(rand(1) * $n)` は 0 以下になる
-/// (共通の `random` は負の `$n` で 0 を返すので、ここでは自前で計算する)
-fn random_signed(ctx: &mut TurnContext, n: i64) -> i64 {
-    if n > 0 {
-        ctx.random(n)
-    } else {
-        trunc(ctx.rand_f64(1.0) * n as f64)
-    }
-}
-
 /// Perl が数値を文字列にするときの形 (`%.15g`)
 fn perl_num_str(v: f64) -> String {
     if v == 0.0 {
@@ -948,8 +938,8 @@ fn mascot(ctx: &mut TurnContext, island: &mut Island, h: &mut HexRun, mon: &mut 
             tet,
         ] = ctx.globals.eisei5.update(&island.eisei_raw[2]);
         let t = t_kind as i64;
-        let mut attack = random_signed(ctx, msap - t);
-        let mut counter = random_signed(ctx, t - msdp);
+        let mut attack = ctx.random(msap - t);
+        let mut counter = ctx.random(t - msdp);
         if attack < 1 {
             attack = c.min_attack;
         }

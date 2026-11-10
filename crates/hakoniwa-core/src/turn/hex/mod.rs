@@ -15,9 +15,6 @@
 //! - `my` で宣言していない変数 (`$point`, `$kind`, `$aucflag1` など) はグローバル変数で、
 //!   別の島・別の処理の値が残っている。移植版は [`HexGlobals`] に持たせる。
 
-// TODO(フェーズ2): すべての系統を移植したら外す (未移植の系統がまだ使っていない項目がある)
-#![allow(dead_code)]
-
 mod city;
 mod hazards;
 mod industry;
@@ -43,10 +40,6 @@ pub(crate) enum Flow {
     Continue,
     /// Perl の `next`: 共通の災害判定を飛ばして次のマスへ
     Next,
-    /// Perl の `last`: ループを抜ける (最後の収益ログは出す)
-    Last,
-    /// Perl の `return`: doEachHex を抜ける (最後の収益ログも出さない)
-    Return,
 }
 
 /// doEachHex 1 回分 (1 つの島) の状態。Perl 版の doEachHex の `my` 変数に当たる
@@ -103,9 +96,6 @@ pub struct HexGlobals {
     /// `$co7`, `$magicf`, `$magici`, `$magica`, `$magicw`, `$magicl`, `$magicd` (`etc9` を分解した先)
     pub etc9: crate::perl::Captures<7>,
     /// 系統ごとのグローバル変数 (各ファイルで定義する)
-    pub industry: industry::Globals,
-    pub city: city::Globals,
-    pub train: train::Globals,
     pub leisure: leisure::Globals,
     pub stadium: stadium::Globals,
     pub special: special::Globals,
@@ -196,15 +186,9 @@ pub(crate) fn do_each_hex(ctx: &mut TurnContext, islands: &mut [Island], idx: us
 
         town::pre_chain(ctx, &mut islands[idx], &mut h);
 
-        let flow = dispatch(ctx, islands, idx, &mut h);
-        let flow = match flow {
-            Flow::Continue => hazards::post_chain(ctx, islands, idx, &mut h),
-            other => other,
-        };
-        match flow {
-            Flow::Continue | Flow::Next => {}
-            Flow::Last => break,
-            Flow::Return => return,
+        // 分岐が Perl の `next` をしたら、共通の判定を飛ばして次のマスへ
+        if dispatch(ctx, islands, idx, &mut h) == Flow::Continue {
+            hazards::post_chain(ctx, islands, idx, &mut h);
         }
         h.i += 1;
     }

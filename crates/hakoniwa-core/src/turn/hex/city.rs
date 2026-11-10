@@ -12,10 +12,6 @@ use super::industry::{oil_end, oil_money};
 use super::town::{set, set_value, town_count};
 use super::{Flow, HexRun, k, msg};
 
-/// この系統で使う Perl 版のグローバル変数
-#[derive(Debug, Default)]
-pub struct Globals {}
-
 /// この系統で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Scratch {}
