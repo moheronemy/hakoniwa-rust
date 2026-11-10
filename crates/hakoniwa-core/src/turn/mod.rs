@@ -383,6 +383,8 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     logs.turns.truncate(config.log_max + 1);
     logs.history.extend(history);
     trim_front(&mut logs.history, config.history_max);
+    // Hakoniwa Cup のログ (Perl 版は logHcup で hakojima.lhc に直接追記する)
+    logs.hcup.append(&mut ctx.globals.hex.stadium.hcup_log);
     trim_front(&mut logs.hcup, config.hcup_log_max);
     trim_front(&mut logs.auction, 10);
 

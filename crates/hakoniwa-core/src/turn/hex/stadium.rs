@@ -60,8 +60,7 @@ pub struct Globals {
     pub yushounamber2: i64,
     /// `$hcturn`
     pub hcturn: i64,
-    /// `logHcup` で `hakojima.lhc` に追記する行。
-    /// TODO: run_turn の最後で `logs.hcup` に移す (TurnLog に Hakoniwa Cup のログが無いため)
+    /// `logHcup` で `hakojima.lhc` に追記する行。run_turn の最後で `logs.hcup` に移す
     pub hcup_log: Vec<TurnMessage>,
 }
 

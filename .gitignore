@@ -13,3 +13,4 @@ Thumbs.db
 
 # Claude Code local state (agent worktrees)
 /.claude/
+__pycache__/
