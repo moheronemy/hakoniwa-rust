@@ -41,6 +41,8 @@ tick_secs = 10                # ターンの時刻を確かめる間隔
 secure_cookie = false         # HTTPS で公開するなら true
 trust_forwarded = false       # リバースプロキシの後ろなら true
 # image_dir = "hakoimg"       # Perl 版の画像を持っていれば (無ければ色と文字のタイルで描く)
+# top_log_lines = 500         # トップページの「最近の出来事」の行数の上限
+# history_page_lines = 500    # 最近の出来事 (/history) の 1 ページの行数
 
 [game]
 title = "☆Hakoniwa R.A.☆"
