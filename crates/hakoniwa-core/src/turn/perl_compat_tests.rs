@@ -70,6 +70,15 @@ fn field(island: &Island, name: &str) -> String {
         "auc9" => island.auction.auc9.clone(),
         "prize" => island.prize.clone(),
         "taiji" => n(island.taiji),
+        "eis1" => n(island.eis[0]),
+        "eis2" => n(island.eis[1]),
+        "eis3" => n(island.eis[2]),
+        "eis4" => n(island.eis[3]),
+        "eis5" => n(island.eis[4]),
+        "eis6" => n(island.eis[5]),
+        "eis7" => n(island.eis[6]),
+        "auc7" => island.auction.auc7.clone(),
+        "propaganda" => n(sc.propaganda),
         "shouhi" => n(sc.shouhi),
         "ene" => n(sc.ene),
         "sabun" => {
@@ -233,6 +242,16 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
         globals: Globals::default(),
         oyasumiritu: 0,
     };
+    // ハコオクの出品 ($auction1..3)
+    ctx.globals.command.ops.auction = std::array::from_fn(|i| {
+        import
+            .state
+            .world
+            .auction_lots
+            .get(i)
+            .cloned()
+            .unwrap_or_default()
+    });
 
     let mut mismatches = Vec::new();
     let mut compared = 0;
@@ -261,6 +280,20 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
                         .unwrap()
                         .iter()
                         .map(|v| v.as_str().unwrap())
+                        .collect();
+                    if got != want {
+                        mismatches.push(format!("{}: rust {got:?} perl {want:?}", at(island, key)));
+                    }
+                    continue;
+                }
+                if key == "command_args" {
+                    let got: Vec<String> =
+                        island.commands.iter().map(|c| c.arg.to_string()).collect();
+                    let want: Vec<&str> = value
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|v| normalize(v.as_str().unwrap()))
                         .collect();
                     if got != want {
                         mismatches.push(format!("{}: rust {got:?} perl {want:?}", at(island, key)));
@@ -358,6 +391,15 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
             .collect();
         if got != want {
             mismatches.push(format!("{step}: history: rust {got:?} perl {want:?}"));
+        }
+
+        // ハコオクの出品 3 枠 ($auction1..3)。古い期待値には無い
+        if let Some(want) = exp.get("auctions").and_then(Value::as_array) {
+            let want: Vec<&str> = want.iter().map(|v| v.as_str().unwrap()).collect();
+            let got = &ctx.globals.command.ops.auction;
+            if got.iter().map(String::as_str).ne(want.iter().copied()) {
+                mismatches.push(format!("{step}: auctions: rust {got:?} perl {want:?}"));
+            }
         }
 
         let want = normalize(exp["oyasumiritu"].as_str().unwrap());
@@ -980,4 +1022,55 @@ fn phase3_build_zoo2_matches_perl_with_rand_0() {
 #[test]
 fn phase3_build_zoo2_matches_perl_with_rand_1_32() {
     check_fixture_at("phase3-build-zoo2", "03125");
+}
+
+#[test]
+fn phase3_ops_eisei_matches_perl() {
+    check_fixture("phase3-ops-eisei", 0);
+    check_fixture("phase3-ops-eisei", RAND_HALF);
+    check_fixture_at("phase3-ops-eisei", "96875");
+    check_fixture_at("phase3-ops-eisei", "03125");
+}
+
+#[test]
+fn phase3_ops_att_matches_perl() {
+    check_fixture("phase3-ops-att", 0);
+    check_fixture("phase3-ops-att", RAND_HALF);
+    check_fixture_at("phase3-ops-att", "96875");
+    check_fixture_at("phase3-ops-att", "03125");
+}
+
+#[test]
+fn phase3_ops_aid_matches_perl() {
+    check_fixture("phase3-ops-aid", 0);
+    check_fixture("phase3-ops-aid", RAND_HALF);
+    check_fixture_at("phase3-ops-aid", "96875");
+    check_fixture_at("phase3-ops-aid", "03125");
+    check_fixture_at("phase3-ops-aid", "40625");
+}
+
+#[test]
+fn phase3_ops_edge_matches_perl() {
+    check_fixture("phase3-ops-edge", 0);
+    check_fixture("phase3-ops-edge", RAND_HALF);
+    check_fixture_at("phase3-ops-edge", "96875");
+    check_fixture_at("phase3-ops-edge", "03125");
+}
+
+#[test]
+fn phase3_ops_rates_matches_perl() {
+    for digits in [
+        "0", "50", "96875", "03125", "203125", "3046875", "40625", "6015625", "703125", "8046875",
+        "90625", "9921875",
+    ] {
+        check_fixture_at("phase3-ops-rates", digits);
+    }
+}
+
+#[test]
+fn phase3_ops_lzr_matches_perl() {
+    check_fixture("phase3-ops-lzr", 0);
+    check_fixture("phase3-ops-lzr", RAND_HALF);
+    check_fixture_at("phase3-ops-lzr", "96875");
+    check_fixture_at("phase3-ops-lzr", "03125");
 }

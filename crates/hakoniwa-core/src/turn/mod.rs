@@ -308,6 +308,9 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         globals: Globals::default(),
         oyasumiritu: 0,
     };
+    // ハコオクの出品 ($auction1..3、Perl 版のグローバル変数)
+    ctx.globals.command.ops.auction =
+        std::array::from_fn(|i| world.auction_lots.get(i).cloned().unwrap_or_default());
     let islands = &mut world.islands;
 
     // 収入、消費フェイズ
@@ -375,6 +378,14 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
 
     if !config.survey.enabled {
         world.survey_votes = [0; 5];
+    }
+
+    for (lot, value) in world
+        .auction_lots
+        .iter_mut()
+        .zip(&ctx.globals.command.ops.auction)
+    {
+        lot.clone_from(value);
     }
 
     let turn = ctx.turn;
