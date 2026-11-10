@@ -452,3 +452,13 @@ fn phase2_stadium_52_matches_perl_with_rand_0() {
 fn phase2_stadium_52_matches_perl_with_rand_half() {
     check_fixture("phase2-stadium-52", RAND_HALF);
 }
+
+#[test]
+fn phase2_leisure_matches_perl_with_rand_0() {
+    check_fixture("phase2-leisure", 0);
+}
+
+#[test]
+fn phase2_leisure_matches_perl_with_rand_half() {
+    check_fixture("phase2-leisure", RAND_HALF);
+}
