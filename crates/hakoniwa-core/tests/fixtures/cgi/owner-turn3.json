@@ -1,0 +1,9 @@
+{
+ "fixture": "legacy-turn3",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {"ISLANDID": "1", "PASSWORD": "pass1", "OwnerButton": "1"}
+  }
+ ]
+}
