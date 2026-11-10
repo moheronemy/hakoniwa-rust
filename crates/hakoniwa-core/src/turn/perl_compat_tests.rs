@@ -240,6 +240,20 @@ pub(crate) fn check_fixture(fixture: &str, rng_value: u64) {
                     }
                     continue;
                 }
+                if key == "land_kinds" {
+                    let want = value.as_array().unwrap();
+                    for (idx, (cell, w)) in island.map.cells.iter().zip(want).enumerate() {
+                        let w = normalize(w.as_str().unwrap());
+                        if cell.kind.to_string() != w {
+                            mismatches.push(format!(
+                                "{}: rust {} perl {w}",
+                                at(island, &format!("land kind ({}, {})", idx % size, idx / size)),
+                                cell.kind
+                            ));
+                        }
+                    }
+                    continue;
+                }
                 if key == "land_values" {
                     let want = value.as_array().unwrap();
                     for (idx, (cell, w)) in island.map.cells.iter().zip(want).enumerate() {

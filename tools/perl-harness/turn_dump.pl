@@ -71,6 +71,13 @@ sub snapshot {
             }
         }
         $h{'land_values'} = \@values;
+        my @kinds;
+        for my $y (0 .. $HislandSize - 1) {
+            for my $x (0 .. $HislandSize - 1) {
+                push @kinds, str($island->{'land'}[$x][$y]);
+            }
+        }
+        $h{'land_kinds'} = \@kinds;
         $h{'commands'} = [map { str($_->{'kind'}) } @{$island->{'command'}}];
         push @out, \%h;
     }
