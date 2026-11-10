@@ -119,6 +119,7 @@ pub async fn admin_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
         }
     }
     h.push_str("</table></div>\n");
+    h.push_str(&ip_ranking(&app).await);
     let last = app.game.read().await.world.last_time;
     let _ = write!(
         h,
@@ -134,6 +135,42 @@ pub async fn admin_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
     render(&app, Some(&login), "管理画面", &h)
         .await
         .into_response()
+}
+
+/// 裏ランキング (Perl 版の `hako-top2.cgi`): 接続元が同じ島を数える (多重登録の確認用)
+async fn ip_ranking(app: &AppState) -> String {
+    let master = app.config.passwords.master.clone().unwrap_or_default();
+    let game = app.game.read().await;
+    let Ok(rows) = hakoniwa_core::view::ipinfo::ip_ranking(&game, &app.config, &master) else {
+        return String::new();
+    };
+    let mut h = String::from(
+        "<h2>裏ランキング (接続元の重なり)</h2>\n<div class=\"table-scroll\"><table>\n\
+         <tr><th class=\"num\">順位</th><th>島</th><th class=\"num\">重なり</th><th>重なった島</th>\
+         <th>接続元 (新しい順、最後は登録時)</th><th class=\"num\">変更</th></tr>\n",
+    );
+    for r in rows {
+        let matches: Vec<String> = r
+            .matches
+            .iter()
+            .map(|m| format!("{}島(ID:{})", esc(&m.name), m.id))
+            .collect();
+        let ips: Vec<String> = r.ips.iter().rev().map(|ip| esc(ip)).collect();
+        let _ = writeln!(
+            h,
+            "<tr><td class=\"num\">{}</td><td>{}島 <small class=\"muted\">ID:{}</small></td><td class=\"num\">{}</td><td>{}</td><td><small>{}</small></td><td class=\"num\">{} / {}</td></tr>",
+            r.rank,
+            esc(&r.name),
+            r.id,
+            r.found,
+            matches.join("、"),
+            ips.join(" / "),
+            r.changes_this_century,
+            r.changes_total
+        );
+    }
+    h.push_str("</table></div>\n");
+    h
 }
 
 #[derive(Deserialize)]
