@@ -64,6 +64,7 @@ master = "..."                # 管理画面 (/admin) とすべての島への�
 bind = "127.0.0.1:8080"
 sets_dir = "sets"
 default_set = false           # true (既定) なら、どのホスト名にも当たらない要求は [game] のゲームに来る
+# turn_workers = 4            # 同時に回すターン処理の数 (既定は CPU の数)
 ```
 
 ```toml
@@ -75,6 +76,7 @@ title = "アルファ諸島"
 ```
 
 セットのデータを JSON に書き出すには `--export-json backup.json --set alpha`。
+新しく作るセットは、ターンが一斉に来ないよう開始時刻が ID ごとにずれる。
 
 ## ライセンス
 

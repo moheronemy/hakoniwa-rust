@@ -59,6 +59,8 @@ struct ServerConfig {
     data_dir: Option<PathBuf>,
     /// ターンの時刻を確かめる間隔 (秒)
     tick_secs: u64,
+    /// 同時に回すターン処理の数 (全セットで)。0 なら CPU の数
+    turn_workers: usize,
     /// 画面まわりの設定
     #[serde(flatten)]
     options: ServerOptions,
@@ -142,6 +144,7 @@ impl Default for ServerConfig {
             state_path: "data/state.json".into(),
             data_dir: None,
             tick_secs: 10,
+            turn_workers: 0,
             options: ServerOptions::default(),
             game: GameConfig::default(),
             default_set: true,
@@ -190,8 +193,9 @@ fn open_set(
     data_dir: PathBuf,
     game: GameConfig,
     options: ServerOptions,
+    stagger: Option<&str>,
 ) -> Result<Arc<AppState>> {
-    let (data, state) = open_data(&data_dir, state_path, &game)?;
+    let (data, state) = open_data(&data_dir, state_path, &game, stagger)?;
     Ok(Arc::new(AppState {
         config: game,
         options,
@@ -210,6 +214,7 @@ fn open_sets(config: &ServerConfig) -> Result<Sets> {
             config.data_dir(),
             config.game.clone(),
             config.options.clone(),
+            None,
         )?);
     }
     for (id, dir) in config.set_dirs()? {
@@ -218,8 +223,15 @@ fn open_sets(config: &ServerConfig) -> Result<Sets> {
             anyhow::bail!("セット {id} にホスト名 (hosts) がありません");
         }
         let (state_path, data_dir) = set.paths(&dir);
-        let app = open_set(&state_path, data_dir, set.game, config.options.clone())
-            .with_context(|| format!("セット {id} を読み込めません"))?;
+        // 新しく作るセットは ID から決まる分だけ開始時刻をずらす (ターンが一斉に来ないように)
+        let app = open_set(
+            &state_path,
+            data_dir,
+            set.game,
+            config.options.clone(),
+            Some(&id),
+        )
+        .with_context(|| format!("セット {id} を読み込めません"))?;
         sets.add(&id, &set.hosts, app)?;
     }
     if sets.default_set().is_none() && sets.list().is_empty() {
@@ -329,12 +341,29 @@ async fn debug_turn(Set(app): Set) -> Response {
     }
 }
 
+/// 新しいゲームの最終更新時刻を、ID から決まる秒数 (`0..unit_time`) だけずらす。
+/// ずらしたあとも `now` 以前の、いちばん近い時刻にする (最初のターンは 1 ターンの秒数より先にはならない)
+fn staggered_start(game: &mut GameState, config: &GameConfig, id: &str, now: i64) {
+    let unit = config.unit_time.max(1);
+    // FNV-1a (版や環境で変わらない)
+    let hash = id.bytes().fold(0xcbf2_9ce4_8422_2325_u64, |h, b| {
+        (h ^ u64::from(b)).wrapping_mul(0x100_0000_01b3)
+    });
+    let offset = (hash % unit as u64) as i64;
+    let mut start = game.world.last_time + offset;
+    if start > now {
+        start -= unit;
+    }
+    game.world.last_time = start;
+}
+
 /// データディレクトリを読み込む。無ければ JSON のセーブデータ (`state_path`) から作り、
-/// それも無ければ新しいゲームを始める
+/// それも無ければ新しいゲームを始める (`stagger` があれば、その ID で開始時刻をずらす)
 fn open_data(
     data_dir: &std::path::Path,
     state_path: &std::path::Path,
     config: &GameConfig,
+    stagger: Option<&str>,
 ) -> Result<(DataDir, GameState)> {
     let started = std::time::Instant::now();
     if let Some((data, game)) = DataDir::open(data_dir)? {
@@ -360,7 +389,12 @@ fn open_data(
         }
         None => {
             tracing::info!(path = %data_dir.display(), "新しいゲームを作りました");
-            GameState::new_game(now_unix(), config)
+            let now = now_unix();
+            let mut game = GameState::new_game(now, config);
+            if let Some(id) = stagger {
+                staggered_start(&mut game, config, id, now);
+            }
+            game
         }
     };
     let data = DataDir::create(data_dir, &game)?;
@@ -407,15 +441,15 @@ async fn main() -> Result<()> {
 
     let sets = Arc::new(open_sets(&config)?);
     let every = Duration::from_secs(config.tick_secs.max(1));
-    if let Some(app) = sets.default_set() {
-        tokio::spawn(turns::scheduler(app.clone(), every, "既定".into()));
-    }
-    for (id, app) in sets.list() {
-        tokio::spawn(turns::scheduler(app.clone(), every, id.clone()));
-    }
+    let workers = match config.turn_workers {
+        0 => std::thread::available_parallelism().map_or(1, |n| n.get()),
+        n => n,
+    };
+    tokio::spawn(turns::Scheduler::new(sets.all(), workers).run(every));
     tracing::info!(
         default = sets.default_set().is_some(),
         sets = sets.list().len(),
+        turn_workers = workers,
         "ゲームを読み込みました"
     );
     let listener = tokio::net::TcpListener::bind(&config.bind)
@@ -547,6 +581,32 @@ mod tests {
         assert_eq!(res.status(), StatusCode::SEE_OTHER);
         assert_eq!(d.game.snapshot().world.islands.len(), 1);
         assert_eq!(a.game.snapshot().world.islands.len(), 1);
+    }
+
+    /// 新しいセットの開始時刻は ID で決まり、1 ターンの秒数の範囲で、いまより前になる
+    #[test]
+    fn staggered_starts_spread_within_one_turn() {
+        let config = GameConfig {
+            unit_time: 3600,
+            ..GameConfig::default()
+        };
+        let now = 1_794_300_123;
+        let mut starts = std::collections::BTreeSet::new();
+        for i in 0..50 {
+            let mut game = GameState::new_game(now, &config);
+            let base = game.world.last_time;
+            staggered_start(&mut game, &config, &format!("set{i}"), now);
+            let t = game.world.last_time;
+            assert!(t <= now && t > now - config.unit_time, "{t}");
+            assert!((t - base).rem_euclid(config.unit_time) < config.unit_time);
+            starts.insert(t);
+            // 同じ ID なら同じ時刻
+            let mut again = GameState::new_game(now, &config);
+            staggered_start(&mut again, &config, &format!("set{i}"), now);
+            assert_eq!(again.world.last_time, t);
+        }
+        // 50 セットがほぼ別々の時刻になる
+        assert!(starts.len() > 40, "{}", starts.len());
     }
 
     /// `sets_dir` の下の `<ID>/hakoniwa.toml` をすべて読み込む

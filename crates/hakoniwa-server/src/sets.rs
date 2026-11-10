@@ -71,6 +71,15 @@ impl Sets {
         &self.list
     }
 
+    /// 既定のセットも含めた全部のセットと、ログに出す名前 (既定のセットは「既定」)
+    pub fn all(&self) -> Vec<(String, Arc<AppState>)> {
+        self.default
+            .iter()
+            .map(|a| ("既定".to_string(), a.clone()))
+            .chain(self.list.iter().cloned())
+            .collect()
+    }
+
     /// ホスト名でセットを探す (当たらなければ既定のセット)
     pub fn find(&self, host: &str) -> Option<Arc<AppState>> {
         self.by_host
