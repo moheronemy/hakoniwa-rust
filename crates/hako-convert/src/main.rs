@@ -191,7 +191,28 @@ fn skip_missed(last: i64, now: i64, unit: i64) -> i64 {
 
 #[cfg(test)]
 mod tests {
-    use super::skip_missed;
+    use super::{skip_missed, write_server_config};
+    use hakoniwa_core::GameConfig;
+    use hakoniwa_core::legacy_settings;
+
+    /// Perl 版の設定から書いた設定ファイルを読み直すと、同じ設定になる
+    #[test]
+    fn server_config_round_trips() {
+        let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../hako-r-a_FE/hako-main.cgi");
+        let (text, _, _) = encoding_rs::EUC_JP.decode(&std::fs::read(path).unwrap());
+        let mut config = legacy_settings::parse(&text.replace("\r\n", "\n")).config;
+        config.unit_time = 3600;
+        let dir = tempfile::tempdir().unwrap();
+        let out = dir.path().join("hakoniwa.toml");
+        write_server_config(&out, &dir.path().join("state.json"), &config).unwrap();
+        #[derive(serde::Deserialize)]
+        struct File {
+            game: GameConfig,
+        }
+        let read: File = toml::from_str(&std::fs::read_to_string(&out).unwrap()).unwrap();
+        assert_eq!(read.game, config);
+    }
 
     #[test]
     fn skips_whole_turns_only() {
