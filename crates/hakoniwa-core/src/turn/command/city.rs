@@ -25,10 +25,6 @@ use crate::turn::monster_spec;
 
 use super::{CmdRun, cmsg};
 
-/// この系統で使う Perl 版のグローバル変数
-#[derive(Debug, Default)]
-pub struct Globals {}
-
 /// この系統で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Scratch {

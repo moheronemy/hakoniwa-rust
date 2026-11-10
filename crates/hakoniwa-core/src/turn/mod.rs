@@ -192,6 +192,9 @@ pub(crate) struct Globals {
     pub auc9: Captures<5>,
     /// `$factory1`, `$factory2`, `$co0`, ... (`income` が `factory` を分解する先)
     pub factory: Captures<10>,
+    /// `$msjotai`, `$nokotan`, `$msid` (`etc7`)。ミサイル・人工衛星攻撃・レーザー・
+    /// 怪獣派遣と、島ごとの処理 (Perl 版 14585 行) が同じ変数に代入する
+    pub etc7: Captures<3>,
     /// doEachHex で使うグローバル変数
     pub hex: hex::HexGlobals,
     /// doCommand だけで使うグローバル変数

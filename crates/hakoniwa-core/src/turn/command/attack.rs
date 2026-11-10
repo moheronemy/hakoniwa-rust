@@ -40,9 +40,6 @@ use super::{CmdRun, cmsg};
 /// この系統で使う Perl 版のグローバル変数
 #[derive(Debug, Default)]
 pub struct Globals {
-    /// `$msjotai`, `$nokotan`, `$msid` (`etc7` を分解した先)。
-    /// 人工衛星攻撃・レーザーの計画と島ごとの処理 (Perl 版 14585 行) も同じ変数に代入する
-    pub ms: Captures<3>,
     /// `$alltotal`: このターンに撃ったミサイルの数 (不発弾の判定に使う)。一度も 0 に戻らない
     pub alltotal: i64,
     /// `@HdefenceHex`: (撃った島の ID, x, y) → 1 (防衛される) / -1 (されない) / 0 (未判定)
@@ -555,9 +552,7 @@ pub(super) fn missile(
     let mut scope = c.scope.clone();
     let [msjotai, _, msid] = ctx
         .globals
-        .command
-        .attack
-        .ms
+        .etc7
         .assign(scope.fields(&islands[idx].etc_raw[2]));
 
     // 自島に目標の島の大使館があれば同盟
@@ -1213,9 +1208,7 @@ pub(super) fn send_monster(
     let mut scope = c.scope.clone();
     let [msjotai, _, msid] = ctx
         .globals
-        .command
-        .attack
-        .ms
+        .etc7
         .assign(scope.fields(&islands[idx].etc_raw[2]));
     if msjotai != 2 || t_id != msid {
         ctx.log
@@ -1376,9 +1369,7 @@ pub(super) fn taishi(
     let mut scope = c.scope.clone();
     let [msjotai, _, msid] = ctx
         .globals
-        .command
-        .attack
-        .ms
+        .etc7
         .assign(scope.fields(&islands[idx].etc_raw[2]));
 
     if ctx.config.love_peace && msjotai != 2 && t_id != msid {

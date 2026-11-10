@@ -18,7 +18,7 @@
 
 use crate::land::{land_name, perl_get};
 use crate::log::tags::{self, wrap};
-use crate::model::{Island, PlannedCommand};
+use crate::model::Island;
 use crate::perl::{Captures, trunc};
 use crate::tables::LandKind as L;
 use crate::turn::hex::town::{set, set_value};
@@ -38,8 +38,6 @@ pub struct Globals {
     pub auction_caps: [Captures<5>; 3],
     /// `$aucland` (出品した地形 × 地形の値)。doIslandProcess の落札処理も使う
     pub aucland: i64,
-    /// `($msjotai, $nokotan, $msid)` (`etc7`)。ミサイル・怪獣派遣・doIslandProcess も代入する
-    pub etc7: Captures<3>,
     /// 人工衛星打ち上げで払った額 (`$value`)
     pub value: i64,
     /// `$err` (着弾のぶれ)。ミサイル発射も代入する
@@ -69,24 +67,6 @@ fn perl_index(island: &Island, x: i64, y: i64) -> Option<(usize, usize)> {
 /// 費用を資金から引く。この系統の計画の費用は必ず整数 (切り捨て済みか、割増しが効かない)
 fn pay(island: &mut Island, cost: f64) {
     island.money -= cost as i64;
-}
-
-/// `slideBack($comArray, 0)` のあと先頭を同じ計画 (数量を 1 減らしたもの) にする
-fn repeat_command(island: &mut Island, c: &CmdRun, arg: i64) {
-    let command = PlannedCommand {
-        kind: c.kind,
-        target: c.target,
-        x: c.x,
-        y: c.y,
-        arg,
-    };
-    // slideBack は計画が 1 つしかなければ何もしない
-    if island.commands.len() != 1 {
-        island.commands.pop();
-        island.commands.insert(0, command);
-    } else {
-        island.commands[0] = command;
-    }
 }
 
 /// `$HidToNumber{$target}`。無い島なら `$Hislands[undef]` = 先頭の島 (Perl 版のまま)
@@ -219,10 +199,7 @@ pub(super) fn givefood(
 
     // 費用は負 (食料)
     island.food += c.cost as i64;
-    if c.arg > 1 {
-        c.arg -= 1;
-        repeat_command(island, c, c.arg);
-    }
+    super::repeat_if_more(island, c);
     true
 }
 
@@ -426,7 +403,7 @@ pub(super) fn eiseimente(
 /// `etc7` の「援助射撃の許可」を確かめる (平和系モードのとき)。許可が無ければ `false`
 fn niwaren_ok(ctx: &mut TurnContext, c: &CmdRun, own_etc7: &str, target_id: i64) -> bool {
     let mut m = c.scope.clone();
-    let [msjotai, _, msid] = ctx.globals.command.ops.etc7.assign(m.fields(own_etc7));
+    let [msjotai, _, msid] = ctx.globals.etc7.assign(m.fields(own_etc7));
     !((msjotai != 2 || target_id != msid) && ctx.config.love_peace)
 }
 
@@ -857,10 +834,7 @@ pub(super) fn propaganda(
     );
     island.scratch.propaganda = 1;
     pay(island, c.cost);
-    if c.arg > 1 {
-        c.arg -= 1;
-        repeat_command(island, c, c.arg);
-    }
+    super::repeat_if_more(island, c);
     true
 }
 

@@ -79,7 +79,6 @@ fn field(island: &Island, name: &str) -> String {
         "eis7" => n(island.eis[6]),
         "auc7" => island.auction.auc7.clone(),
         "propaganda" => n(sc.propaganda),
-        "eis5" => n(island.eis[4]),
         "etc7" => island.etc_raw[2].clone(),
         "monstersend" => n(sc.command.attack.monstersend),
         "monstersendkind" => n(sc.command.attack.monstersendkind),

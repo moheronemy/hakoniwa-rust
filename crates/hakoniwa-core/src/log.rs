@@ -184,15 +184,6 @@ pub mod msg {
             wrap(tags::NAME, &format!("{name}島{point}"))
         )
     }
-
-    /// 未移植の計画が実行されたとき (移植作業中だけのもの。Perl 版には無い)
-    pub fn not_ported(name: &str, com_name: &str) -> String {
-        format!(
-            "{}で予定されていた{}は、移植作業中のため実行されませんでした。",
-            island(name),
-            wrap(tags::COM_NAME, com_name)
-        )
-    }
 }
 
 #[cfg(test)]

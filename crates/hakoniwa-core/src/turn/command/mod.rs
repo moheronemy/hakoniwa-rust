@@ -12,9 +12,6 @@
 //!   (`$kind`, `$point`, `$tId`, `$z0`.., `$costseisaku` など)。[`CmdRun`] にあるのは
 //!   doCommand の `my` 変数だけ。
 
-// TODO(フェーズ3): すべての系統を移植したら外す (未移植の系統がまだ使っていない項目がある)
-#![allow(dead_code)]
-
 mod attack;
 mod build;
 mod city;
@@ -72,9 +69,7 @@ impl CmdRun {
 pub struct CommandGlobals {
     /// `$jikkouarg`
     pub jikkouarg: i64,
-    pub land: land::Globals,
     pub build: build::Globals,
-    pub city: city::Globals,
     pub ops: ops::Globals,
     pub attack: attack::Globals,
     pub magic: magic::Globals,
@@ -279,6 +274,39 @@ pub(crate) fn do_command(ctx: &mut TurnContext, islands: &mut [Island], idx: usi
     dispatch(ctx, islands, idx, &mut c)
 }
 
+/// `slideBack($comArray, $number)`: `number` 番目の計画を複製して後ろにずらす (末尾は消える)
+pub(super) fn slide_back(commands: &mut Vec<PlannedCommand>, number: usize) {
+    // return if $number == $#$command;
+    if commands.len() == number + 1 {
+        return;
+    }
+    commands.pop();
+    let copy = commands.get(number).copied().unwrap_or_default();
+    let at = number.min(commands.len());
+    commands.insert(at, copy);
+}
+
+/// `$arg` 回繰り返す計画の残りを入れ直す
+/// (`if ($arg > 1) { $arg--; slideBack($comArray, 0); $comArray->[0] = {... 'arg' => $arg} }`)
+pub(super) fn repeat_if_more(island: &mut Island, c: &mut CmdRun) {
+    if c.arg <= 1 {
+        return;
+    }
+    c.arg -= 1;
+    slide_back(&mut island.commands, 0);
+    let cmd = PlannedCommand {
+        kind: c.kind,
+        target: c.target,
+        x: c.x,
+        y: c.y,
+        arg: c.arg,
+    };
+    match island.commands.first_mut() {
+        Some(first) => *first = cmd,
+        None => island.commands.push(cmd),
+    }
+}
+
 /// 計画ごとの分岐。Perl 版の `if/elsif` の順番どおり。戻り値は doCommand の戻り値 (1 なら true)
 fn dispatch(ctx: &mut TurnContext, islands: &mut [Island], idx: usize, c: &mut CmdRun) -> bool {
     let Some(kind) = c.command_kind() else {
@@ -480,6 +508,28 @@ pub(crate) mod cmsg {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn cmds(kinds: &[u16]) -> Vec<PlannedCommand> {
+        kinds
+            .iter()
+            .map(|&kind| PlannedCommand {
+                kind,
+                ..Default::default()
+            })
+            .collect()
+    }
+
+    #[test]
+    fn slide_back_duplicates_and_drops_last() {
+        let mut v = cmds(&[1, 2, 3]);
+        slide_back(&mut v, 0);
+        let kinds: Vec<_> = v.iter().map(|c| c.kind).collect();
+        assert_eq!(kinds, [1, 1, 2]);
+
+        let mut v = cmds(&[1]);
+        slide_back(&mut v, 0);
+        assert_eq!(v.len(), 1);
+    }
 
     #[test]
     fn slide_front_fills_with_do_nothing() {

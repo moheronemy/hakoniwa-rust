@@ -13,7 +13,7 @@
 
 use crate::land::{around, count_around, in_island};
 use crate::log::tags::{self, wrap};
-use crate::model::{Island, IslandMap, PlannedCommand};
+use crate::model::{Island, IslandMap};
 use crate::perl::trunc;
 use crate::tables::{CommandKind as C, LandKind as L};
 use crate::turn::TurnContext;
@@ -22,47 +22,11 @@ use crate::turn::hex::town::{set, set_value};
 
 use super::{CmdRun, cmsg};
 
-/// この系統で使う Perl 版のグローバル変数
-#[derive(Debug, Default)]
-pub struct Globals {}
-
 /// この系統で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Scratch {
     /// `$island->{'prepare2'}`: このターンの地ならしの回数 (地震の確率に効く)
     pub prepare2: i64,
-}
-
-/// `slideBack($comArray, $number)`: `number` 番目の計画を複製して後ろにずらす (末尾は消える)
-pub(super) fn slide_back(commands: &mut Vec<PlannedCommand>, number: usize) {
-    // return if $number == $#$command;
-    if commands.len() == number + 1 {
-        return;
-    }
-    commands.pop();
-    let copy = commands.get(number).copied().unwrap_or_default();
-    let at = number.min(commands.len());
-    commands.insert(at, copy);
-}
-
-/// `$arg` 回繰り返す計画の残りを先頭に入れ直す (`$arg--` して slideBack)
-fn repeat_command(island: &mut Island, c: &mut CmdRun) {
-    if c.arg > 1 {
-        c.arg -= 1;
-        slide_back(&mut island.commands, 0);
-        let cmd = PlannedCommand {
-            kind: c.kind,
-            target: c.target,
-            x: c.x,
-            y: c.y,
-            arg: c.arg,
-        };
-        if let Some(first) = island.commands.first_mut() {
-            *first = cmd;
-        } else {
-            island.commands.push(cmd);
-        }
-    }
 }
 
 /// 予定地 `$land->[$x][$y]` の書き込み先。負の添字は Perl と同じく反対側から数える
@@ -599,7 +563,7 @@ pub(super) fn mountain(
     }
     land_suc(ctx, island, c.com_name, c);
     pay(island, c);
-    repeat_command(island, c);
+    super::repeat_if_more(island, c);
 
     if ctx.random(1000) < 9 {
         let v = 1000 + ctx.random(4001);
@@ -698,32 +662,5 @@ mod msg {
             island(name),
             com(com_name)
         )
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn cmds(kinds: &[u16]) -> Vec<PlannedCommand> {
-        kinds
-            .iter()
-            .map(|&kind| PlannedCommand {
-                kind,
-                ..Default::default()
-            })
-            .collect()
-    }
-
-    #[test]
-    fn slide_back_duplicates_and_drops_last() {
-        let mut v = cmds(&[1, 2, 3]);
-        slide_back(&mut v, 0);
-        let kinds: Vec<_> = v.iter().map(|c| c.kind).collect();
-        assert_eq!(kinds, [1, 1, 2]);
-
-        let mut v = cmds(&[1]);
-        slide_back(&mut v, 0);
-        assert_eq!(v.len(), 1);
     }
 }

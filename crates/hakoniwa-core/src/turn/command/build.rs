@@ -31,7 +31,7 @@ use std::ops::ControlFlow;
 
 use crate::land::{count_around, land_name};
 use crate::log::tags::{self, wrap};
-use crate::model::{Island, PlannedCommand};
+use crate::model::Island;
 use crate::perl::trunc;
 use crate::tables::{CommandKind as C, LandKind as L, MONSTERS};
 use crate::turn::hex::monster::wide_damage;
@@ -426,32 +426,10 @@ pub(super) fn build(
                 | C::Factory
         )
     );
-    if repeat && c.arg > 1 {
-        c.arg -= 1;
-        slide_back(&mut island.commands);
-        island.commands[0] = PlannedCommand {
-            kind: c.kind,
-            target: c.target,
-            x: c.x,
-            y: c.y,
-            arg: c.arg,
-        };
+    if repeat {
+        super::repeat_if_more(island, c);
     }
     true
-}
-
-/// `slideBack($comArray, 0)`: 末尾を捨てて先頭を複製する (計画が 1 つしかなければ何もしない)
-fn slide_back(commands: &mut Vec<PlannedCommand>) {
-    if commands.len() <= 1 {
-        // return if $number == $#$command (計画が空のときは Perl 版では $#$command が -1)
-        if commands.is_empty() {
-            commands.push(PlannedCommand::default());
-        }
-        return;
-    }
-    commands.pop();
-    let first = commands[0];
-    commands.insert(0, first);
 }
 
 /// `$island->{'shouhi'} > $island->{'ene'}` なら logMsNoEne を出して `true`
@@ -1104,22 +1082,4 @@ fn bomb_set(name: &str, l_name: &str, point: &str) -> String {
         "{}の<B>{l_name}</B>の<B>自爆装置がセット</B>されました。",
         wrap(tags::NAME, &format!("{name}島{point}"))
     )
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn slide_back_duplicates_the_first_command() {
-        let mut v: Vec<PlannedCommand> = (1..=3)
-            .map(|k| PlannedCommand {
-                kind: k,
-                ..Default::default()
-            })
-            .collect();
-        slide_back(&mut v);
-        let kinds: Vec<_> = v.iter().map(|c| c.kind).collect();
-        assert_eq!(kinds, [1, 1, 2]);
-    }
 }
