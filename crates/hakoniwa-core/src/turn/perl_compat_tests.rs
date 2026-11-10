@@ -135,6 +135,8 @@ fn field(island: &Island, name: &str) -> String {
         "ownfe" => n(sc.ownfe),
         "absent" => n(island.absent),
         "incomemoney" => n(sc.incomemoney),
+        "hcsankaflag" => n(sc.hcsankaflag),
+        "stsankahantei" => n(sc.hex.stadium.stsankahantei),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -337,4 +339,94 @@ fn phase2_town_matches_perl_with_rand_0() {
 #[test]
 fn phase2_town_matches_perl_with_rand_half() {
     check_fixture("phase2-town", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium", 0);
+}
+
+#[test]
+fn phase2_stadium_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_reset_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-reset", 0);
+}
+
+#[test]
+fn phase2_stadium_reset_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-reset", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_r2_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-r2", 0);
+}
+
+#[test]
+fn phase2_stadium_r2_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-r2", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_r4_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-r4", 0);
+}
+
+#[test]
+fn phase2_stadium_r4_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-r4", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_qf_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-qf", 0);
+}
+
+#[test]
+fn phase2_stadium_qf_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-qf", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_sf_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-sf", 0);
+}
+
+#[test]
+fn phase2_stadium_sf_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-sf", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_final_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-final", 0);
+}
+
+#[test]
+fn phase2_stadium_final_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-final", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_end_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-end", 0);
+}
+
+#[test]
+fn phase2_stadium_end_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-end", RAND_HALF);
+}
+
+#[test]
+fn phase2_stadium_52_matches_perl_with_rand_0() {
+    check_fixture("phase2-stadium-52", 0);
+}
+
+#[test]
+fn phase2_stadium_52_matches_perl_with_rand_half() {
+    check_fixture("phase2-stadium-52", RAND_HALF);
 }
