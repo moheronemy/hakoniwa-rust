@@ -4,6 +4,7 @@
 //! 計画の大半、島全体の処理、ハコオク・toto など) は、該当する場所にコメントで
 //! 印を付けてある。詳しくは docs/PORTING.md を参照。
 
+mod auction;
 pub(crate) mod command;
 mod cup;
 pub(crate) mod estimate;
@@ -373,7 +374,8 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         }
     }
 
-    // TODO(フェーズ6): ハコオクの順位と賞品 (ターン杯のターン)
+    // ハコオクの順位と賞品 (ターン杯のターン)
+    auction::rank(&mut ctx, islands);
 
     // ポイント順にソート
     ranking::sort_by_pts(islands);
@@ -383,7 +385,8 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         turn_prize(&mut ctx, &mut islands[0]);
     }
 
-    // TODO(フェーズ6): ハコオクの出品の入れ替えと状態の更新
+    // ハコオクの出品の入れ替えと状態の更新
+    auction::rotate(&mut ctx);
 
     // 島数カット (無人島はポイント 0 で末尾に並んでいる)
     islands.truncate(remain);
@@ -404,6 +407,7 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
             island.survey_flag = 1;
         }
     }
+    auction::reload_defaults(&mut world.islands);
 
     for (lot, value) in world
         .auction_lots

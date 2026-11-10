@@ -532,7 +532,10 @@ mod tests {
         let token = cookie.split_once('=').unwrap().1.to_string();
         let csrf = state.sessions.get(&token, crate::now_unix()).unwrap().csrf;
         let page = body(send(&state, get("/admin", Some(&cookie))).await).await;
-        assert!(page.contains("現役データ") && page.contains("裏ランキング"), "{page}");
+        assert!(
+            page.contains("現役データ") && page.contains("裏ランキング"),
+            "{page}"
+        );
 
         let res = send(
             &state,

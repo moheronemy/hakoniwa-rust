@@ -26,8 +26,64 @@ pub(crate) fn check_turn(name: &str, ignore: &[&str]) {
 
 #[test]
 fn turn_basic_matches_perl() {
-    // TODO(フェーズ6): ハコオクの出品の入れ替えを移植したら外す
-    check_turn("turn-basic", &["/world/auction_lots"]);
+    check_turn("turn-basic", &[]);
+}
+
+// ---- ハコオク (turnMain 857〜903 行、934〜1116 行) -------------------------------
+// データは tools/fixtures/phase6_auction.py で作る。
+
+/// ターン 100 にほかの段階が書くもの (並行して移植中: toto・Numbers3 の記録ログ、
+/// Hakoniwa Cup の参加数のログ)。マージ後に外す
+const OTHERS_AT_TURN_100: &[&str] = &["/logs/history"];
+
+#[test]
+fn turn_auction_normal_matches_perl() {
+    check_turn("turn-auction-normal", &[]);
+}
+
+#[test]
+fn turn_auction_late_matches_perl() {
+    check_turn("turn-auction-late", &[]);
+}
+
+#[test]
+fn turn_auction_prize_matches_perl() {
+    check_turn("turn-auction-prize", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_cap_matches_perl() {
+    check_turn("turn-auction-cap", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_many_matches_perl() {
+    check_turn("turn-auction-many", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_rest_matches_perl() {
+    check_turn("turn-auction-rest", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_sold_matches_perl() {
+    check_turn("turn-auction-sold", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_mid_matches_perl() {
+    check_turn("turn-auction-mid", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_rest9_matches_perl() {
+    check_turn("turn-auction-rest9", OTHERS_AT_TURN_100);
+}
+
+#[test]
+fn turn_auction_few_matches_perl() {
+    check_turn("turn-auction-few", OTHERS_AT_TURN_100);
 }
 
 // Hakoniwa Cup (cup.rs)。TODO(フェーズ6): ハコオクの出品の入れ替えを移植したら
@@ -36,69 +92,29 @@ fn turn_basic_matches_perl() {
 #[test]
 fn turn_cup_seed_matches_perl() {
     // ターン 141: 勝ち点で並べ替え、段階 0 以外の上位チームを決勝トーナメントへ
-    check_turn("turn-cup-41", &["/world/auction_lots"]);
+    check_turn("turn-cup-41", &[]);
 }
 
 #[test]
 fn turn_cup_seed_without_teams_matches_perl() {
-    check_turn("turn-cup-41-none", &["/world/auction_lots"]);
+    check_turn("turn-cup-41-none", &[]);
 }
 
-/// ターン % 100 == 0 のケース。ターン杯のターンなので、まだ移植していないハコオクの順位と賞品
-/// (高額落札ランキング) と、toto・Numbers の当選番号の記録が Perl 版にだけ出る。
-/// その記録を取り除き、賞金を差し引いて比べる。
-/// 賞品を受け取る島 (どちらのケースも 2 番目の島) の `auc4` (落札の記録) と `etc8` (お守り) は
-/// 比べない。TODO(フェーズ6): ハコオクの順位と賞品、toto・Numbers を移植したら、
-/// この関数をやめて check_turn に戻す
+/// ターン % 100 == 0 のケース。ターン杯のターンなので、まだ移植していない toto・Numbers の
+/// 当選番号の記録が Perl 版にだけ出る。その記録を取り除いて比べる。
+/// TODO(フェーズ6): toto・Numbers を移植したら、この関数をやめて check_turn に戻す
 fn check_turn_without_auction_prize(name: &str) {
     check_case_with(
         name,
-        &[
-            "/world/auction_lots",
-            "/world/islands/1/auction/auc4",
-            "/world/islands/1/etc_raw/3",
-        ],
+        &[],
         |want| {
             if let Some(turn) = want.logs.turns.first_mut() {
                 turn.retain(|e| !e.message.contains("負荷計測"));
             }
-            let is_prize = |m: &str| m.contains("高額落札ランキング１位");
-            let prize = want
-                .logs
-                .auction
-                .iter()
-                .find(|e| is_prize(&e.message))
-                .map(|e| e.message.clone())
-                .expect("ハコオクの賞品の記録");
-            want.logs.auction.retain(|e| !is_prize(&e.message));
             // toto・Numbers の当選番号 (「第200ターン ｔｏｔｏ」など)
             want.logs.history.retain(|e| {
                 !(e.message.contains("ターン ｔｏｔｏ") || e.message.contains("ターン Numbers"))
             });
-            // 「<B>名前島様</B>、... （賞金<B>950億円/お守り1個</B>)」
-            let name = prize
-                .split("<B>")
-                .nth(1)
-                .unwrap()
-                .split("島様")
-                .next()
-                .unwrap();
-            let value: i64 = prize
-                .split("賞金<B>")
-                .nth(1)
-                .unwrap()
-                .split("億円")
-                .next()
-                .unwrap()
-                .parse()
-                .unwrap();
-            let island = want
-                .world
-                .islands
-                .iter_mut()
-                .find(|i| i.name == name)
-                .unwrap();
-            island.money -= value;
         },
         |game, config, case| {
             run_turn(game, config, &mut case.rng);
