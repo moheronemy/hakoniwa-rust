@@ -1,6 +1,6 @@
 //! Perl 版との突き合わせテスト。
 //!
-//! `tests/fixtures/<名前>.rand*.expected.json` は、元の Perl コードを
+//! `tests/fixtures/<名前>.rand*.expected.json.gz` は、元の Perl コードを
 //! `tools/perl-harness/run-harness.sh` で実行して作ったもの。`rand()` の値を固定し
 //! (0 と 0.5)、座標の並びは行優先にしてある。同じ条件で移植版を同じ段階
 //! (`estimate`, `income`, `commands`, `eachhex`) の順に動かし、各段階のあとで
@@ -209,7 +209,7 @@ pub(crate) fn check_fixture_at(fixture: &str, digits: &str) {
     check_fixture_inner(
         fixture,
         rng_value,
-        &format!("{fixture}.rand{digits}.expected.json"),
+        &format!("{fixture}.rand{digits}.expected.json.gz"),
     );
 }
 
@@ -222,11 +222,12 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
     )
     .unwrap();
     let mut islands = import.state.world.islands;
-    let expected: Vec<Value> = serde_json::from_str(
-        &std::fs::read_to_string(fixture_dir().join(expected_file))
-            .unwrap_or_else(|e| panic!("{expected_file}: {e}")),
-    )
-    .unwrap();
+    // 期待値は gzip で圧縮して置いてある (tools/perl-harness/run-harness.sh が作る)
+    let file = std::fs::File::open(fixture_dir().join(expected_file))
+        .unwrap_or_else(|e| panic!("{expected_file}: {e}"));
+    let expected: Vec<Value> =
+        serde_json::from_reader(std::io::BufReader::new(flate2::read::GzDecoder::new(file)))
+            .unwrap_or_else(|e| panic!("{expected_file}: {e}"));
 
     let mut rng = StepRng::new(rng_value, 0);
     let size = config.island_size;

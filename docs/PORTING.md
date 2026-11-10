@@ -154,7 +154,7 @@ DES の値はログイン成功時に置き換える。
 2. `tools/perl-harness/run-harness.sh <名前> <段階>` が、`hako-main.cgi` (設定と関数だけ) と
    `hako-turn.cgi` を読み込み、`rand()` の値と座標の並びを固定して、指定した段階
    (`estimate`, `income`, `commands`, `eachhex` を並べたもの) を島ごとに動かす。
-   段階ごとにすべての値とログを `*.expected.json` に書き出す (`rand()` を 0 と 0.5 に固定した 2 通り)
+   段階ごとにすべての値とログを `*.expected.json.gz` に書き出す (`rand()` を 0 と 0.5 に固定した 2 通り)
 3. `turn::perl_compat_tests` が同じ条件で移植版を動かし、島の値・一時値・地形の値・
    計画・ログが 1 つ残らず一致することを確かめる
 

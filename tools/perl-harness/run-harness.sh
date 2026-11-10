@@ -5,7 +5,7 @@
 # Usage: tools/perl-harness/run-harness.sh FIXTURE STEPS
 #   FIXTURE  directory name under crates/hakoniwa-core/tests/fixtures
 #   STEPS    comma separated, e.g. estimate,estimate,income,commands
-# Writes FIXTURE.rand<D>.expected.json for each D in $RANDS (default "0 50"),
+# Writes FIXTURE.rand<D>.expected.json.gz for each D in $RANDS (default "0 50"),
 # with rand() pinned to the number 0.D (e.g. 0 -> 0, 50 -> 0.5, 03125 -> 1/32).
 # Use exact binary fractions so that Rust's generator can produce the same value.
 set -eu
@@ -23,8 +23,10 @@ cp "$root/hako-r-a_FE/hako-turn.cgi" "$work/turn.cgi"
 cd "$work"
 for r in ${RANDS:-0 50}; do
   rm -rf data && cp -r "$fixture" data
-  out="$fixture.rand$r.expected.json"
+  out="$fixture.rand$r.expected.json.gz"
   STEPS="$steps" HAKO_RAND="0.$r" \
-    perl "$root/tools/perl-harness/turn_dump.pl" main.pl turn.cgi data 2>/dev/null > "$out"
+    perl "$root/tools/perl-harness/turn_dump.pl" main.pl turn.cgi data 2>/dev/null > "$work/out.json"
+  # -n: ファイル名と時刻を入れない (同じ内容なら同じファイルになる)
+  gzip -9 -n -c "$work/out.json" > "$out"
   echo "wrote ${out#$root/}"
 done
