@@ -308,8 +308,10 @@ mod tests {
         assert_eq!(c.passwords.master.as_deref(), Some("uhusnuvnurkanjhfh"));
         c.passwords = Default::default();
         c.survey = Default::default();
-        let mut d = GameConfig::default();
-        d.survey = Default::default();
+        let d = GameConfig {
+            survey: Default::default(),
+            ..Default::default()
+        };
         assert_eq!(c, d);
         assert_eq!(s.new_game, Some(true));
     }
