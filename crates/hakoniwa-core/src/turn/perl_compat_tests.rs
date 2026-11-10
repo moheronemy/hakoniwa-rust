@@ -70,6 +70,10 @@ fn field(island: &Island, name: &str) -> String {
         "auc9" => island.auction.auc9.clone(),
         "prize" => island.prize.clone(),
         "taiji" => n(island.taiji),
+        "eis5" => n(island.eis[4]),
+        "etc7" => island.etc_raw[2].clone(),
+        "monstersend" => n(sc.command.attack.monstersend),
+        "monstersendkind" => n(sc.command.attack.monstersendkind),
         "shouhi" => n(sc.shouhi),
         "ene" => n(sc.ene),
         "sabun" => {
@@ -759,4 +763,49 @@ fn phase2_mix_6_matches_perl_with_rand_50() {
 #[test]
 fn phase2_mix_6_matches_perl_with_rand_96875() {
     check_fixture_at("phase2-mix-6", "96875");
+}
+
+#[test]
+fn phase3_attack_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack", 0);
+}
+
+#[test]
+fn phase3_attack_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_lr_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-lr", 0);
+}
+
+#[test]
+fn phase3_attack_lr_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-lr", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_ld_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-ld", 0);
+}
+
+#[test]
+fn phase3_attack_ld_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-ld", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_guard_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-guard", 0);
+}
+
+#[test]
+fn phase3_attack_guard_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-guard", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_guard_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-guard", "03125");
 }

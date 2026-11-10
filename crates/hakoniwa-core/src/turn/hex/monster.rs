@@ -135,7 +135,7 @@ pub(crate) fn seqnum(n: i64) -> i64 {
 }
 
 /// 硬化中か (サンジラは奇数ターン、クジラは偶数ターン、めたはむ系は `seqnum` で決まる)
-fn hardened(special: i64, turn: i64) -> bool {
+pub(crate) fn hardened(special: i64, turn: i64) -> bool {
     (special == 3 && turn % 2 == 1)
         || (special == 8 && seqnum(turn) % 2 == 0)
         || (special == 4 && turn % 2 == 0)
@@ -1459,7 +1459,7 @@ pub(crate) fn wide_damage(ctx: &mut TurnContext, island: &mut Island, x: i64, y:
 }
 
 /// ログの文面
-mod m {
+pub(crate) mod m {
     use super::{msg, tags, wrap};
 
     fn ia(name: &str, point: &str) -> String {
