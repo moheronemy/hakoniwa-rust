@@ -119,6 +119,12 @@ class Fixture:
         """hakojima.dat の値 (money, food, pts, eis1..7, eisei1..6 など)"""
         self._set("hakojima.dat", MAIN, island_id, values)
 
+    def turn(self, turn):
+        """hakojima.dat の 1 行目 (ターン数)。ターンを進めると turn + 1 のターンが行われる"""
+        lines = self._lines("hakojima.dat")
+        lines[0] = str(turn).encode()
+        self._write("hakojima.dat", lines)
+
     def owner(self, island_id, **values):
         """howner.dat の値 (rena, totoyoso2 など)"""
         self._set("howner.dat", OWNER, island_id, values)

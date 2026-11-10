@@ -11,6 +11,7 @@ pub(crate) mod estimate;
 pub(crate) mod hex;
 mod income;
 pub(crate) mod island;
+mod lottery;
 mod ranking;
 
 #[cfg(test)]
@@ -388,10 +389,19 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     // ハコオクの出品の入れ替えと状態の更新
     auction::rotate(&mut ctx);
 
-    // 島数カット (無人島はポイント 0 で末尾に並んでいる)
-    islands.truncate(remain);
+    // 島数カット (無人島はポイント 0 で末尾に並んでいる)。Perl 版は $HislandNumber を減らす
+    // だけで、切り捨てた島は @Hislands に残る (toto・Numbers が見る)
+    let cut = islands.split_off(remain);
 
-    // TODO(フェーズ6): toto、Hakoniwa Cup toto、Numbers3、Numbers4
+    // toto、Hakoniwa Cup toto、Numbers3、Numbers4。払い戻しの auc9・etc8 のマッチが失敗すると
+    // turnMain のトップレベルの最後のマッチ (出品の状態を更新する直前の $auction3 の分解) の
+    // $1.. が入る。ここでは更新後の出品で近似する (2 回目の estimate が auc9・etc8 を書き直すので、
+    // マッチが失敗する道筋は実際には通らない)
+    let mut top = perl::MatchScope::default();
+    for lot in &ctx.globals.command.ops.auction {
+        top.try_fields::<5>(lot);
+    }
+    lottery::run(&mut ctx, islands, &cut, &top);
 
     // Hakoniwa Cup の開催と参加数 (ターン % 100 == 0)
     cup::opening(&mut ctx);

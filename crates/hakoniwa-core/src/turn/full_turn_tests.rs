@@ -4,11 +4,22 @@
 //! Perl 版はリクエストを受けた時点で `turnMain` を実行する。`rand()` は固定してある。
 
 use crate::actions::perl_compat_tests::check_case_with;
+use crate::model::GameState;
 
 use super::run_turn;
 
 /// `name` のケースの Perl 版のターンと、移植版の `run_turn` を比べる
 pub(crate) fn check_turn(name: &str, ignore: &[&str]) {
+    check_turn_with(name, ignore, |_| {}, |_| {});
+}
+
+/// [`check_turn`] で、比べる前に Perl 版の結果を `fix_want` で、移植版の結果を `fix_got` で直すもの
+pub(crate) fn check_turn_with(
+    name: &str,
+    ignore: &[&str],
+    fix_want: impl FnOnce(&mut GameState),
+    fix_got: impl FnOnce(&mut GameState),
+) {
     check_case_with(
         name,
         ignore,
@@ -17,9 +28,11 @@ pub(crate) fn check_turn(name: &str, ignore: &[&str]) {
             if let Some(turn) = want.logs.turns.first_mut() {
                 turn.retain(|e| !e.message.contains("負荷計測"));
             }
+            fix_want(want);
         },
         |game, config, case| {
             run_turn(game, config, &mut case.rng);
+            fix_got(game);
         },
     );
 }
@@ -31,10 +44,6 @@ fn turn_basic_matches_perl() {
 
 // ---- ハコオク (turnMain 857〜903 行、934〜1116 行) -------------------------------
 // データは tools/fixtures/phase6_auction.py で作る。
-
-/// ターン 100 にほかの段階が書くもの (並行して移植中: toto・Numbers3 の記録ログ、
-/// Hakoniwa Cup の参加数のログ)。マージ後に外す
-const OTHERS_AT_TURN_100: &[&str] = &["/logs/history"];
 
 #[test]
 fn turn_auction_normal_matches_perl() {
@@ -48,46 +57,45 @@ fn turn_auction_late_matches_perl() {
 
 #[test]
 fn turn_auction_prize_matches_perl() {
-    check_turn("turn-auction-prize", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-prize", &[]);
 }
 
 #[test]
 fn turn_auction_cap_matches_perl() {
-    check_turn("turn-auction-cap", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-cap", &[]);
 }
 
 #[test]
 fn turn_auction_many_matches_perl() {
-    check_turn("turn-auction-many", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-many", &[]);
 }
 
 #[test]
 fn turn_auction_rest_matches_perl() {
-    check_turn("turn-auction-rest", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-rest", &[]);
 }
 
 #[test]
 fn turn_auction_sold_matches_perl() {
-    check_turn("turn-auction-sold", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-sold", &[]);
 }
 
 #[test]
 fn turn_auction_mid_matches_perl() {
-    check_turn("turn-auction-mid", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-mid", &[]);
 }
 
 #[test]
 fn turn_auction_rest9_matches_perl() {
-    check_turn("turn-auction-rest9", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-rest9", &[]);
 }
 
 #[test]
 fn turn_auction_few_matches_perl() {
-    check_turn("turn-auction-few", OTHERS_AT_TURN_100);
+    check_turn("turn-auction-few", &[]);
 }
 
-// Hakoniwa Cup (cup.rs)。TODO(フェーズ6): ハコオクの出品の入れ替えを移植したら
-// /world/auction_lots の無視は外す
+// Hakoniwa Cup (cup.rs)
 
 #[test]
 fn turn_cup_seed_matches_perl() {
@@ -100,35 +108,51 @@ fn turn_cup_seed_without_teams_matches_perl() {
     check_turn("turn-cup-41-none", &[]);
 }
 
-/// ターン % 100 == 0 のケース。ターン杯のターンなので、まだ移植していない toto・Numbers の
-/// 当選番号の記録が Perl 版にだけ出る。その記録を取り除いて比べる。
-/// TODO(フェーズ6): toto・Numbers を移植したら、この関数をやめて check_turn に戻す
-fn check_turn_without_auction_prize(name: &str) {
-    check_case_with(
-        name,
-        &[],
-        |want| {
-            if let Some(turn) = want.logs.turns.first_mut() {
-                turn.retain(|e| !e.message.contains("負荷計測"));
-            }
-            // toto・Numbers の当選番号 (「第200ターン ｔｏｔｏ」など)
-            want.logs.history.retain(|e| {
-                !(e.message.contains("ターン ｔｏｔｏ") || e.message.contains("ターン Numbers"))
-            });
-        },
-        |game, config, case| {
-            run_turn(game, config, &mut case.rng);
-        },
-    );
-}
-
 #[test]
 fn turn_cup_opening_matches_perl() {
     // ターン 200: 開催と参加数 ($stsanka − 1)
-    check_turn_without_auction_prize("turn-cup-00");
+    check_turn("turn-cup-00", &[]);
 }
 
 #[test]
 fn turn_cup_opening_without_teams_matches_perl() {
-    check_turn_without_auction_prize("turn-cup-00-none");
+    check_turn("turn-cup-00-none", &[]);
+}
+
+// toto・Numbers (lottery.rs)
+
+/// Hakoniwa Cup の試合のログの「−」は、Perl 版のデータ (EUC-JP の 0xA1DD) を読み込むと
+/// U+FF0D「－」になるが、移植版の stadium.rs は U+2212「−」で書く (ターン処理の突き合わせ
+/// (Perl の Encode で読む) では U+2212 なので、stadium.rs はそのままにしている)
+fn stadium_dash(want: &mut GameState) {
+    let fix = |m: &mut String| *m = m.replace('－', "−");
+    want.logs.hcup.iter_mut().for_each(|m| fix(&mut m.message));
+    want.logs.turns[0]
+        .iter_mut()
+        .for_each(|e| fix(&mut e.message));
+}
+
+/// ターン 100: toto (切り捨てた無人島の ID が正解に入る、8 点と 6 点、7 点の率の繰り越し) と
+/// Numbers3 (配当が読み込み時の位置の島へ行き、無人島に行った分は消える)
+#[test]
+fn turn_lottery_100_matches_perl() {
+    check_turn("turn-lottery-100", &[]);
+}
+
+/// ターン 200: toto の資金不足、7 点 2 島で分ける (6 点の率の繰り越し)、Numbers3 の資金不足
+#[test]
+fn turn_lottery_200_matches_perl() {
+    check_turn("turn-lottery-200", &[]);
+}
+
+/// ターン 150: Hakoniwa Cup toto (2 点・1 点・資金不足) と Numbers4 (3 島が的中)
+#[test]
+fn turn_lottery_150_matches_perl() {
+    check_turn_with("turn-lottery-150", &[], stadium_dash, |_| {});
+}
+
+/// ターン 150 (優勝が逆): 1 点の的中がいない (2 点の率の繰り越し)、Numbers4 の資金不足と外れ
+#[test]
+fn turn_lottery_150b_matches_perl() {
+    check_turn_with("turn-lottery-150b", &[], stadium_dash, |_| {});
 }
