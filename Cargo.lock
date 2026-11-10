@@ -422,6 +422,7 @@ dependencies = [
  "rand",
  "serde",
  "tempfile",
+ "thiserror",
  "tokio",
  "toml",
  "tower",

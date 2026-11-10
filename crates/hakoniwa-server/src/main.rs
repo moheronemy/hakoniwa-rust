@@ -1,11 +1,15 @@
 //! Hakoniwa R.A. Rust 版の Web サーバー。
 //!
-//! 保存データを読み込んでトップページ (順位表とログ) を表示し、時刻が来たら
-//! ターンを進める。島の登録・開発画面などはまだ無い (docs/PORTING.md を参照)。
+//! 保存データを読み込んで画面を出し、時刻が来たらターンを進める。
+//! 画面は Perl 版を再現せず作り直している (ゲームのルールは `hakoniwa-core` が Perl 版のとおりに持つ)。
 
-mod page;
+mod edit;
+mod layout;
+mod pages;
+mod session;
 mod turns;
 
+use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -13,8 +17,8 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{Context, Result};
 use axum::Router;
 use axum::extract::State;
-use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Redirect, Response};
+use axum::http::{HeaderMap, StatusCode};
+use axum::response::{IntoResponse, Redirect, Response};
 use axum::routing::{get, post};
 use clap::Parser;
 use hakoniwa_core::{GameConfig, GameState, storage};
@@ -41,8 +45,21 @@ struct ServerConfig {
     state_path: PathBuf,
     /// ターンの時刻を確かめる間隔 (秒)
     tick_secs: u64,
+    /// 画面まわりの設定
+    #[serde(flatten)]
+    options: ServerOptions,
     /// ゲームの設定
     game: GameConfig,
+}
+
+/// 画面まわりの設定 (ゲームのルールに関係しないもの)
+#[derive(Debug, Clone, Default, Deserialize)]
+#[serde(default)]
+pub struct ServerOptions {
+    /// ログインのクッキーに Secure を付ける (HTTPS で公開するとき)
+    pub secure_cookie: bool,
+    /// リバースプロキシの X-Forwarded-For を接続元として信じる
+    pub trust_forwarded: bool,
 }
 
 impl Default for ServerConfig {
@@ -51,6 +68,7 @@ impl Default for ServerConfig {
             bind: "127.0.0.1:8080".into(),
             state_path: "data/state.json".into(),
             tick_secs: 10,
+            options: ServerOptions::default(),
             game: GameConfig::default(),
         }
     }
@@ -58,6 +76,8 @@ impl Default for ServerConfig {
 
 pub struct AppState {
     pub config: GameConfig,
+    pub options: ServerOptions,
+    pub sessions: session::Sessions,
     pub state_path: PathBuf,
     pub game: RwLock<GameState>,
     pub rng: Mutex<StdRng>,
@@ -73,14 +93,32 @@ pub fn now_unix() -> i64 {
 pub fn app(state: Arc<AppState>) -> Router {
     Router::new()
         .route("/", get(top_page))
+        .route(
+            "/login",
+            get(pages::auth::login_page).post(pages::auth::login),
+        )
+        .route("/logout", post(pages::auth::logout))
+        .route("/owner", get(pages::owner::owner_page))
+        .route("/owner/comment", post(pages::owner::comment))
         .route("/healthz", get(|| async { "ok" }))
         .route("/debug/turn", post(debug_turn))
         .with_state(state)
 }
 
-async fn top_page(State(app): State<Arc<AppState>>) -> Html<String> {
-    let game = app.game.read().await;
-    Html(page::top(&app.config, &game, now_unix()))
+async fn top_page(State(app): State<Arc<AppState>>, headers: HeaderMap) -> Response {
+    let login = pages::login_of(&app, &headers).await;
+    let body = {
+        let game = app.game.read().await;
+        pages::top::top(
+            &app.config,
+            &game,
+            now_unix(),
+            login.as_ref().map(|l| l.session.csrf.as_str()),
+        )
+    };
+    pages::render(&app, login.as_ref(), "", &body)
+        .await
+        .into_response()
 }
 
 /// デバッグモードの「ターンを進める」
@@ -142,6 +180,8 @@ async fn main() -> Result<()> {
 
     let state = Arc::new(AppState {
         config: config.game,
+        options: config.options,
+        sessions: Default::default(),
         state_path: config.state_path,
         game: RwLock::new(game),
         rng: Mutex::new(StdRng::from_entropy()),
@@ -154,11 +194,14 @@ async fn main() -> Result<()> {
         .await
         .with_context(|| format!("{} で待ち受けできません", config.bind))?;
     tracing::info!("http://{} で待ち受けています", listener.local_addr()?);
-    axum::serve(listener, app(state))
-        .with_graceful_shutdown(async {
-            let _ = tokio::signal::ctrl_c().await;
-        })
-        .await?;
+    axum::serve(
+        listener,
+        app(state).into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(async {
+        let _ = tokio::signal::ctrl_c().await;
+    })
+    .await?;
     Ok(())
 }
 
@@ -176,6 +219,8 @@ mod tests {
         let game = GameState::new_game(1_794_250_000, &config);
         let app = Arc::new(AppState {
             config,
+            options: ServerOptions::default(),
+            sessions: Default::default(),
             state_path: dir.path().join("state.json"),
             game: RwLock::new(game),
             rng: Mutex::new(StdRng::seed_from_u64(0)),
@@ -219,6 +264,6 @@ mod tests {
         let body = res.into_body().collect().await.unwrap().to_bytes();
         let html = String::from_utf8(body.to_vec()).unwrap();
         assert!(html.contains("ターン1"));
-        assert!(html.contains(page::ORIGINAL_SITE));
+        assert!(html.contains(layout::ORIGINAL_SITE));
     }
 }

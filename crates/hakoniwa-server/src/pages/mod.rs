@@ -1,0 +1,292 @@
+//! 画面ごとの処理 (ルーティングの先)。
+
+pub mod auth;
+pub mod owner;
+pub mod top;
+
+use std::net::SocketAddr;
+use std::sync::Arc;
+
+use axum::http::HeaderMap;
+use axum::http::header::SET_COOKIE;
+use axum::response::{Html, IntoResponse, Redirect, Response};
+
+use crate::layout::{self, Viewer};
+use crate::session::{self, Session};
+use crate::{AppState, now_unix};
+
+/// ログイン中ならそのセッション (トークンと中身)
+pub struct Login {
+    pub token: String,
+    pub session: Session,
+}
+
+/// リクエストのクッキーからログイン中のセッションを探す。島が無くなっていたら無効
+pub async fn login_of(app: &AppState, headers: &HeaderMap) -> Option<Login> {
+    let token = session::token_from(headers)?;
+    let session = app.sessions.get(&token, now_unix())?;
+    let game = app.game.read().await;
+    if !game.world.islands.iter().any(|i| i.id == session.island_id) {
+        app.sessions.remove(&token);
+        return None;
+    }
+    Some(Login { token, session })
+}
+
+/// 共通の外枠で画面を返す。ログイン中なら知らせ (flash) も取り出して出す
+pub async fn render(
+    app: &AppState,
+    login: Option<&Login>,
+    title: &str,
+    body: &str,
+) -> Html<String> {
+    let game = app.game.read().await;
+    let name = login.and_then(|l| {
+        game.world
+            .islands
+            .iter()
+            .find(|i| i.id == l.session.island_id)
+            .map(|i| i.name.clone())
+    });
+    drop(game);
+    let flash = login.and_then(|l| app.sessions.take_flash(&l.token));
+    let viewer = match (login, &name) {
+        (Some(l), Some(n)) => Some(Viewer {
+            island_name: n,
+            csrf: &l.session.csrf,
+        }),
+        _ => None,
+    };
+    Html(layout::page(
+        &app.config.title,
+        title,
+        viewer.as_ref(),
+        flash.as_deref(),
+        body,
+    ))
+}
+
+/// POST のフォームの CSRF 対策のトークンを確かめる
+pub fn csrf_ok(login: &Login, token: &str) -> bool {
+    session::same(&login.session.csrf, token)
+}
+
+/// エラーの画面 (ステータス 400 など)
+pub async fn error_page(
+    app: &AppState,
+    login: Option<&Login>,
+    status: axum::http::StatusCode,
+    message: &str,
+) -> Response {
+    let body = format!(
+        "<p class=\"error\">{}</p>\n<p><a href=\"/\">トップへ戻る</a></p>",
+        layout::esc(message)
+    );
+    (status, render(app, login, "エラー", &body).await).into_response()
+}
+
+/// 操作のあと、知らせを付けて別の画面へ移る
+pub fn redirect_with_flash(
+    app: &AppState,
+    login: &Login,
+    to: &str,
+    message: impl Into<String>,
+) -> Response {
+    app.sessions.set_flash(&login.token, message);
+    Redirect::to(to).into_response()
+}
+
+/// クッキーを付けて移る
+pub fn redirect_with_cookie(to: &str, cookie: String) -> Response {
+    ([(SET_COOKIE, cookie)], Redirect::to(to)).into_response()
+}
+
+// TODO(フェーズ5): 計画の入力と島の登録で使う
+#[allow(dead_code)]
+/// 接続元のアドレス (Perl 版の `REMOTE_ADDR`)。`trust_forwarded` なら X-Forwarded-For の先頭を使う
+pub fn remote_addr(app: &Arc<AppState>, headers: &HeaderMap, peer: Option<SocketAddr>) -> String {
+    let forwarded = headers
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.split(',').next())
+        .map(str::trim)
+        .filter(|v| app.options.trust_forwarded && !v.is_empty());
+    if let Some(first) = forwarded {
+        return first.to_string();
+    }
+    peer.map(|p| p.ip().to_string()).unwrap_or_default()
+}
+
+#[cfg(test)]
+pub(crate) mod test_util {
+    use std::sync::{Arc, Mutex};
+
+    use axum::body::Body;
+    use axum::http::{Request, header};
+    use axum::response::Response;
+    use hakoniwa_core::GameConfig;
+    use hakoniwa_core::legacy::{self, ImportOptions};
+    use http_body_util::BodyExt;
+    use rand::SeedableRng;
+    use rand::rngs::StdRng;
+    use tokio::sync::RwLock;
+    use tower::ServiceExt;
+
+    use crate::{AppState, ServerOptions, app};
+
+    /// Perl 版のデータ (3 島。島 N のパスワードは "passN") を読み込んだサーバー
+    pub fn legacy_app() -> (Arc<AppState>, tempfile::TempDir) {
+        let dir = tempfile::tempdir().unwrap();
+        let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../hakoniwa-core/tests/fixtures/legacy-turn3");
+        let game = legacy::import_dir(
+            &src,
+            &ImportOptions::default(),
+            &mut StdRng::seed_from_u64(0),
+        )
+        .unwrap()
+        .state;
+        let state = Arc::new(AppState {
+            config: GameConfig::default(),
+            options: ServerOptions::default(),
+            sessions: Default::default(),
+            state_path: dir.path().join("state.json"),
+            game: RwLock::new(game),
+            rng: Mutex::new(StdRng::seed_from_u64(0)),
+        });
+        (state, dir)
+    }
+
+    pub async fn send(state: &Arc<AppState>, req: Request<Body>) -> Response {
+        app(state.clone()).oneshot(req).await.unwrap()
+    }
+
+    pub async fn body(res: Response) -> String {
+        String::from_utf8(res.into_body().collect().await.unwrap().to_bytes().to_vec()).unwrap()
+    }
+
+    pub fn get(uri: &str, cookie: Option<&str>) -> Request<Body> {
+        let mut b = Request::get(uri);
+        if let Some(c) = cookie {
+            b = b.header(header::COOKIE, c);
+        }
+        b.body(Body::empty()).unwrap()
+    }
+
+    pub fn post(uri: &str, cookie: Option<&str>, form: &[(&str, &str)]) -> Request<Body> {
+        let body: String = form
+            .iter()
+            .map(|(k, v)| format!("{}={}", enc(k), enc(v)))
+            .collect::<Vec<_>>()
+            .join("&");
+        let mut b =
+            Request::post(uri).header(header::CONTENT_TYPE, "application/x-www-form-urlencoded");
+        if let Some(c) = cookie {
+            b = b.header(header::COOKIE, c);
+        }
+        b.body(Body::from(body)).unwrap()
+    }
+
+    fn enc(s: &str) -> String {
+        s.bytes()
+            .map(|b| match b {
+                b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
+                    (b as char).to_string()
+                }
+                _ => format!("%{b:02X}"),
+            })
+            .collect()
+    }
+
+    /// ログインしてセッションのクッキーと CSRF 対策のトークンを返す
+    pub async fn login(state: &Arc<AppState>, id: i64, password: &str) -> (String, String) {
+        let res = send(
+            state,
+            post(
+                "/login",
+                None,
+                &[("island", &id.to_string()), ("password", password)],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303, "login failed");
+        let cookie = res.headers()[header::SET_COOKIE].to_str().unwrap();
+        let cookie = cookie.split(';').next().unwrap().to_string();
+        let token = cookie.split_once('=').unwrap().1;
+        let csrf = state.sessions.get(token, crate::now_unix()).unwrap().csrf;
+        (cookie, csrf)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::test_util::*;
+    use hakoniwa_core::actions::password;
+
+    #[tokio::test]
+    async fn login_comment_logout() {
+        let (state, _dir) = legacy_app();
+        // パスワード違い
+        let res = send(
+            &state,
+            post("/login", None, &[("island", "1"), ("password", "x")]),
+        )
+        .await;
+        assert_eq!(res.status(), 401);
+        assert!(body(res).await.contains("パスワードが違います"));
+
+        let (cookie, csrf) = login(&state, 1, "pass1").await;
+        // Perl 版の DES crypt は新しい形式に置き換わる
+        {
+            let game = state.game.read().await;
+            let island = game.world.islands.iter().find(|i| i.id == 1).unwrap();
+            assert!(!password::is_legacy(&island.password));
+            assert!(password::verify(&island.password, "pass1"));
+        }
+        let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
+        assert!(page.contains("開発計画"), "{page}");
+
+        // CSRF 対策のトークンが無い POST は受け付けない
+        let res = send(
+            &state,
+            post("/owner/comment", Some(&cookie), &[("message", "x")]),
+        )
+        .await;
+        assert_eq!(res.status(), 403);
+
+        let res = send(
+            &state,
+            post(
+                "/owner/comment",
+                Some(&cookie),
+                &[("csrf", &csrf), ("message", "やあ<b>")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
+        assert!(page.contains("コメントを更新しました"));
+        assert!(page.contains("value=\"やあ&lt;b&gt;\""), "{page}");
+        // 保存もされている
+        let saved = hakoniwa_core::storage::load(&state.state_path)
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            saved
+                .world
+                .islands
+                .iter()
+                .find(|i| i.id == 1)
+                .unwrap()
+                .comment,
+            "やあ&lt;b&gt;"
+        );
+
+        let res = send(&state, post("/logout", Some(&cookie), &[("csrf", &csrf)])).await;
+        assert_eq!(res.status(), 303);
+        assert_eq!(
+            send(&state, get("/owner", Some(&cookie))).await.status(),
+            401
+        );
+    }
+}

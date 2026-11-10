@@ -1,6 +1,6 @@
-//! HTML の組み立て。
+//! トップページ (順位表とログ)。
 //!
-//! 画面は Perl 版を再現せず作り直す方針。いまはトップページの最小限だけ。
+//! 画面は Perl 版を再現せず作り直す方針。
 
 use std::fmt::Write;
 
@@ -30,43 +30,24 @@ fn remaining(secs: i64) -> String {
     format!("次の更新まで {}時間{}分", secs / 3600, secs % 3600 / 60)
 }
 
-/// 移植元の使用条件により、ゲーム画面の最上部に置く必要がある配布元へのリンク
-pub const ORIGINAL_SITE: &str = "http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html";
-
-pub fn top(config: &GameConfig, game: &GameState, now: i64) -> String {
+/// トップページの中身 (外枠は [`crate::layout::page`])
+pub fn top(config: &GameConfig, game: &GameState, now: i64, csrf: Option<&str>) -> String {
     let world = &game.world;
     let units = &config.units;
-    let title = html_escape(&config.title);
     let mut h = String::new();
 
     let _ = write!(
         h,
-        r#"<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
-<style>
-body {{ font-family: system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 16px; }}
-table {{ border-collapse: collapse; width: 100%; }}
-th, td {{ border-bottom: 1px solid #ccc; padding: 4px 8px; text-align: left; }}
-td.num {{ text-align: right; white-space: nowrap; }}
-.log {{ font-size: 0.9em; }}
-</style>
-</head>
-<body>
-<p><a href="{ORIGINAL_SITE}">箱庭諸島スクリプト配布元</a></p>
-<h1>{title}</h1>
-<h2>ターン{turn}</h2>
-<p>{remain}</p>
-{debug}"#,
+        "<h1>ターン{turn}</h1>\n<p>{remain}</p>\n{debug}",
         turn = world.turn,
         remain = remaining(world.next_turn_time(config) - now),
-        debug = if config.debug {
-            "<form method=\"post\" action=\"/debug/turn\"><button>ターンを進める</button></form>\n"
-        } else {
-            ""
+        debug = match (config.debug, csrf) {
+            (true, Some(csrf)) => format!(
+                "<form method=\"post\" action=\"/debug/turn\">{}<button>ターンを進める</button></form>\n",
+                crate::layout::csrf_field(csrf)
+            ),
+            (true, None) => "<form method=\"post\" action=\"/debug/turn\"><button>ターンを進める</button></form>\n".into(),
+            _ => String::new(),
         },
     );
 
@@ -86,10 +67,11 @@ td.num {{ text-align: right; white-space: nowrap; }}
                 .unwrap_or_default();
             let _ = writeln!(
                 h,
-                "<tr><td class=\"num\">{rank}</td><td>{name}島<br><small>{owner}</small></td>\
+                "<tr><td class=\"num\">{rank}</td><td><a href=\"/island/{id}\">{name}島</a><br><small>{owner}</small></td>\
                  <td class=\"num\">{pop}{up}</td><td class=\"num\">{area}{ua}</td>{money}\
                  <td class=\"num\">{food}{uf}</td><td>{comment}</td></tr>",
                 rank = rank + 1,
+                id = island.id,
                 name = html_escape(&island.name),
                 owner = html_escape(&island.owner_name),
                 pop = island.pop,
@@ -124,7 +106,7 @@ td.num {{ text-align: right; white-space: nowrap; }}
     for m in game.logs.history.iter().rev() {
         let _ = writeln!(h, "<p>ターン{}：{}</p>", m.turn, log_text(&m.message));
     }
-    let _ = writeln!(h, "</div>\n</body>\n</html>");
+    let _ = writeln!(h, "</div>");
     h
 }
 
