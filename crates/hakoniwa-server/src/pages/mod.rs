@@ -1,6 +1,7 @@
 //! 画面ごとの処理 (ルーティングの先)。
 
 pub mod auth;
+pub mod images;
 pub mod owner;
 pub mod top;
 

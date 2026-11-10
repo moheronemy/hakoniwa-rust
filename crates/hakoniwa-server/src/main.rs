@@ -60,6 +60,9 @@ pub struct ServerOptions {
     pub secure_cookie: bool,
     /// リバースプロキシの X-Forwarded-For を接続元として信じる
     pub trust_forwarded: bool,
+    /// Perl 版の地形の画像を置いたディレクトリ。無ければ地図は色と文字のタイルで描く
+    /// (画像は移植元の著作物で再配布できないので同梱していない)
+    pub image_dir: Option<PathBuf>,
 }
 
 impl Default for ServerConfig {
@@ -100,6 +103,7 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/logout", post(pages::auth::logout))
         .route("/owner", get(pages::owner::owner_page))
         .route("/owner/comment", post(pages::owner::comment))
+        .route("/img/{name}", get(pages::images::image))
         .route("/healthz", get(|| async { "ok" }))
         .route("/debug/turn", post(debug_turn))
         .with_state(state)
