@@ -1,5 +1,6 @@
 //! 画面ごとの処理 (ルーティングの先)。
 
+pub mod admin;
 pub mod auth;
 pub mod images;
 pub mod island;
@@ -28,6 +29,9 @@ pub struct Login {
 pub async fn login_of(app: &AppState, headers: &HeaderMap) -> Option<Login> {
     let token = session::token_from(headers)?;
     let session = app.sessions.get(&token, now_unix())?;
+    if session.island_id == session::ADMIN_ISLAND && session.master {
+        return Some(Login { token, session });
+    }
     let game = app.game.read().await;
     if !game.world.islands.iter().any(|i| i.id == session.island_id) {
         app.sessions.remove(&token);
@@ -501,5 +505,78 @@ mod tests {
             game.world.islands.iter().find(|i| i.id == id).unwrap().name,
             "別天地"
         );
+    }
+
+    #[tokio::test]
+    async fn admin_flow() {
+        let (mut state, _dir) = legacy_app();
+        // マスターパスワードが無ければ管理画面は無い
+        assert_eq!(send(&state, get("/admin", None)).await.status(), 404);
+        std::sync::Arc::get_mut(&mut state)
+            .unwrap()
+            .config
+            .passwords
+            .master = Some("mm".into());
+        let res = send(&state, post("/admin/login", None, &[("password", "x")])).await;
+        assert_eq!(res.status(), 401);
+        let res = send(&state, post("/admin/login", None, &[("password", "mm")])).await;
+        assert_eq!(res.status(), 303);
+        let cookie = res.headers()[axum::http::header::SET_COOKIE]
+            .to_str()
+            .unwrap()
+            .split(';')
+            .next()
+            .unwrap()
+            .to_string();
+        let token = cookie.split_once('=').unwrap().1.to_string();
+        let csrf = state.sessions.get(&token, crate::now_unix()).unwrap().csrf;
+        let page = body(send(&state, get("/admin", Some(&cookie))).await).await;
+        assert!(page.contains("現役データ"), "{page}");
+
+        let res = send(
+            &state,
+            post(
+                "/admin/time",
+                Some(&cookie),
+                &[("csrf", &csrf), ("last_time", "1000")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        assert_eq!(state.game.read().await.world.last_time, 1000);
+        // 確認の文字が違えば消さない
+        send(
+            &state,
+            post(
+                "/admin/reset",
+                Some(&cookie),
+                &[("csrf", &csrf), ("confirm", "x")],
+            ),
+        )
+        .await;
+        assert_eq!(state.game.read().await.world.islands.len(), 3);
+        let res = send(
+            &state,
+            post(
+                "/admin/reset",
+                Some(&cookie),
+                &[("csrf", &csrf), ("confirm", "削除する")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        assert!(state.game.read().await.world.islands.is_empty());
+        // 消す前のデータはバックアップに残っていて、戻せる
+        let res = send(
+            &state,
+            post(
+                "/admin/restore",
+                Some(&cookie),
+                &[("csrf", &csrf), ("n", "0")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        assert_eq!(state.game.read().await.world.islands.len(), 3);
     }
 }

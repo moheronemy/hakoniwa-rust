@@ -16,6 +16,9 @@ use rand::rngs::OsRng;
 /// セッションのクッキーの名前
 pub const COOKIE_NAME: &str = "hako_session";
 
+/// 管理者 (マスターパスワードで管理画面に入った人) のセッションの島 ID。島には結び付かない
+pub const ADMIN_ISLAND: i64 = -1;
+
 /// 何もしないでいるとログアウトになるまでの秒数 (30 日)
 pub const LIFETIME_SECS: i64 = 30 * 24 * 3600;
 
