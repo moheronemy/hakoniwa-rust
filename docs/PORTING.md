@@ -210,7 +210,7 @@ printf 'TurnButton=1&' | PERL5LIB=. REQUEST_METHOD=POST perl hako-main.cgi
 - [x] **4. 島全体の処理** — `doIslandProcess` (災害、怪獣の出現、賞)、`doIslandunemployed` (詳細は下記)
 - [x] **5. 画面** — 島の登録、開発画面 (計画の入力)、観光画面、ローカル掲示板、ランキング (詳細は下記)
 - [x] **6. 付加機能** — ハコオク、toto、アンケート、人工衛星、Hakoniwa Cup、管理機能 (詳細は下記)
-- [ ] **7. 移行** — パスワードの互換、本番データの変換手順 ([MIGRATION.md](MIGRATION.md))、Perl 版との比較テスト
+- [x] **7. 移行** — パスワードの互換、本番データの変換手順 ([MIGRATION.md](MIGRATION.md))、Perl 版との比較テスト
 
 ## フェーズ 1 (ターン処理の骨格) の内容
 
