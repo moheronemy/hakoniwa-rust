@@ -428,7 +428,7 @@ fn turn_prize(ctx: &mut TurnContext, island: &mut Island) {
             let amount = format!("{value}{unit}");
             ctx.log.out(
                 ctx.turn,
-                msg::shrine_money(&island.name, building, &amount),
+                msg::shrine_money(&island.name, &ctx.globals.hex.point, building, &amount),
                 Some(island.id),
                 None,
             );

@@ -176,11 +176,12 @@ pub mod msg {
         )
     }
 
-    /// `logSinMoney`。Perl 版は島名の後ろに未定義の `$point` を挟んでいる (空文字列になる)
-    pub fn shrine_money(name: &str, building: &str, amount: &str) -> String {
+    /// `logSinMoney` / `logJinMoney`。島名の後ろにグローバル変数 `$point` を挟む
+    /// (同じターンの前の処理が代入した座標が残っていれば、それが出る。Perl 版のまま)
+    pub fn shrine_money(name: &str, point: &str, building: &str, amount: &str) -> String {
         format!(
             "{}の<B>{building}</B>で祝いの祭りが行われ、<B>{amount}</B>の収益が上がりました。",
-            island(name)
+            wrap(tags::NAME, &format!("{name}島{point}"))
         )
     }
 
