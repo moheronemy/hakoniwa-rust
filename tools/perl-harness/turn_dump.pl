@@ -50,7 +50,7 @@ for my $i (0 .. $HpointNumber - 1) {
 
 my @persisted = qw(pop area farm factory mountain pts money food etc0 eisei1 eisei2
   eisei3 eisei4 eisei5 eisei6 etc5 etc6 etc8 etc9 totoyoso2 kei rena fore tare zipro
-  leje monsterlive monsterlivetype anflag auc0 auc4 auc5 auc6 auc9);
+  leje monsterlive monsterlivetype anflag auc0 auc4 auc5 auc6 auc9 prize taiji);
 my @scratch = qw(shouhi ene sabun con99 factory1 factory2 factoryt oil bas htf shtf
   hou shu sin jin h10 h11 co0 co1 co4 co7 co8 co77 co99 c13 c28 tet m26 m27 m74 m75 m79
   m84 m93 kyu ky2 zoo sci pro sba amu kin tra tra1 tra2 fukeikimoney unemployed
@@ -71,6 +71,13 @@ sub snapshot {
             }
         }
         $h{'land_values'} = \@values;
+        my @kinds;
+        for my $y (0 .. $HislandSize - 1) {
+            for my $x (0 .. $HislandSize - 1) {
+                push @kinds, str($island->{'land'}[$x][$y]);
+            }
+        }
+        $h{'land_kinds'} = \@kinds;
         $h{'commands'} = [map { str($_->{'kind'}) } @{$island->{'command'}}];
         push @out, \%h;
     }
