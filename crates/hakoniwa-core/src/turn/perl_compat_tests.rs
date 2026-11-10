@@ -338,3 +338,13 @@ fn phase2_town_matches_perl_with_rand_0() {
 fn phase2_town_matches_perl_with_rand_half() {
     check_fixture("phase2-town", RAND_HALF);
 }
+
+#[test]
+fn phase2_sea_matches_perl_with_rand_0() {
+    check_fixture("phase2-sea", 0);
+}
+
+#[test]
+fn phase2_sea_matches_perl_with_rand_half() {
+    check_fixture("phase2-sea", RAND_HALF);
+}
