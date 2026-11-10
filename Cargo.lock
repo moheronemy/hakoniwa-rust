@@ -391,8 +391,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "encoding_rs",
  "hakoniwa-core",
  "rand",
+ "serde",
+ "tempfile",
+ "toml",
 ]
 
 [[package]]

@@ -2,13 +2,18 @@
 //!
 //! 使い方:
 //!     hako-convert <Perl版の data ディレクトリ> <出力する state.json>
+//!     hako-convert --settings hako-main.cgi <Perl版の data ディレクトリ> <出力する state.json>
+//!
+//! `--settings` を付けると Perl 版の設定 (`hako-main.cgi`) も読み、島の大きさなどの変換の設定に
+//! 使ったうえで、移植版のサーバーの設定ファイル (`--config-out`、既定は出力先と同じ場所の
+//! `hakoniwa.toml`) を書く。
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use clap::{Parser, ValueEnum};
 use hakoniwa_core::legacy::{self, ImportOptions, IslandLayout};
-use hakoniwa_core::storage;
+use hakoniwa_core::{GameConfig, legacy_settings, storage};
 
 #[derive(Parser)]
 #[command(
@@ -23,15 +28,21 @@ struct Args {
     /// 島データの形式。auto なら hakojima.dat の行数から判定する
     #[arg(long, value_enum, default_value_t = Layout::Auto)]
     layout: Layout,
-    /// 島の大きさ ($HislandSize)
-    #[arg(long, default_value_t = 12)]
-    island_size: usize,
-    /// コマンド入力限界数 ($HcommandMax)
-    #[arg(long, default_value_t = 40)]
-    command_max: usize,
-    /// ローカル掲示板行数 ($HlbbsMax)
-    #[arg(long, default_value_t = 15)]
-    lbbs_max: usize,
+    /// Perl 版の設定 (hako-main.cgi)。読めた設定でサーバーの設定ファイルも書く
+    #[arg(long)]
+    settings: Option<PathBuf>,
+    /// サーバーの設定ファイルの出力先 (--settings のとき。既定は出力先と同じ場所の hakoniwa.toml)
+    #[arg(long)]
+    config_out: Option<PathBuf>,
+    /// 島の大きさ ($HislandSize)。--settings があればその値
+    #[arg(long)]
+    island_size: Option<usize>,
+    /// コマンド入力限界数 ($HcommandMax)。--settings があればその値
+    #[arg(long)]
+    command_max: Option<usize>,
+    /// ローカル掲示板行数 ($HlbbsMax)。--settings があればその値
+    #[arg(long)]
+    lbbs_max: Option<usize>,
     /// 旧形式の掲示板ログを変換しない ($HlbbsOldToNew = 0 のとき)
     #[arg(long)]
     keep_old_lbbs: bool,
@@ -57,16 +68,42 @@ fn main() -> Result<()> {
             args.output.display()
         );
     }
-    let opts = ImportOptions {
-        layout: match args.layout {
-            Layout::Auto => None,
-            Layout::NewGame => Some(IslandLayout::NewGame),
-            Layout::Monslive => Some(IslandLayout::MonsLive),
+    let settings = match &args.settings {
+        Some(path) => {
+            let bytes =
+                std::fs::read(path).with_context(|| format!("{} を読めません", path.display()))?;
+            let (text, _, _) = encoding_rs::EUC_JP.decode(&bytes);
+            let s = legacy_settings::parse(&text.replace("\r\n", "\n"));
+            for w in &s.warnings {
+                eprintln!("警告 (設定): {w}");
+            }
+            Some(s)
+        }
+        None => None,
+    };
+    let config = settings
+        .as_ref()
+        .map(|s| s.config.clone())
+        .unwrap_or_default();
+    let layout = match args.layout {
+        Layout::Auto => match settings.as_ref().and_then(|s| s.new_game) {
+            Some(true) => Some(IslandLayout::NewGame),
+            Some(false) => Some(IslandLayout::MonsLive),
+            None => None,
         },
-        island_size: args.island_size,
-        command_max: args.command_max,
-        lbbs_max: args.lbbs_max,
-        lbbs_old_to_new: !args.keep_old_lbbs,
+        Layout::NewGame => Some(IslandLayout::NewGame),
+        Layout::Monslive => Some(IslandLayout::MonsLive),
+    };
+    let opts = ImportOptions {
+        layout,
+        island_size: args.island_size.unwrap_or(config.island_size),
+        command_max: args.command_max.unwrap_or(config.command_max),
+        lbbs_max: args.lbbs_max.unwrap_or(config.lbbs.max),
+        lbbs_old_to_new: !args.keep_old_lbbs
+            && settings
+                .as_ref()
+                .and_then(|s| s.lbbs_old_to_new)
+                .unwrap_or(true),
     };
     let import = legacy::import_dir(&args.input, &opts, &mut rand::thread_rng())
         .with_context(|| format!("{} を読み込めませんでした", args.input.display()))?;
@@ -74,6 +111,20 @@ fn main() -> Result<()> {
         eprintln!("警告: {w}");
     }
     storage::save(&args.output, &import.state)?;
+    if settings.is_some() {
+        let out = args
+            .config_out
+            .clone()
+            .unwrap_or_else(|| args.output.with_file_name("hakoniwa.toml"));
+        if out.exists() && !args.force {
+            bail!(
+                "{} はすでにあります。上書きするなら --force を付けてください",
+                out.display()
+            );
+        }
+        write_server_config(&out, &args.output, &config)?;
+        eprintln!("サーバーの設定ファイルを書きました -> {}", out.display());
+    }
 
     let world = &import.state.world;
     eprintln!(
@@ -84,5 +135,27 @@ fn main() -> Result<()> {
         import.layout,
         args.output.display()
     );
+    Ok(())
+}
+
+/// サーバーの設定ファイル (hakoniwa-server の --config に渡すもの)
+fn write_server_config(out: &Path, state_path: &Path, game: &GameConfig) -> Result<()> {
+    #[derive(serde::Serialize)]
+    struct ServerConfig<'a> {
+        bind: &'a str,
+        state_path: &'a Path,
+        tick_secs: u64,
+        game: &'a GameConfig,
+    }
+    let text = toml::to_string(&ServerConfig {
+        bind: "127.0.0.1:8080",
+        state_path,
+        tick_secs: 10,
+        game,
+    })?;
+    let header = "# Perl 版の hako-main.cgi から hako-convert が作った設定。\n\
+                  # パスワードが平文で入っているので、ファイルの権限に気をつけること。\n\n";
+    std::fs::write(out, format!("{header}{text}"))
+        .with_context(|| format!("{} に書けません", out.display()))?;
     Ok(())
 }

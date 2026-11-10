@@ -7,6 +7,7 @@
 //! - [`storage`] — 移植版のセーブデータ (JSON) の読み書き
 //! - [`land`] — 地形の名前と周囲の数え上げ
 //! - [`legacy`] — Perl 版のセーブデータの読み込み
+//! - [`legacy_settings`] — Perl 版の設定 (`hako-main.cgi`) の読み込み
 //! - [`turn`] — ターン処理
 //! - [`view`] — 画面に出す内容 (トップページ、観光画面・開発画面の島の情報・地図・計画の一覧)
 //! - [`log`] — ターン処理のログ
@@ -18,6 +19,7 @@ pub mod actions;
 pub mod config;
 pub mod land;
 pub mod legacy;
+pub mod legacy_settings;
 pub mod log;
 pub mod model;
 pub mod perl;
