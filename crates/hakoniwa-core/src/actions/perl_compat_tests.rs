@@ -4,9 +4,6 @@
 //! `tests/fixtures/cgi/<名前>/{before,after}` (Perl 形式のデータ)。`before` を読み込んで
 //! 移植版の操作を加え、`after` を読み込んだものと比べる。
 
-// TODO(フェーズ5): すべての操作を移植したら外す (使わない補助がまだある)
-#![allow(dead_code)]
-
 use std::path::{Path, PathBuf};
 
 use rand::rngs::mock::StepRng;
