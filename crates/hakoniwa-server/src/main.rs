@@ -101,7 +101,13 @@ pub fn app(state: Arc<AppState>) -> Router {
             get(pages::auth::login_page).post(pages::auth::login),
         )
         .route("/logout", post(pages::auth::logout))
+        .route(
+            "/register",
+            get(pages::register::register_page).post(pages::register::register),
+        )
         .route("/owner", get(pages::owner::owner_page))
+        .route("/owner/change", post(pages::register::change))
+        .route("/owner/change-owner", post(pages::register::change_owner))
         .route("/owner/comment", post(pages::owner::comment))
         .route("/owner/command", post(pages::owner::command))
         .route("/owner/policy", post(pages::owner::policy))

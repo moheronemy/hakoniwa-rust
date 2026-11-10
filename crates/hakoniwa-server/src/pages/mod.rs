@@ -4,6 +4,7 @@ pub mod auth;
 pub mod images;
 pub mod island;
 pub mod owner;
+pub mod register;
 pub mod top;
 
 use std::net::SocketAddr;
@@ -385,6 +386,115 @@ mod tests {
         assert_eq!(
             send(&state, get("/owner", Some(&cookie))).await.status(),
             401
+        );
+    }
+
+    #[tokio::test]
+    async fn register_and_change() {
+        let (state, _dir) = legacy_app();
+        // 確認用のパスワードが違う
+        let res = send(
+            &state,
+            post(
+                "/register",
+                None,
+                &[
+                    ("name", "新"),
+                    ("owner", "私"),
+                    ("password", "a"),
+                    ("password2", "b"),
+                    ("message", "m"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 400);
+        let b = body(res).await;
+        assert!(b.contains("一致しません"), "{b}");
+        // 同じ名前
+        let res = send(
+            &state,
+            post(
+                "/register",
+                None,
+                &[
+                    ("name", "Alpha"),
+                    ("owner", "私"),
+                    ("password", "a"),
+                    ("password2", "a"),
+                    ("message", "m"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 400);
+
+        let res = send(
+            &state,
+            post(
+                "/register",
+                None,
+                &[
+                    ("name", "新天地"),
+                    ("owner", "私"),
+                    ("password", "secret1"),
+                    ("password2", "secret1"),
+                    ("message", "よろしく"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        let cookie = res.headers()[axum::http::header::SET_COOKIE]
+            .to_str()
+            .unwrap()
+            .split(';')
+            .next()
+            .unwrap()
+            .to_string();
+        let page = body(send(&state, get("/owner", Some(&cookie))).await).await;
+        assert!(page.contains("「新天地島」と命名します"), "{page}");
+        let id = {
+            let game = state.game.read().await;
+            game.world
+                .islands
+                .iter()
+                .find(|i| i.name == "新天地")
+                .unwrap()
+                .id
+        };
+
+        // 名前の変更は、いまのパスワードが要る
+        let token = cookie.split_once('=').unwrap().1;
+        let csrf = state.sessions.get(token, crate::now_unix()).unwrap().csrf;
+        let res = send(
+            &state,
+            post(
+                "/owner/change",
+                Some(&cookie),
+                &[("csrf", &csrf), ("old_password", "x"), ("name", "別天地")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 403);
+        let res = send(
+            &state,
+            post(
+                "/owner/change",
+                Some(&cookie),
+                &[
+                    ("csrf", &csrf),
+                    ("old_password", "secret1"),
+                    ("name", "別天地"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        let game = state.game.read().await;
+        assert_eq!(
+            game.world.islands.iter().find(|i| i.id == id).unwrap().name,
+            "別天地"
         );
     }
 }

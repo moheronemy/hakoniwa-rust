@@ -34,7 +34,8 @@ pub async fn owner_page(State(app): State<Arc<AppState>>, headers: HeaderMap) ->
              <h2>コメント</h2>\n<form method=\"post\" action=\"/owner/comment\" class=\"card\">{csrf}\n\
              <label for=\"message\">島のコメント</label>\n\
              <input id=\"message\" type=\"text\" name=\"message\" value=\"{comment}\" maxlength=\"80\" size=\"60\">\n\
-             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}",
+             <p><button>コメントを変える</button></p>\n</form>\n{lbbs}{change}",
+            change = super::register::change_forms(&app, &login.session.csrf),
             lbbs = if app.config.lbbs.enabled {
                 owner_lbbs(&app.config, island, &login.session.csrf)
             } else {
