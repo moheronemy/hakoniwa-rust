@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """phase4-upkeep: doIslandProcess の人工衛星・宇宙ステーション・天空城の維持の突き合わせ用データ。
 
-rand を 0.75 / 0.96875 に固定すると、ほかの段階 (災害・暴動・怪獣・移民) は Perl 版でも
-何も起きない。食料は減らさない (食料不足のときの宇宙ステーションの処理は別の段階)。
+rand を 0.25 / 0.5 / 0.75 / 0.96875 に固定すると、ほかの段階 (災害・暴動・怪獣・移民) は
+Perl 版でも何も起きない (0.25 では random(2) が 0 で衛星が減らない)。rand 0 では Perl 版が
+終わらない。食料は減らさない (食料不足のときの宇宙ステーションの処理は別の段階)。
 
     python3 -I tools/fixtures/phase4_upkeep.py
-    RANDS="75 96875" tools/perl-harness/run-harness.sh phase4-upkeep \\
+    RANDS="25 50 75 96875" tools/perl-harness/run-harness.sh phase4-upkeep \\
+        estimate,income,commands,eachhex,process,estimate
+    RANDS="75 96875" tools/perl-harness/run-harness.sh phase4-upkeep-2 \\
         estimate,income,commands,eachhex,process,estimate
 """
 import pathlib

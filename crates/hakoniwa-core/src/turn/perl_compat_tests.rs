@@ -1479,6 +1479,11 @@ fn phase4_upkeep_matches_perl_with_rand_1_4() {
 }
 
 #[test]
+fn phase4_upkeep_matches_perl_with_rand_half() {
+    check_fixture("phase4-upkeep", RAND_HALF);
+}
+
+#[test]
 fn phase4_upkeep_2_matches_perl_with_rand_3_4() {
     check_fixture_at("phase4-upkeep-2", "75");
 }
