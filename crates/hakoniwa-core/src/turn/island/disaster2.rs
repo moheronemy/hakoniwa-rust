@@ -22,6 +22,7 @@ use crate::turn::hex::msg;
 use crate::turn::hex::town::{set, set_value};
 
 use super::ProcRun;
+use super::common::{is_one_of, omamori, out};
 
 /// この段階で使う Perl 版のグローバル変数
 #[derive(Debug, Default)]
@@ -39,14 +40,6 @@ const SINKING: u8 = u8::MAX;
 
 const fn k(l: L) -> u8 {
     l as u8
-}
-
-fn is_one_of(kind: u8, kinds: &[L]) -> bool {
-    kinds.iter().any(|&l| kind == l as u8)
-}
-
-fn out(ctx: &mut TurnContext, id: i64, message: String) {
-    ctx.log.out(ctx.turn, message, Some(id), None);
 }
 
 fn point(x: impl std::fmt::Display, y: impl std::fmt::Display) -> String {
@@ -152,7 +145,7 @@ fn typhoon(ctx: &mut TurnContext, island: &mut Island) {
     let toto2 = ctx.globals.etc8.0[1];
     if toto2 > 0 {
         set_toto2(ctx, island, toto2 - 1);
-        out(ctx, id, m::omamori(&island.name));
+        out(ctx, id, omamori(&island.name));
         return;
     }
 
@@ -209,7 +202,7 @@ fn huge_meteo(ctx: &mut TurnContext, island: &mut Island) {
         set(island, ux, uy, L::Sea, 0);
     } else if toto2 > 1 {
         set_toto2(ctx, island, toto2 - 2);
-        out(ctx, id, m::omamori(&island.name));
+        out(ctx, id, omamori(&island.name));
         set(island, ux, uy, L::Sea, 0);
     } else {
         // 広域被害ルーチン
@@ -262,7 +255,7 @@ fn meteo(ctx: &mut TurnContext, island: &mut Island) {
             out(ctx, id, m::omamori2(&island.name));
         } else {
             set_toto2(ctx, island, toto2 - 1);
-            out(ctx, id, m::omamori(&island.name));
+            out(ctx, id, omamori(&island.name));
         }
         return;
     }
@@ -359,7 +352,7 @@ fn eruption(ctx: &mut TurnContext, island: &mut Island) {
     let toto2 = ctx.globals.etc8.0[1];
     if toto2 > 1 {
         set_toto2(ctx, island, toto2 - 2);
-        out(ctx, id, m::omamori(&island.name));
+        out(ctx, id, omamori(&island.name));
         return;
     }
 
@@ -439,15 +432,6 @@ mod m {
     /// `logTyphoon`
     pub fn typhoon(name: &str) -> String {
         format!("{}に{}上陸！！", msg::island(name), d("台風"))
-    }
-
-    /// `logOmamori`
-    pub fn omamori(name: &str) -> String {
-        format!(
-            "{}所有の<B>お守り</B>のお陰でしょうか、{}が少なかったようです！！",
-            msg::island(name),
-            d("被害")
-        )
     }
 
     /// `logOmamori2`

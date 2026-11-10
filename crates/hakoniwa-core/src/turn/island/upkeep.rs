@@ -19,28 +19,7 @@ use crate::turn::estimate::monster_spec;
 use crate::turn::hex::town::{set, set_value};
 
 use super::ProcRun;
-
-fn island_name(name: &str) -> String {
-    wrap(tags::NAME, &format!("{name}島"))
-}
-
-/// `logEiseiEnd`
-fn eisei_end(name: &str, eisei: &str) -> String {
-    format!(
-        "{}の<B>{eisei}</B>は{}したようです！！",
-        island_name(name),
-        wrap(tags::DISASTER, "崩壊")
-    )
-}
-
-/// `logEiseiEndNopop`
-fn eisei_end_nopop(name: &str, eisei: &str) -> String {
-    format!(
-        "{}の<B>{eisei}</B>は{}ようです！！",
-        island_name(name),
-        wrap(tags::DISASTER, "人がいなくなった")
-    )
-}
+use super::common::{eisei_end, eisei_end_nopop, island_name};
 
 /// `logNoRokeCst`
 fn no_roke_cst(name: &str) -> String {

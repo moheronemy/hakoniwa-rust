@@ -9,22 +9,15 @@ use crate::turn::hex::town::{set, set_value};
 use crate::turn::{TurnContext, monster_spec};
 
 use super::ProcRun;
+use super::common::{eisei_end_nopop, is_one_of, island_name, omamori, out};
 
 const fn k(l: L) -> u8 {
     l as u8
 }
 
-fn is_one_of(kind: u8, list: &[L]) -> bool {
-    list.iter().any(|&l| kind == k(l))
-}
-
 /// 島の中のマスの (種類, 値)
 fn get(island: &Island, x: usize, y: usize) -> (u8, i64) {
     island.map.get(x, y).map_or((0, 0), |c| (c.kind, c.value))
-}
-
-fn island_name(name: &str) -> String {
-    wrap(tags::NAME, &format!("{name}島"))
 }
 
 fn island_at(name: &str, point: &str) -> String {
@@ -38,15 +31,6 @@ fn d(s: &str) -> String {
 /// `logEarthquake`
 fn earthquake(name: &str) -> String {
     format!("{}で大規模な{}が発生！！", island_name(name), d("地震"))
-}
-
-/// `logOmamori`
-fn omamori(name: &str) -> String {
-    format!(
-        "{}所有の<B>お守り</B>のお陰でしょうか、{}が少なかったようです！！",
-        island_name(name),
-        d("被害")
-    )
 }
 
 /// `logEQDamage`
@@ -91,15 +75,6 @@ fn starve(name: &str) -> String {
     format!("{}の{}しています！！", island_name(name), d("食料が不足"))
 }
 
-/// `logEiseiEndNopop`
-fn eisei_end_nopop(name: &str, eisei: &str) -> String {
-    format!(
-        "{}の<B>{eisei}</B>は{}ようです！！",
-        island_name(name),
-        d("人がいなくなった")
-    )
-}
-
 /// `logSvDamage`
 fn sv_damage(name: &str, l: &str, point: &str) -> String {
     format!(
@@ -129,10 +104,6 @@ fn mons_come(name: &str, m_name: &str, point: &str, l_name: &str) -> String {
         island_name(name),
         wrap(tags::NAME, point)
     )
-}
-
-fn out(ctx: &mut TurnContext, id: i64, message: String) {
-    ctx.log.out(ctx.turn, message, Some(id), None);
 }
 
 /// 地震・津波でお守り (`$toto2`) があれば 1 つ使って被害を防ぐ。使ったら `true`

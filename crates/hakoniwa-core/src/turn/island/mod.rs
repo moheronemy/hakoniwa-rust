@@ -10,6 +10,53 @@
 
 // TODO(フェーズ4): すべての段階を移植したら外す
 
+/// 複数の段階で使う小さな関数とログの文面
+mod common {
+    use crate::log::tags::{self, wrap};
+    use crate::tables::LandKind as L;
+    use crate::turn::TurnContext;
+
+    pub fn is_one_of(kind: u8, list: &[L]) -> bool {
+        list.iter().any(|&l| kind == l as u8)
+    }
+
+    /// `logOut` (相手の島なし)
+    pub fn out(ctx: &mut TurnContext, id: i64, message: String) {
+        ctx.log.out(ctx.turn, message, Some(id), None);
+    }
+
+    pub fn island_name(name: &str) -> String {
+        wrap(tags::NAME, &format!("{name}島"))
+    }
+
+    /// `logOmamori`
+    pub fn omamori(name: &str) -> String {
+        format!(
+            "{}所有の<B>お守り</B>のお陰でしょうか、{}が少なかったようです！！",
+            island_name(name),
+            wrap(tags::DISASTER, "被害")
+        )
+    }
+
+    /// `logEiseiEnd`
+    pub fn eisei_end(name: &str, eisei: &str) -> String {
+        format!(
+            "{}の<B>{eisei}</B>は{}したようです！！",
+            island_name(name),
+            wrap(tags::DISASTER, "崩壊")
+        )
+    }
+
+    /// `logEiseiEndNopop`
+    pub fn eisei_end_nopop(name: &str, eisei: &str) -> String {
+        format!(
+            "{}の<B>{eisei}</B>は{}ようです！！",
+            island_name(name),
+            wrap(tags::DISASTER, "人がいなくなった")
+        )
+    }
+}
+
 mod auction;
 mod disaster1;
 mod disaster2;

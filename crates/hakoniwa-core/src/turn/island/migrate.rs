@@ -9,6 +9,7 @@ use crate::turn::hex::town::set;
 use crate::turn::{TurnContext, random_array};
 
 use super::ProcRun;
+use super::common::is_one_of;
 
 /// この段階で使う Perl 版のグローバル変数
 #[derive(Debug, Default)]
@@ -16,10 +17,6 @@ pub struct Globals {
     /// `$migrate2` (ログに書く移民の数)。`my` が無いので島やターンの処理をまたいで残る。
     /// 一度も代入されていなければ未定義 (ログには空で入る)
     pub migrate2: Option<i64>,
-}
-
-fn is_one_of(kind: u8, list: &[L]) -> bool {
-    list.iter().any(|&l| kind == l as u8)
 }
 
 /// 暴動で壊される施設
