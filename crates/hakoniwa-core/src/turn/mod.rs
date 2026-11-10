@@ -442,7 +442,7 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     let logs = &mut state.logs;
     logs.turns.insert(
         0,
-        std::sync::Arc::new(crate::turn_log::TurnLog::new(entries)),
+        std::sync::Arc::new(crate::turn_log::TurnLog::from_records(entries)),
     );
     logs.turns.truncate(config.log_max + 1);
     logs.history.extend(history);

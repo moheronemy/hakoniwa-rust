@@ -34,8 +34,9 @@ use crate::turn_log::TurnLog;
 
 /// スナップショットのファイルの先頭
 const MAGIC: &[u8; 8] = b"HAKOSNAP";
-/// 形式の版。データモデル (bincode にする型) を変えたら上げる
-pub const FORMAT: u32 = 1;
+/// 形式の版。データモデル (bincode にする型) を変えたら上げる。
+/// 2: ターンのログを文面と出来事 (`LogRecord`) で持つようにした
+pub const FORMAT: u32 = 2;
 /// スナップショット・差分の圧縮の強さ (zstd)
 const LEVEL: i32 = 1;
 

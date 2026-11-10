@@ -383,6 +383,88 @@ pub struct LogEntry {
     pub message: String,
 }
 
+/// ターンのログ 1 行の、溜めておく・保存するときの形 ([`crate::turn_log::TurnLog`] の中身)。
+///
+/// 件数の多いログは文面を作らずに出来事 ([`LogBody`] の `Text` 以外) で持ち、
+/// 読むときに Perl 版と同じ文面を作る ([`LogRecord::to_entry`])。
+/// 大きな地図では 1 ターン数百万行になり、文面を作るだけでターン処理の 3 割ほどかかっていた
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LogRecord {
+    pub secret: bool,
+    pub turn: i64,
+    pub island1: Option<i64>,
+    pub island2: Option<i64>,
+    pub body: LogBody,
+}
+
+/// ログの本文
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum LogBody {
+    /// 文面 (HTML を含む)
+    Text(String),
+    /// `logOilMoney`: 「(島)(座標)の(地形)から、(金額)の収益が上がりました。」
+    /// (金山・温泉街・天然スケート場など。大きな地図ではログの 3 割ほど)
+    OilMoney {
+        /// 島の名前 (ログを書いた時点のもの)
+        name: Arc<str>,
+        x: usize,
+        y: usize,
+        /// 地形の名前を決める地形と値 (`landName($kind, $lv)`)
+        kind: u8,
+        lv: i64,
+        /// 金額と単位 (`"$value$HunitMoney"`)
+        value: i64,
+        unit: Arc<str>,
+    },
+}
+
+impl LogBody {
+    /// Perl 版と同じ文面
+    pub fn text(&self) -> std::borrow::Cow<'_, str> {
+        match self {
+            LogBody::Text(s) => std::borrow::Cow::Borrowed(s),
+            LogBody::OilMoney {
+                name,
+                x,
+                y,
+                kind,
+                lv,
+                value,
+                unit,
+            } => std::borrow::Cow::Owned(crate::log::msg::oil_money(
+                name,
+                &crate::land::land_name(*kind, *lv),
+                &format!("({x}, {y})"),
+                &format!("{value}{unit}"),
+            )),
+        }
+    }
+}
+
+impl LogRecord {
+    /// 文面の行にする
+    pub fn to_entry(&self) -> LogEntry {
+        LogEntry {
+            secret: self.secret,
+            turn: self.turn,
+            island1: self.island1,
+            island2: self.island2,
+            message: self.body.text().into_owned(),
+        }
+    }
+
+    /// 文面の行を、そのまま文面として持つ
+    pub fn from_entry(e: LogEntry) -> Self {
+        Self {
+            secret: e.secret,
+            turn: e.turn,
+            island1: e.island1,
+            island2: e.island2,
+            body: LogBody::Text(e.message),
+        }
+    }
+}
+
 /// `ターン,本文` 形式のログ 1 行
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TurnMessage {

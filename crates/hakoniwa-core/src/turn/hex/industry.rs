@@ -432,15 +432,16 @@ pub(super) fn ice(
     let island = &mut islands[idx];
     let lv = cell_value(island, h.x, h.y);
     if lv > 0 {
-        let l_name = land_name(h.land_kind, lv);
         let value = lv * 25 + ctx.random(501);
         island.money += value;
-        let amount = format!("{value}{}", ctx.config.units.money);
-        ctx.log.out(
+        ctx.log.oil_money(
             ctx.turn,
-            oil_money(&island.name, &l_name, &h.point(), &amount),
-            Some(island.id),
-            None,
+            island.id,
+            &island.name,
+            (h.x, h.y),
+            (h.land_kind, lv),
+            value,
+            &ctx.config.units.money,
         );
     }
     if ctx.random(100) < 10 {
@@ -514,12 +515,14 @@ pub(super) fn gold(
     let l_name = land_name(h.land_kind, lv);
     let value = lv * 25 + ctx.random(501);
     island.money += value;
-    let amount = format!("{value}{}", ctx.config.units.money);
-    ctx.log.out(
+    ctx.log.oil_money(
         ctx.turn,
-        oil_money(&island.name, &l_name, &h.point(), &amount),
-        Some(island.id),
-        None,
+        island.id,
+        &island.name,
+        (h.x, h.y),
+        (h.land_kind, lv),
+        value,
+        &ctx.config.units.money,
     );
     if ctx.random(100) < 7 {
         ctx.log.out(
@@ -597,14 +600,6 @@ pub(super) fn park(
         set(island, h.x, h.y, L::Plains, 0);
     }
     Flow::Continue
-}
-
-/// `logOilMoney`
-pub(super) fn oil_money(name: &str, land_name: &str, point: &str, amount: &str) -> String {
-    format!(
-        "{}の<B>{land_name}</B>から、<B>{amount}</B>の収益が上がりました。",
-        msg::island_at(name, point)
-    )
 }
 
 /// `logOilEnd`

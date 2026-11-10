@@ -6,8 +6,13 @@
 //!
 //! 文面のテンプレート (`log*` 関数、Perl 版で 281 個) は、移植した処理が使うものから
 //! 順に [`msg`] に追加していく。
+//!
+//! 件数がとくに多いログ (`logOilMoney`) は文面を作らずに出来事 ([`LogBody`]) で溜め、
+//! 読むときに同じ文面を作る (大規模化のため。docs/SCALING.md の手順 5)。
 
-use crate::model::{LogEntry, TurnMessage};
+use std::sync::Arc;
+
+use crate::model::{LogBody, LogEntry, LogRecord, TurnMessage};
 
 /// 文字の装飾 (`$HtagXxx_` と `$H_tagXxx`)
 pub mod tags {
@@ -27,9 +32,12 @@ pub mod tags {
 /// 1 ターン分のログを溜めておく
 #[derive(Debug, Default)]
 pub struct TurnLog {
-    normal: Vec<LogEntry>,
-    late: Vec<LogEntry>,
-    secret: Vec<LogEntry>,
+    normal: Vec<LogRecord>,
+    late: Vec<LogRecord>,
+    secret: Vec<LogRecord>,
+    /// 出来事に入れる島の名前と単位 (直前のものを使い回し、行ごとに文字列を作らない)
+    last_name: Option<Arc<str>>,
+    last_unit: Option<Arc<str>>,
     /// 発見の記録 (`hakojima.his` に追記するもの)
     pub history: Vec<TurnMessage>,
     /// Hakoniwa Cup の記録 (`logHcup`、`hakojima.lhc` に追記するもの)
@@ -45,14 +53,57 @@ impl TurnLog {
         message: String,
         id1: Option<i64>,
         id2: Option<i64>,
-    ) -> LogEntry {
-        LogEntry {
+    ) -> LogRecord {
+        LogRecord {
             secret,
             turn,
             island1: id1,
             island2: id2,
-            message,
+            body: LogBody::Text(message),
         }
+    }
+
+    fn shared(slot: &mut Option<Arc<str>>, s: &str) -> Arc<str> {
+        match slot {
+            Some(a) if &**a == s => a.clone(),
+            _ => {
+                let a: Arc<str> = Arc::from(s);
+                *slot = Some(a.clone());
+                a
+            }
+        }
+    }
+
+    /// `logOut(logOilMoney(...))`: 島 `id` の (x, y) の地形 (`kind`, `lv`) から `value` (単位 `unit`) の収益。
+    /// 文面は読むときに作る ([`LogBody::OilMoney`])
+    #[allow(clippy::too_many_arguments)]
+    pub fn oil_money(
+        &mut self,
+        turn: i64,
+        id: i64,
+        name: &str,
+        (x, y): (usize, usize),
+        (kind, lv): (u8, i64),
+        value: i64,
+        unit: &str,
+    ) {
+        let name = Self::shared(&mut self.last_name, name);
+        let unit = Self::shared(&mut self.last_unit, unit);
+        self.normal.push(LogRecord {
+            secret: false,
+            turn,
+            island1: Some(id),
+            island2: None,
+            body: LogBody::OilMoney {
+                name,
+                x,
+                y,
+                kind,
+                lv,
+                value,
+                unit,
+            },
+        });
     }
 
     /// `logOut`
@@ -94,13 +145,13 @@ impl TurnLog {
             .rev()
             .chain(self.late.iter().rev())
             .chain(self.normal.iter().rev())
-            .cloned()
+            .map(LogRecord::to_entry)
             .collect();
         (entries, self.history.clone())
     }
 
     /// `logFlush`: 機密・遅延・通常の順に、それぞれ新しいものから並べる
-    pub fn flush(self) -> (Vec<LogEntry>, Vec<TurnMessage>) {
+    pub fn flush(self) -> (Vec<LogRecord>, Vec<TurnMessage>) {
         let entries = self
             .secret
             .into_iter()
@@ -118,6 +169,23 @@ pub mod msg {
 
     fn island(name: &str) -> String {
         wrap(tags::NAME, &format!("{name}島"))
+    }
+
+    /// `logOilMoney`
+    pub fn oil_money(name: &str, land_name: &str, point: &str, amount: &str) -> String {
+        [
+            tags::NAME.0,
+            name,
+            "島",
+            point,
+            tags::NAME.1,
+            "の<B>",
+            land_name,
+            "</B>から、<B>",
+            amount,
+            "</B>の収益が上がりました。",
+        ]
+        .concat()
     }
 
     /// `logNoMoney`
@@ -213,7 +281,8 @@ mod tests {
         log.out(1, "n2".into(), Some(1), None);
         log.late(1, "l1".into(), Some(1), None);
         log.secret(1, "s2".into(), Some(1), None);
-        let (entries, _) = log.flush();
+        let (records, _) = log.flush();
+        let entries: Vec<_> = records.iter().map(LogRecord::to_entry).collect();
         let order: Vec<_> = entries.iter().map(|e| e.message.as_str()).collect();
         assert_eq!(order, ["s2", "s1", "l1", "n2", "n1"]);
         assert!(entries[0].secret && !entries[2].secret);

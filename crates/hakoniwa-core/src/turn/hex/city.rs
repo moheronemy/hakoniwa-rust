@@ -8,7 +8,7 @@ use crate::model::Island;
 use crate::tables::LandKind as L;
 use crate::turn::{TurnContext, monster_spec};
 
-use super::industry::{oil_end, oil_money};
+use super::industry::oil_end;
 use super::town::{set, set_value, town_count};
 use super::{Flow, HexRun, k, msg};
 
@@ -328,12 +328,14 @@ pub(super) fn onsen(
     let l_name = land_name(h.land_kind, h.lv);
     if value > 0 {
         island.money += value;
-        let amount = format!("{value}{}", ctx.config.units.money);
-        ctx.log.out(
+        ctx.log.oil_money(
             ctx.turn,
-            oil_money(&island.name, &l_name, &h.point(), &amount),
-            Some(island.id),
-            None,
+            island.id,
+            &island.name,
+            (h.x, h.y),
+            (h.land_kind, h.lv),
+            value,
+            &ctx.config.units.money,
         );
     }
     if ctx.random(1000) < 10 {
