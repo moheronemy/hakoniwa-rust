@@ -1,6 +1,6 @@
 //! 画面に出す内容。Perl 版の `temp*` が HTML に埋め込んでいた値を、ゲームのデータを
 //! 書き換えずに組み立てる。トップページ ([`top`]) と、島の画面に出すもの: 観光画面 (`printIslandMain`) と開発画面 (`ownerMain` → `tempOwner`) の
-//! 島の情報の表 ([`info`]) と地図 ([`map`])。
+//! 島の情報の表 ([`info`]) と地図 ([`map`])、開発画面の計画の入力欄と計画の一覧 ([`owner`])。
 //!
 //! HTML は作り直すので、ここでは「何を見せるか」だけを Perl 版のとおりに作る。
 //! 他人 (観光者) に隠すもの: 資金 (`$HhideMoneyMode`)、森の木の数、ミサイル基地・地雷・
@@ -11,6 +11,7 @@
 
 pub mod info;
 pub mod map;
+pub mod owner;
 pub mod top;
 
 use crate::GameConfig;

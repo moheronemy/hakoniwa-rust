@@ -1,0 +1,21 @@
+{
+ "fixture": "phase5-owner",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {"ISLANDID": "3", "PASSWORD": "pass3", "OwnerButton": "1"},
+   "cookie": "http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiKIND=(13); http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiPOINTX=(4); http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiPOINTY=(7)"
+  },
+  {
+   "form": {"ISLANDID": "1", "PASSWORD": "pass1", "OwnerButton": "1"}
+  },
+  {
+   "form": {"ISLANDID": "2", "PASSWORD": "uhusnuvnurkanjhfh", "OwnerButton": "1"},
+   "cookie": "http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiKIND=(63); http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiLAMOUNT1=(5); http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiPOINTX=(11)"
+  },
+  {
+   "form": {"ISLANDID": "3", "PASSWORD": "uhusnuvnurkanjhfh", "OwnerButton": "1"},
+   "cookie": "http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiLAMOUNT1=(99); http://www.xxxxxxxx/cgi-bin/hako/hako-main.cgiKIND=(63)"
+  }
+ ]
+}
