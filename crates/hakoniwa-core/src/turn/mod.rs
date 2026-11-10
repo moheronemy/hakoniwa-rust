@@ -282,6 +282,8 @@ fn shuffle_like_perl<T>(rng: &mut dyn RngCore, list: &mut [T]) {
 /// 時刻の判定はしない (呼び出し側で [`crate::model::World::turn_due`] を見る)。
 pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCore) -> TurnReport {
     let world = &mut state.world;
+    // Perl 版はターン処理の前にデータを読み込み、空の出品の品物を決め直す
+    crate::model::reroll_empty_lots(&mut world.auction_lots, rng);
 
     // 最終更新時間を更新
     world.last_time += config.unit_time;

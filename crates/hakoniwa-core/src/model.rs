@@ -390,6 +390,19 @@ pub fn money_for_others(money: i64, mode: HideMoneyMode, unit: &str) -> Option<S
     }
 }
 
+/// `readIslandsFile` の出品の読み込み: 数値として 0 の出品 (`',,0,-3,'` なども) は、品物を
+/// `random(27) + 1` で決め直した `品物,0,0,0,0` にする。Perl 版は読み込むたびに (ターン処理の前にも)
+/// これを行うので、移植版は読み込みとターン処理の始めと、画面の操作で保存する前に行う
+pub fn reroll_empty_lots<R: rand::RngCore + ?Sized>(lots: &mut Vec<String>, rng: &mut R) {
+    lots.resize(3, String::new());
+    for lot in lots.iter_mut() {
+        if crate::perl::num_eq_empty(lot) {
+            let item = crate::perl::random(rng, 27) + 1;
+            *lot = format!("{item},0,0,0,0");
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

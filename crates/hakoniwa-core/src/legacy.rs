@@ -124,15 +124,8 @@ pub fn import_dir<R: Rng + ?Sized>(
         None => detect_layout(main.len(), island_number)?,
     };
 
-    let mut auction_lots = Vec::with_capacity(3);
-    for _ in 0..3 {
-        let mut lot = auction.next().to_string();
-        if perl::num_eq_empty(&lot) {
-            let item = perl::random(rng, 27) + 1;
-            lot = format!("{item},0,0,0,0");
-        }
-        auction_lots.push(lot);
-    }
+    let mut auction_lots: Vec<String> = (0..3).map(|_| auction.next().to_string()).collect();
+    crate::model::reroll_empty_lots(&mut auction_lots, rng);
     let mut survey_votes = [0i64; 5];
     for v in survey_votes.iter_mut() {
         *v = perl::int(an.next());

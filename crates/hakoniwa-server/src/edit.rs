@@ -29,7 +29,10 @@ pub async fn edit<T>(
     let mut next = game.clone();
     let out = {
         let mut rng = app.rng.lock().expect("rng lock poisoned");
-        f(&mut next, &mut rng)?
+        let out = f(&mut next, &mut rng)?;
+        // Perl 版は次に読み込むときに空の出品の品物を決め直す (入札の値が壊れたときなど)
+        hakoniwa_core::model::reroll_empty_lots(&mut next.world.auction_lots, &mut *rng);
+        out
     };
     storage::save(&app.state_path, &next).map_err(|e| EditError::Save(e.into()))?;
     *game = next;
