@@ -83,6 +83,10 @@ fn field(island: &Island, name: &str) -> String {
         "eis6" => n(island.eis[5]),
         "eis7" => n(island.eis[6]),
         "auc7" => island.auction.auc7.clone(),
+        "auc1" => n(island.auction.auc1),
+        "auc2" => n(island.auction.auc2),
+        "auc3" => n(island.auction.auc3),
+        "auc8" => island.auction.auc8.clone(),
         "propaganda" => n(sc.propaganda),
         "etc7" => island.etc_raw[2].clone(),
         "monstersend" => n(sc.command.attack.monstersend),
@@ -1511,4 +1515,37 @@ fn phase4_disaster1_mon_matches_perl_with_rand_0() {
 #[test]
 fn phase4_disaster1_mon2_matches_perl_with_rand_0() {
     check_fixture("phase4-disaster1-mon2", 0);
+/// ハコオクの落札 (phase4-auction-*) を rand 3/4 と 31/32 で突き合わせるテストを作る
+macro_rules! phase4_auction_tests {
+    ($($name:ident => $fixture:literal,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                check_fixture_at($fixture, "75");
+                check_fixture_at($fixture, "96875");
+            }
+        )*
+    };
+}
+
+phase4_auction_tests! {
+    phase4_auction_lot00_matches_perl => "phase4-auction-lot00",
+    phase4_auction_lot01_matches_perl => "phase4-auction-lot01",
+    phase4_auction_lot02_matches_perl => "phase4-auction-lot02",
+    phase4_auction_lot03_matches_perl => "phase4-auction-lot03",
+    phase4_auction_lot04_matches_perl => "phase4-auction-lot04",
+    phase4_auction_lot05_matches_perl => "phase4-auction-lot05",
+    phase4_auction_lot06_matches_perl => "phase4-auction-lot06",
+    phase4_auction_lot07_matches_perl => "phase4-auction-lot07",
+    phase4_auction_lot08_matches_perl => "phase4-auction-lot08",
+    phase4_auction_lot09_matches_perl => "phase4-auction-lot09",
+    phase4_auction_lot10_matches_perl => "phase4-auction-lot10",
+    phase4_auction_lot11_matches_perl => "phase4-auction-lot11",
+    phase4_auction_prize0_matches_perl => "phase4-auction-prize0",
+    phase4_auction_prize1_matches_perl => "phase4-auction-prize1",
+    phase4_auction_prize2_matches_perl => "phase4-auction-prize2",
+    phase4_auction_prize3_matches_perl => "phase4-auction-prize3",
+    phase4_auction_prize4_matches_perl => "phase4-auction-prize4",
+    phase4_auction_prize5_matches_perl => "phase4-auction-prize5",
+    phase4_auction_mix_matches_perl => "phase4-auction-mix",
 }

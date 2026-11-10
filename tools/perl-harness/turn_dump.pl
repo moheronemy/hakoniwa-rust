@@ -53,7 +53,7 @@ for my $i (0 .. $HpointNumber - 1) {
 
 my @persisted = qw(pop area farm factory mountain pts money food etc0 eisei1 eisei2
   eisei3 eisei4 eisei5 eisei6 etc5 etc6 etc8 etc9 totoyoso2 kei rena fore tare zipro
-  leje monsterlive monsterlivetype anflag auc0 auc4 auc5 auc6 auc9 prize taiji eis1 eis2 eis3 eis4 eis5 eis6 eis7 auc7 etc7);
+  leje monsterlive monsterlivetype anflag auc0 auc4 auc5 auc6 auc9 prize taiji eis1 eis2 eis3 eis4 eis5 eis6 eis7 auc7 etc7 auc1 auc2 auc3 auc8);
 my @scratch = qw(shouhi ene sabun con99 factory1 factory2 factoryt oil bas htf shtf
   hou shu sin jin h10 h11 co0 co1 co4 co7 co8 co77 co99 c13 c28 tet m26 m27 m74 m75 m79
   m84 m93 kyu ky2 zoo sci pro sba amu kin tra tra1 tra2 fukeikimoney unemployed
