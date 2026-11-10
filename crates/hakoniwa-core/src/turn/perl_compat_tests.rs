@@ -813,6 +813,26 @@ fn phase3_build_3_matches_perl_with_rand_half() {
     check_fixture("phase3-build-3", RAND_HALF);
 }
 
+#[test]
+fn phase3_build_4_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-4", 0);
+}
+
+#[test]
+fn phase3_build_4_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-4", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_5_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-5", 0);
+}
+
+#[test]
+fn phase3_build_5_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-5", RAND_HALF);
+}
+
 /// 動物園の新設の入荷ループは random(5) が 0 になるまで回るので、rand 0.5 では Perl 版が止まらない
 #[test]
 fn phase3_build_zoo_matches_perl_with_rand_0() {

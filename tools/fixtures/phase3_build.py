@@ -6,6 +6,8 @@
     RANDS="0 03125 50 96875" tools/perl-harness/run-harness.sh phase3-build-1 $STEPS
     RANDS="0 03125 50 96875" tools/perl-harness/run-harness.sh phase3-build-2 $STEPS
     RANDS="0 50" tools/perl-harness/run-harness.sh phase3-build-3 estimate,income,commands,commands,estimate
+    RANDS="0 50" tools/perl-harness/run-harness.sh phase3-build-4 estimate,income,$(printf 'commands,%.0s' $(seq 18))estimate
+    RANDS="0 50" tools/perl-harness/run-harness.sh phase3-build-5 estimate,income,$(printf 'commands,%.0s' $(seq 12))estimate
     RANDS="0 03125" tools/perl-harness/run-harness.sh phase3-build-zoo $STEPS
     RANDS="0 03125" tools/perl-harness/run-harness.sh phase3-build-zoo2 commands,commands,commands
 
@@ -301,6 +303,76 @@ f.commands(1, [
     c("Farmcpc", 10, 8, 2),            # 牛を売る (0)
     c("Plant", 5, 4),                  # 平地 2 には建てられる
     c("College", 6, 2),                # 大学 77 に大学 (新設になる)
+])
+f.commands(2, [c("EneNF", 8, 9)])      # 魔法の石が無い (magicl = 0) (0)
+f.save()
+
+# ---------------------------------------------------------------- phase3-build-4
+# 核融合の失敗の条件を 1 つずつ、回数付きの発電所・食物研究所、周りの地形の数え方
+rich4a = dict(RICH)
+rich4a[(4, 1)] = ("Monument", 79)      # magicl = 2, magica = 1
+rich4a[(5, 1)] = ("Monument", 79)
+rich4a[(3, 10)] = ("Monument", 75)
+rich4b = dict(RICH)
+rich4b[(4, 1)] = ("Monument", 75)      # magica = magicl = 1 だが核融合発電所 (99) がある
+rich4b[(5, 1)] = ("Monument", 79)
+rich4b[(3, 10)] = ("Conden4", 99)
+f = setup("phase3-build-4", rich4b, rich4a)
+# 島 3: 文部科学省が無い (co77 = 0)。森の中に町を置き、周りの 1 マスだけを数える地形にする
+f.map(3, base_map({
+    (1, 1): ("Town", 200), (2, 1): ("Town", 200),
+    (10, 1): ("EneAt", 1490), (10, 2): ("EneSo", 1000),
+    (4, 1): ("Monument", 75), (5, 1): ("Monument", 79),
+    (3, 3): ("Plains", 0),
+    (5, 5): ("Town", 100), (6, 5): ("Seacity", 10),
+    (5, 8): ("Town", 100), (6, 8): ("Gold", 0),
+    (8, 8): ("Town", 100), (9, 8): ("Plains2", 0),
+}, fill=("Forest", 5)))
+f.main(3, money=6000000, food=900000, eis7=1)
+f.commands(1, [
+    c("EneNF", 8, 9),                  # magica != magicl (0)
+    c("EneAt", 10, 3, 2),
+    c("Foodim", 4, 9, 2),
+    c("EneFw", 10, 5, 2),
+    c("EneWt", 9, 1, 2),
+    c("EneWd", 8, 2, 2),
+    c("EneBo", 7, 2, 2),
+    c("EneSo", 10, 2, 2),
+    c("EneCs", 9, 2, 2),
+])
+f.commands(2, [c("EneNF", 8, 9), c("Plant", 8, 9)])   # 核融合発電所がある (0)
+f.commands(3, [
+    c("EneNF", 3, 3),                  # 文部科学省が無い (0)
+    c("EneFw", 5, 5),                  # 周りは海上都市だけ
+    c("EneWt", 5, 8),                  # 周りは金山だけ
+    c("EneWd", 8, 8),                  # 周りは平地 2 だけ
+])
+f.save()
+
+# ---------------------------------------------------------------- phase3-build-5
+# 境界の値 (倉庫の上限、数量 9/10、政策の値 48)、海底基地のある島からの記念碑の発射
+rich5a = dict(RICH)
+rich5a[(3, 6)] = ("Kura", 195)
+rich5a[(4, 6)] = ("Kuraf", 2400)
+rich5a[(0, 5)] = ("Sbase", 0)
+rich5b = dict(RICH)
+rich5b[(8, 9)] = ("College", 77)
+rich5b[(9, 9)] = ("Umishuto", 0)
+f = setup("phase3-build-5", rich5b, rich5a)
+f.ips(1, etc5=etc5(1, 50))             # s10b = 11 (数量 9 まで選べる)
+f.commands(1, [
+    c("College", 7, 4, 9),             # 新設 -> 文部科学省で 8 に
+    c("College", 1, 4, 0),             # 6 -> 95 (数量 0 なので選び直さない)
+    c("Farmcpc", 9, 3, 0),             # 数量 0 -> 鶏
+    c("Kuraf", 4, 7, 10),              # 10 -> 9
+    c("Kura", 3, 6, 7),                # 95 + 7 -> 99
+    c("Kura2", 4, 6, 0),               # 2400: 倉庫として 0 -> 食料倉庫として 1 (0)
+    c("Kura2", 6, 7, 10),              # 10 -> 9 (0)
+    c("Monument", 8, 8, 1, target=2),  # 発射 (海底基地も壊れる)
+])
+f.commands(2, [
+    c("Yakusho", 6, 2),                # costseisaku 48: 77 -> 78
+    c("Yakusho", 8, 9),                # 首都は無いが海上首都が隣にある
 ])
 f.save()
 
