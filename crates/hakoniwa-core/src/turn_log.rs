@@ -188,7 +188,7 @@ mod tests {
 
     fn entry(n: usize, island1: Option<i64>, island2: Option<i64>) -> LogEntry {
         LogEntry {
-            secret: n % 7 == 0,
+            secret: n.is_multiple_of(7),
             turn: 5,
             island1,
             island2,
