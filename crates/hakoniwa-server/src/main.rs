@@ -196,10 +196,12 @@ fn open_set(
     stagger: Option<&str>,
 ) -> Result<Arc<AppState>> {
     let (data, state) = open_data(&data_dir, state_path, &game, stagger)?;
+    // ログインはデータディレクトリに残し、再起動しても続くようにする
+    let sessions = session::Sessions::open(&data_dir.join("sessions.json"), now_unix());
     Ok(Arc::new(AppState {
         config: game,
         options,
-        sessions: Default::default(),
+        sessions,
         data_dir,
         game: store::Store::new(state, StdRng::from_entropy(), data),
     }))
@@ -581,6 +583,53 @@ mod tests {
         assert_eq!(res.status(), StatusCode::SEE_OTHER);
         assert_eq!(d.game.snapshot().world.islands.len(), 1);
         assert_eq!(a.game.snapshot().world.islands.len(), 1);
+    }
+
+    /// 再起動しても (同じデータディレクトリから開き直しても) ログインが続く
+    #[tokio::test]
+    async fn login_survives_restart() {
+        let tmp = tempfile::tempdir().unwrap();
+        let state_path = tmp.path().join("state.json");
+        let data_dir = tmp.path().join("store");
+        let open = || {
+            open_set(
+                &state_path,
+                data_dir.clone(),
+                GameConfig::default(),
+                ServerOptions::default(),
+                None,
+            )
+            .unwrap()
+        };
+        let first = open();
+        let res = app(first.clone())
+            .oneshot(register_req("kappa"))
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::SEE_OTHER);
+        let cookie = res.headers()[axum::http::header::SET_COOKIE]
+            .to_str()
+            .unwrap()
+            .split(';')
+            .next()
+            .unwrap()
+            .to_string();
+        drop(first);
+
+        let second = open();
+        let res = app(second)
+            .oneshot(
+                Request::get("/owner")
+                    .header(axum::http::header::COOKIE, &cookie)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let html = String::from_utf8(res.into_body().collect().await.unwrap().to_bytes().to_vec())
+            .unwrap();
+        assert!(html.contains("kappa島開発計画"), "{html}");
     }
 
     /// 新しいセットの開始時刻は ID で決まり、1 ターンの秒数の範囲で、いまより前になる
