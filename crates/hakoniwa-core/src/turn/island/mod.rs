@@ -45,6 +45,8 @@ pub struct ProcessGlobals {
     pub value: i64,
     /// `$pika2` (ハイテク企業の維持費)
     pub pika2: i64,
+    /// `$eis7` (宇宙ステーション。食料不足と維持の段階が代入する)
+    pub eis7: i64,
     pub migrate: migrate::Globals,
     pub disaster1: disaster1::Globals,
     pub disaster2: disaster2::Globals,

@@ -148,6 +148,7 @@ fn irregular(ctx: &mut TurnContext, island: &mut Island) {
 fn space_station(ctx: &mut TurnContext, island: &mut Island) {
     let (id, turn) = (island.id, ctx.turn);
     let eis7 = island.eis[6];
+    ctx.globals.process.eis7 = eis7;
     let mut cstpop = trunc(eis7 as f64 / 100.0);
     let csten = eis7.rem_euclid(100);
 

@@ -12,10 +12,7 @@ use super::ProcRun;
 
 /// この段階で使う Perl 版のグローバル変数
 #[derive(Debug, Default)]
-pub struct Globals {
-    /// `$eis7` (宇宙ステーションの値)。人工衛星の維持の段階も代入する
-    pub eis7: i64,
-}
+pub struct Globals {}
 
 /// この段階で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -362,7 +359,7 @@ fn food_shortage(ctx: &mut TurnContext, island: &mut Island) {
 
     if island.eis[6] >= 1 {
         let eis7 = island.eis[6];
-        ctx.globals.process.disaster1.eis7 = eis7;
+        ctx.globals.process.eis7 = eis7;
         let cstpop = trunc(eis7 as f64 / 100.0);
         let csten = eis7.rem_euclid(100);
         let tdmg = ctx.random(1000);
