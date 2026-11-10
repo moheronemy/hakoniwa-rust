@@ -105,7 +105,9 @@ fn turn_prize_goes_to_top_island() {
         .iter()
         .filter(|h| h.turn == 100)
         .collect();
-    assert_eq!(history.len(), 1);
+    // ターン杯と、Hakoniwa Cup の開催 (ターン % 100 == 0)
+    assert_eq!(history.len(), 2);
+    assert!(history[1].message.contains("Hakoniwa Cup100"));
     assert!(history[0].message.contains(&winners[0].name));
     assert!(history[0].message.contains("100ターン杯"));
 }

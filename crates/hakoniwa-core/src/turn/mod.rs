@@ -5,6 +5,7 @@
 //! 印を付けてある。詳しくは docs/PORTING.md を参照。
 
 pub(crate) mod command;
+mod cup;
 pub(crate) mod estimate;
 pub(crate) mod hex;
 mod income;
@@ -346,7 +347,8 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
         island::do_island_process(&mut ctx, islands, i);
         island::do_island_unemployed(&mut ctx, islands, i);
     }
-    // TODO(フェーズ6): Hakoniwa Cup のシード (ターン % 100 == 41)
+    // Hakoniwa Cup の決勝トーナメントのシード (ターン % 100 == 41)
+    cup::seed(&mut ctx, islands);
 
     // 部門賞
     ranking::award_departments(islands);
@@ -386,7 +388,10 @@ pub fn run_turn(state: &mut GameState, config: &GameConfig, rng: &mut dyn RngCor
     // 島数カット (無人島はポイント 0 で末尾に並んでいる)
     islands.truncate(remain);
 
-    // TODO(フェーズ6): toto、Hakoniwa Cup toto、Numbers3、Numbers4、Hakoniwa Cup の参加数
+    // TODO(フェーズ6): toto、Hakoniwa Cup toto、Numbers3、Numbers4
+
+    // Hakoniwa Cup の開催と参加数 (ターン % 100 == 0)
+    cup::opening(&mut ctx);
 
     if !config.survey.enabled {
         world.survey_votes = [0; 5];

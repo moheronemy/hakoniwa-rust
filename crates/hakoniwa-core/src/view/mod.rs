@@ -10,6 +10,7 @@
 //! 画面を開く前にターンが進むが、それはターン処理の側の仕事)。
 
 pub mod info;
+pub mod ipinfo;
 pub mod map;
 pub mod owner;
 pub mod top;

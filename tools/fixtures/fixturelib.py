@@ -129,5 +129,11 @@ class Fixture:
         """auction.dat の値 (auc0..auc9)"""
         self._set("auction.dat", AUCTION, island_id, values)
 
+    def turn(self, turn):
+        """hakojima.dat の 1 行目 (ターン番号 $HislandTurn) を書き換える"""
+        lines = self._lines("hakojima.dat")
+        lines[0] = str(turn).encode()
+        self._write("hakojima.dat", lines)
+
     def save(self):
         print("wrote", self.dir.relative_to(ROOT))
