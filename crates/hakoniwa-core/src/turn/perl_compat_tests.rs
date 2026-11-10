@@ -866,6 +866,46 @@ fn phase3_attack_mon_matches_perl_with_rand_96875() {
 }
 
 #[test]
+fn phase3_attack_mon6_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-mon6", 0);
+}
+
+#[test]
+fn phase3_attack_mon6_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-mon6", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_mon6_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-mon6", "03125");
+}
+
+#[test]
+fn phase3_attack_mon6_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-mon6", "96875");
+}
+
+#[test]
+fn phase3_attack_boat_matches_perl_with_rand_0() {
+    check_fixture("phase3-attack-boat", 0);
+}
+
+#[test]
+fn phase3_attack_boat_matches_perl_with_rand_half() {
+    check_fixture("phase3-attack-boat", RAND_HALF);
+}
+
+#[test]
+fn phase3_attack_boat_matches_perl_with_rand_03125() {
+    check_fixture_at("phase3-attack-boat", "03125");
+}
+
+#[test]
+fn phase3_attack_boat_matches_perl_with_rand_96875() {
+    check_fixture_at("phase3-attack-boat", "96875");
+}
+
+#[test]
 fn phase3_attack_send_matches_perl_with_rand_0() {
     check_fixture("phase3-attack-send", 0);
 }

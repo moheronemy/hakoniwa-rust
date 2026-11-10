@@ -9,10 +9,10 @@ rand 0 なら計画の座標そのもの、rand 0.5 なら誤差 19 の弾は (x
 島 1 は島 2 の大使館を持つ (同盟)、島 3 は etc7 で島 2 を撃つ許可を持つ、島 2 は自分の島を撃つ。
 
     python3 -I tools/fixtures/phase3_attack.py
-    for f in phase3-attack phase3-attack-lr phase3-attack-guard phase3-attack-mon \
-             phase3-attack-send; do
-        tools/perl-harness/run-harness.sh $f \
-            estimate,income,commands,commands,commands,commands,commands,commands,commands,commands,estimate
+    for f in phase3-attack phase3-attack-lr phase3-attack-ld phase3-attack-guard \
+             phase3-attack-mon phase3-attack-mon6 phase3-attack-boat phase3-attack-send; do
+        RANDS="0 50 03125 96875" tools/perl-harness/run-harness.sh $f \
+            estimate,income,commands,commands,commands,commands,commands,commands,commands,commands,commands,commands,estimate
     done
 """
 import pathlib
@@ -260,6 +260,8 @@ f.commands(1, [
     (ST, 2, 6, 8, 2),
     (SPP, 3, 5, 5, 3),
     (NM, 1, 7, 5, 1),
+    (SEND, 3, 0, 0, 1),
+    (TAISHI, 3, 5, 5, 0),
 ])
 f.commands(3, [
     (NM, 2, 6, 8, 1),
@@ -270,5 +272,141 @@ f.commands(2, [
     (NM, 1, 5, 5, 1),
     (NM, 2, 8, 10, 0),
     (NM, 2, 9, 10, 0),
+])
+f.save()
+
+
+# ---------------------------------------------------------------------------
+# phase3-attack-mon / -mon6: 怪獣に当たるミサイル (硬化・叩き落とし・退治・王蟲・人造怪獣・
+# 神殿と神社の収入・魔方陣)。-mon6 はターン 6 (めたはむ系が硬化せず、クジラが硬化する)
+MON_SPEC = [  # (地形, 撃つ島, 計画, 弾数)
+    (mon(2, 1), 1, NM, 1), (mon(9, 1), 3, NM, 1), (mon(3, 1), 1, NM, 1),
+    (mon(15, 1), 3, NM, 1), (mon(13, 1), 2, NM, 1), (mon(20, 1), 1, NM, 1),
+    (mon(21, 1), 3, NM, 1), (mon(22, 1), 2, NM, 1), (mon(18, 1), 1, NM, 1),
+    (mon(30, 1), 3, NM, 1), (mon(19, 1), 2, NM, 1), (mon(14, 1), 1, NM, 1),
+    (mon(17, 1), 3, NM, 1), (mon(8, 1), 2, NM, 1), (mon(1, 3), 1, NM, 1),
+    (mon(1, 1), 3, ST, 1), (mon(1, 2), 2, NM, 3), (("Monument", 25), 1, NM, 2),
+    (mon(6, 1), 3, ST, 1), (mon(10, 2), 2, NM, 2),
+]
+for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
+    f = Fixture(name)
+    t = {}
+    for (x, y), (land, _, _, _) in zip(SPOTS, MON_SPEC):
+        spot(t, x, y, land)
+    t.update(TARGET_HOME)
+    put(f, 2, t)
+    # 島 1: 同盟、神殿・神社、基地 2 つ (rena が大きいので魔方陣から怪獣が出る)
+    a = {}
+    home(a, row=11, bases=(("Base", 4000), ("Base", 4000)),
+         extra=(("Taishi", 2), ("Monument", 26), ("Monument", 27)))
+    put(f, 1, a)
+    # 島 3: 撃つ許可、大学 99 と 4 (叩き落とされにくい)
+    b = {}
+    home(b, row=11, extra=(("College", 99), ("College", 4)))
+    put(f, 3, b)
+    f.ips(3, etc7="2,5,2")
+    for i in (1, 2, 3):
+        f.main(i, money=MONEY)
+    cmds = {1: [], 3: [], 2: []}
+    for (x, y), (_, shooter, kind, arg) in zip(SPOTS, MON_SPEC):
+        cmds[shooter].append((kind, 2, x, y, arg))
+    for i, c in cmds.items():
+        f.commands(i, c)
+    if turn:
+        set_turn(f, turn)
+    f.save()
+
+# ---------------------------------------------------------------------------
+# phase3-attack-boat: 難民 (平和賞 16・32、平地に 5 人を超える残り)、ステルスは難民なし、
+# 基地なし、賠償金
+f = Fixture("phase3-attack-boat")
+t = {(0, 0): ("Bigtown", 3000), (2, 0): ("Bigtown", 3000), (1, 1): ("Bigtown", 3000),
+     (6, 0): ("Bigtown", 2014), (8, 0): ("Bigtown", 2014), (7, 1): ("Bigtown", 2014),
+     (0, 4): ("Town", 114), (2, 4): ("Town", 114), (1, 5): ("Town", 114)}
+t.update(TARGET_HOME)
+t[(11, 11)] = ("Plains", 0)  # 島 2 は基地を持たない
+put(f, 2, t)
+# 島 1: 同盟、平和賞 8 を持つ。値 150 の町が 12 個、その後に平地が 12 個
+a = {}
+home(a, row=11, bases=(("Base", 4000),), extra=(("Taishi", 2),))
+for x in range(12):
+    a[(x, 0)] = ("Town", 150)
+    a[(x, 1)] = ("Plains", 0)
+put(f, 1, a)
+f.main(1, prize="8,0,")
+# 島 3: 撃つ許可、平和賞 8 と 16 を持つ。値 0 の町が 20 個、その次が平地
+b = {}
+home(b, row=11)
+for p in range(20):
+    b[(p % 12, p // 12)] = ("Town", 0)
+b[(8, 1)] = ("Plains", 0)
+put(f, 3, b)
+f.main(3, prize="24,0,1,2")
+f.ips(3, etc7="2,5,2")
+for i in (1, 2, 3):
+    f.main(i, money=MONEY)
+f.commands(1, [
+    (NM, 2, 0, 0, 1),
+    (NM, 3, 5, 5, 1),
+])
+f.commands(3, [
+    (PP, 2, 6, 0, 1),
+    (ST, 2, 0, 4, 1),
+])
+f.commands(2, [
+    (NM, 2, 0, 0, 1),
+])
+f.save()
+
+# ---------------------------------------------------------------------------
+# phase3-attack-send: 動物派遣と大使派遣
+f = Fixture("phase3-attack-send")
+# 島 2: 動物園 (怪獣 1 が 3 匹)、大使館 3 つ (それ以上受け入れない)。許可は島 3 (状態 1)
+t = {(x, 0): ("Plains", 0) for x in range(12)}
+t.update({(0, 2): ("Zoo", 0), (1, 2): ("Taishi", 1), (2, 2): ("Taishi", 3),
+          (3, 2): ("Taishi", 3), (4, 2): ("Forest", 10)})
+home(t, row=11)
+put(f, 2, t)
+f.ips(2, etc7="1,0,3", etc6=",".join(["0", "3"] + ["0"] * 29))
+f.main(2, eisei5="0,0,0,0,0,300,0")
+# 島 1: 動物園 (怪獣 1 と 30 を 2 匹ずつ)、島 2 への許可
+a = {(x, 0): ("Plains", 0) for x in range(12)}
+a[(0, 2)] = ("Zoo", 0)
+home(a, row=11)
+put(f, 1, a)
+f.ips(1, etc7="2,0,2", etc6=",".join(["0", "2"] + ["0"] * 28 + ["2"]))
+f.main(1, eisei5="0,0,0,0,0,100,0")
+# 島 3: 発電所がない (エネルギー不足)、島 2 への許可
+b = {(x, 0): ("Plains", 0) for x in range(12)}
+b.update({(0, 2): ("Zoo", 0), (0, 11): ("Town", 200), (1, 11): ("Town", 200),
+          (2, 11): ("Town", 200), (3, 11): ("Base", 4000)})
+put(f, 3, b)
+f.ips(3, etc7="2,5,2", etc6=",".join(["1"] * 31))
+f.main(3, eisei5="0,0,0,0,0,5000,0")
+for i in (1, 2, 3):
+    f.main(i, money=MONEY)
+f.commands(1, [
+    (SEND, 99, 0, 0, 1),
+    (SEND, 3, 0, 0, 1),
+    (SEND, 2, 0, 0, 35),
+    (SEND, 2, 0, 0, 1),
+    (TAISHI, 99, 0, 0, 0),
+    (TAISHI, 1, 0, 0, 0),
+    (TAISHI, 2, 0, 0, 0),
+    (TAISHI, 3, 20, 0, 0),
+    (TAISHI, 3, 0, 2, 0),
+    (TAISHI, 3, 1, 0, 0),
+    (NM, 3, 0, 0, 1),
+])
+f.commands(3, [
+    (NM, 2, 0, 0, 1),
+    (SEND, 2, 0, 0, 1),
+    (TAISHI, 2, 5, 0, 0),
+    (TAISHI, 1, 5, 0, 0),
+])
+f.commands(2, [
+    (SEND, 1, 0, 0, 1),
+    (TAISHI, 1, 3, 0, 0),
+    (TAISHI, 3, 3, 0, 0),
 ])
 f.save()
