@@ -2,6 +2,7 @@
 
 pub mod auth;
 pub mod images;
+pub mod island;
 pub mod owner;
 pub mod top;
 
@@ -102,8 +103,6 @@ pub fn redirect_with_cookie(to: &str, cookie: String) -> Response {
     ([(SET_COOKIE, cookie)], Redirect::to(to)).into_response()
 }
 
-// TODO(フェーズ5): 計画の入力と島の登録で使う
-#[allow(dead_code)]
 /// 接続元のアドレス (Perl 版の `REMOTE_ADDR`)。`trust_forwarded` なら X-Forwarded-For の先頭を使う
 pub fn remote_addr(app: &Arc<AppState>, headers: &HeaderMap, peer: Option<SocketAddr>) -> String {
     let forwarded = headers
@@ -282,6 +281,104 @@ mod tests {
                 .comment,
             "やあ&lt;b&gt;"
         );
+
+        // 政策・計画・掲示板
+        let res = send(
+            &state,
+            post(
+                "/owner/policy",
+                Some(&cookie),
+                &[("csrf", &csrf), ("policy", "kankou"), ("amount", "60")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        let res = send(
+            &state,
+            post(
+                "/owner/command",
+                Some(&cookie),
+                &[
+                    ("csrf", &csrf),
+                    ("number", "0"),
+                    ("mode", "insert"),
+                    ("kind", "41"),
+                    ("amount", "0"),
+                    ("target", "1"),
+                    ("x", "3"),
+                    ("y", "4"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        // いじりはマスターパスワードのときだけ
+        let res = send(
+            &state,
+            post(
+                "/owner/command",
+                Some(&cookie),
+                &[("csrf", &csrf), ("number", "0"), ("kind", "60")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 403);
+        let res = send(
+            &state,
+            post(
+                "/owner/lbbs",
+                Some(&cookie),
+                &[("csrf", &csrf), ("name", "島主"), ("message", "ようこそ")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        {
+            let game = state.game.read().await;
+            let island = game.world.islands.iter().find(|i| i.id == 1).unwrap();
+            assert_eq!(island.etc_raw[0].split(',').nth(5), Some("50"));
+            assert_eq!(
+                (
+                    island.commands[0].kind,
+                    island.commands[0].x,
+                    island.commands[0].y
+                ),
+                (41, 3, 4)
+            );
+            assert!(island.lbbs[0].contains("ようこそ"));
+        }
+        // ほかの島 (2) の観光画面から公開で書き込む (島 1 が払う)
+        let res = send(
+            &state,
+            post(
+                "/island/2/lbbs",
+                Some(&cookie),
+                &[
+                    ("csrf", &csrf),
+                    ("name", "客"),
+                    ("message", "こんにちは"),
+                    ("kind", "public"),
+                ],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 303);
+        let page = body(send(&state, get("/island/2", None)).await).await;
+        assert!(
+            page.contains("こんにちは") && page.contains("Alpha島"),
+            "{page}"
+        );
+        // 匿名は設定で許されていない
+        let res = send(
+            &state,
+            post(
+                "/island/2/lbbs",
+                None,
+                &[("name", "x"), ("message", "y"), ("kind", "anonymous")],
+            ),
+        )
+        .await;
+        assert_eq!(res.status(), 403);
 
         let res = send(&state, post("/logout", Some(&cookie), &[("csrf", &csrf)])).await;
         assert_eq!(res.status(), 303);
