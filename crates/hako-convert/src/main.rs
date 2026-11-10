@@ -200,7 +200,8 @@ mod tests {
     fn server_config_round_trips() {
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../hako-r-a_FE/hako-main.cgi");
-        let (text, _, _) = encoding_rs::EUC_JP.decode(&std::fs::read(path).unwrap());
+        let bytes = std::fs::read(path).unwrap();
+        let (text, _, _) = encoding_rs::EUC_JP.decode(&bytes);
         let mut config = legacy_settings::parse(&text.replace("\r\n", "\n")).config;
         config.unit_time = 3600;
         let dir = tempfile::tempdir().unwrap();
