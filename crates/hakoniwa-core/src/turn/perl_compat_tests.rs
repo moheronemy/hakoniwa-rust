@@ -1506,3 +1506,13 @@ fn phase4_migrate_3_matches_perl_with_rand_03125() {
 fn phase4_migrate_3_matches_perl_with_rand_50() {
     check_fixture_at("phase4-migrate-3", "50");
 }
+
+#[test]
+fn phase4_migrate_4_matches_perl_with_rand_02734375() {
+    check_fixture_at("phase4-migrate-4", "02734375");
+}
+
+#[test]
+fn phase4_migrate_4_matches_perl_with_rand_50() {
+    check_fixture_at("phase4-migrate-4", "50");
+}

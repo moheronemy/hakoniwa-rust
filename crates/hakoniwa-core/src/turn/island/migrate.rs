@@ -277,14 +277,9 @@ pub(super) fn resort_fatigue(
 ) {
     let s06 = ctx.globals.etc5.0[6];
     let riz = islands[idx].scratch.riz;
-    if riz > 0
-        && ctx.rand_f64(40.0) > s06 as f64
-        && ctx.rand_f64((500 + s06 * 2) as f64) < 15.0
-    {
+    if riz > 0 && ctx.rand_f64(40.0) > s06 as f64 && ctx.rand_f64((500 + s06 * 2) as f64) < 15.0 {
         fatigue_to_resort(ctx, islands, idx, p, s06);
-    } else if riz > 0
-        && ctx.rand_f64(20.0) > s06 as f64
-        && ctx.rand_f64((500 + s06) as f64) < 20.0
+    } else if riz > 0 && ctx.rand_f64(20.0) > s06 as f64 && ctx.rand_f64((500 + s06) as f64) < 20.0
     {
         fatigue_to_town(ctx, islands, idx, s06);
     }
