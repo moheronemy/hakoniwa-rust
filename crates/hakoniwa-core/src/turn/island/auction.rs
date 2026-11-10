@@ -30,10 +30,6 @@ pub struct Globals {
     pub dashiname: String,
 }
 
-/// この段階で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct Scratch {}
-
 /// `$auc9c2` (補助金の万の位より上) と `$auc9c3` (補助金を 1 万単位に切り捨てたもの)
 struct Subsidy {
     c2: i64,

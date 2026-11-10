@@ -20,14 +20,6 @@ use crate::turn::hex::town::{set, set_value};
 
 use super::ProcRun;
 
-/// この段階で使う Perl 版のグローバル変数
-#[derive(Debug, Default)]
-pub struct Globals {}
-
-/// この段階で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct Scratch {}
-
 fn island_name(name: &str) -> String {
     wrap(tags::NAME, &format!("{name}島"))
 }

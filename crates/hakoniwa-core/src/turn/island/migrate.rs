@@ -18,10 +18,6 @@ pub struct Globals {
     pub migrate2: Option<i64>,
 }
 
-/// この段階で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct Scratch {}
-
 fn is_one_of(kind: u8, list: &[L]) -> bool {
     list.iter().any(|&l| kind == l as u8)
 }

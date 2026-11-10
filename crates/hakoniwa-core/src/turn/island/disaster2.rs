@@ -34,10 +34,6 @@ pub struct Globals {
     pub lv: i64,
 }
 
-/// この段階で使う、島に一時的に持たせる値 (`$island->{'...'}` で保存されないもの)
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct Scratch {}
-
 /// 地盤沈下で沈むマスの印 (Perl 版の -1)。どの地形の番号とも重ならない値
 const SINKING: u8 = u8::MAX;
 

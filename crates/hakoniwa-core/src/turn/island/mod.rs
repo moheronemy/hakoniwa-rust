@@ -9,7 +9,6 @@
 //! doEachHex・doCommand や別の島と値を共有する。
 
 // TODO(フェーズ4): すべての段階を移植したら外す
-#![allow(dead_code, unused_imports)]
 
 mod auction;
 mod disaster1;
@@ -27,8 +26,6 @@ use super::TurnContext;
 /// doIslandProcess 1 回分の状態。Perl 版の doIslandProcess の `my` 変数に当たる
 #[derive(Debug, Default)]
 pub struct ProcRun {
-    /// 島の配列の位置 (`$number`)
-    pub number: usize,
     /// 怪獣判定の乱数 (`my($r) = random(10000)`)
     pub r: i64,
     /// 人口 (`my($pop)`)
@@ -48,30 +45,15 @@ pub struct ProcessGlobals {
     /// `$eis7` (宇宙ステーション。食料不足と維持の段階が代入する)
     pub eis7: i64,
     pub migrate: migrate::Globals,
-    pub disaster1: disaster1::Globals,
     pub disaster2: disaster2::Globals,
     pub ending: ending::Globals,
-    pub upkeep: upkeep::Globals,
     pub auction: auction::Globals,
-}
-
-/// 島に一時的に持たせる値のうち、島全体の処理の段階ごとのもの
-#[derive(Debug, Clone, Default, PartialEq)]
-pub struct Scratch {
-    pub migrate: migrate::Scratch,
-    pub disaster1: disaster1::Scratch,
-    pub disaster2: disaster2::Scratch,
-    pub upkeep: upkeep::Scratch,
-    pub auction: auction::Scratch,
 }
 
 /// `doIslandProcess($number, $island)`
 pub(crate) fn do_island_process(ctx: &mut TurnContext, islands: &mut [Island], idx: usize) {
     // turnMain のループの中から、マッチの無い状態で呼ばれる
-    let mut p = ProcRun {
-        number: idx,
-        ..Default::default()
-    };
+    let mut p = ProcRun::default();
     prologue(ctx, &mut islands[idx], &mut p);
     migrate::resort_fatigue(ctx, islands, idx, &mut p); // 14635-14849
     disaster1::run(ctx, islands, idx, &mut p); // 14850-15247
