@@ -20,7 +20,13 @@ pub async fn history_page(State(app): State<Arc<AppState>>, headers: HeaderMap) 
     let mut h = String::from("<h1>最近の出来事</h1>\n<div class=\"log\">\n");
     {
         let game = app.game.read().await;
-        for entry in game.logs.turns.iter().flatten().filter(|e| !e.secret) {
+        for entry in game
+            .logs
+            .turns
+            .iter()
+            .flat_map(|t| t.iter())
+            .filter(|e| !e.secret)
+        {
             let _ = writeln!(
                 h,
                 "<p>ターン{}：{}</p>",

@@ -8,6 +8,8 @@
 //! Perl 版の名前と型のまま保持する。Perl 側で `int()` を通して読んでいた項目は `i64`、
 //! そのまま読んでいた項目 (カンマ区切りの複合値など) は `String` にしてある。
 
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 use crate::config::{GameConfig, HideMoneyMode};
@@ -298,17 +300,21 @@ impl LandCell {
 }
 
 /// 島の地図。`cells[y * size + x]`
+///
+/// マスの並びは複製のあいだで共有し、書き換えるときに初めて写す (`Arc::make_mut`)。
+/// 状態のスナップショット ([`GameState`] の複製) を安くするため (docs/SCALING.md)。
+/// 保存の形は `Vec` と同じ
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct IslandMap {
     pub size: usize,
-    pub cells: Vec<LandCell>,
+    pub cells: Arc<Vec<LandCell>>,
 }
 
 impl IslandMap {
     pub fn new_sea(size: usize) -> Self {
         Self {
             size,
-            cells: vec![LandCell::default(); size * size],
+            cells: Arc::new(vec![LandCell::default(); size * size]),
         }
     }
 
@@ -318,10 +324,16 @@ impl IslandMap {
 
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut LandCell> {
         if x < self.size && y < self.size {
-            Some(&mut self.cells[y * self.size + x])
+            let size = self.size;
+            Some(&mut self.cells_mut()[y * size + x])
         } else {
             None
         }
+    }
+
+    /// 書き換えるためのマスの並び (ほかの複製と共有していれば写す)
+    pub fn cells_mut(&mut self) -> &mut Vec<LandCell> {
+        Arc::make_mut(&mut self.cells)
     }
 }
 
@@ -347,8 +359,9 @@ impl PlannedCommand {
 /// ログ類
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Logs {
-    /// ターンごとのログ。`turns[0]` が最新 (`hakojima.log0`)
-    pub turns: Vec<Vec<LogEntry>>,
+    /// ターンごとのログ。`turns[0]` が最新 (`hakojima.log0`)。
+    /// 済んだターンのログは変わらないので、複製のあいだで共有する
+    pub turns: Vec<Arc<Vec<LogEntry>>>,
     /// 発見の記録 (`hakojima.his`)。古い順
     pub history: Vec<TurnMessage>,
     /// Hakoniwa Cup のログ (`hakojima.lhc`)。古い順

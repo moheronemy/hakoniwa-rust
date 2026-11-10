@@ -233,12 +233,21 @@ async fn guard(app: &AppState, headers: &HeaderMap, csrf: &str) -> Result<Login,
     Ok(login)
 }
 
-/// いまのデータを `next` に差し替えて保存する (差し替える前のデータはバックアップに回す)
-async fn replace(app: &AppState, next: GameState) -> anyhow::Result<()> {
-    let mut game = app.game.write().await;
-    storage::rotate_backups(&app.state_path, app.config.backup_keep)?;
-    storage::save(&app.state_path, &next)?;
-    *game = next;
+/// いまのデータを `make` が作るデータに差し替えて保存する (差し替える前のデータはバックアップに回す)。
+/// `make` は書き込みの順番を持ってから呼ぶ (バックアップを読むあいだにターン処理がずらさないように)
+async fn replace(
+    app: &AppState,
+    make: impl FnOnce() -> anyhow::Result<GameState>,
+) -> anyhow::Result<()> {
+    let mut writer = app.game.write().await;
+    let next = Arc::new(make()?);
+    crate::store::save(
+        app.state_path.clone(),
+        next.clone(),
+        Some(app.config.backup_keep),
+    )
+    .await?;
+    writer.publish(next);
     Ok(())
 }
 
@@ -296,13 +305,11 @@ pub async fn restore(
     let Some(n) = form.n.filter(|&n| n < app.config.backup_keep) else {
         return Redirect::to("/admin").into_response();
     };
-    let result = async {
-        let path = storage::backup_path(&app.state_path, n);
-        let game =
-            storage::load(&path)?.ok_or_else(|| anyhow::anyhow!("バックアップ{n}がありません"))?;
-        // 戻す前にバックアップの番号がずれるので、読み込んでから差し替える
-        replace(&app, game).await
-    }
+    let path = storage::backup_path(&app.state_path, n);
+    // 戻す前にバックアップの番号がずれるので、読み込んでから差し替える
+    let result = replace(&app, || {
+        storage::load(&path)?.ok_or_else(|| anyhow::anyhow!("バックアップ{n}がありません"))
+    })
     .await;
     done(
         &app,
@@ -348,7 +355,7 @@ pub async fn reset(
     if form.confirm != "削除する" {
         return redirect_with_flash(&app, &login, "/admin", "「削除する」と入力してください");
     }
-    let result = replace(&app, GameState::new_game(now_unix(), &app.config)).await;
+    let result = replace(&app, || Ok(GameState::new_game(now_unix(), &app.config))).await;
     // 島が無くなるので、島のセッションはすべて無効になる (login_of が確かめる)
     done(&app, &login, result, "新しいゲームを始めました").await
 }

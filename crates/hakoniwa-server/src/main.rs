@@ -8,11 +8,12 @@ mod layout;
 mod pages;
 mod render;
 mod session;
+mod store;
 mod turns;
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
@@ -26,7 +27,6 @@ use hakoniwa_core::{GameConfig, GameState, storage};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use serde::Deserialize;
-use tokio::sync::RwLock;
 
 #[derive(Parser)]
 #[command(version, about = "Hakoniwa R.A. Rust 版のサーバー")]
@@ -83,8 +83,8 @@ pub struct AppState {
     pub options: ServerOptions,
     pub sessions: session::Sessions,
     pub state_path: PathBuf,
-    pub game: RwLock<GameState>,
-    pub rng: Mutex<StdRng>,
+    /// ゲームの状態 (読み取りはスナップショット、書き込みは順番待ち。[`store`] を参照)
+    pub game: store::Store,
 }
 
 pub fn now_unix() -> i64 {
@@ -213,8 +213,7 @@ async fn main() -> Result<()> {
         options: config.options,
         sessions: Default::default(),
         state_path: config.state_path,
-        game: RwLock::new(game),
-        rng: Mutex::new(StdRng::from_entropy()),
+        game: store::Store::new(game, StdRng::from_entropy()),
     });
     tokio::spawn(turns::scheduler(
         state.clone(),
@@ -252,8 +251,7 @@ mod tests {
             options: ServerOptions::default(),
             sessions: Default::default(),
             state_path: dir.path().join("state.json"),
-            game: RwLock::new(game),
-            rng: Mutex::new(StdRng::seed_from_u64(0)),
+            game: store::Store::new(game, StdRng::seed_from_u64(0)),
         });
         (app, dir)
     }
@@ -281,6 +279,38 @@ mod tests {
             .unwrap();
         assert_eq!(res.status(), StatusCode::SEE_OTHER);
         assert_eq!(state.game.read().await.world.turn, 2);
+    }
+
+    /// 書き込み (ターン処理など) のあいだも画面は 1 つ前の状態で返り、
+    /// そのあいだに来た書き込みは待って、前の書き込みが終わってから行われる
+    #[tokio::test]
+    async fn pages_are_served_while_a_writer_holds_the_state() {
+        let (state, _dir) = test_app_with(GameConfig {
+            debug: true,
+            ..Default::default()
+        });
+        let writer = state.game.write().await;
+
+        let res = tokio::time::timeout(
+            Duration::from_secs(5),
+            app(state.clone()).oneshot(Request::get("/").body(Body::empty()).unwrap()),
+        )
+        .await
+        .expect("書き込み中に画面が返らない")
+        .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+
+        let turn = tokio::spawn(
+            app(state.clone()).oneshot(Request::post("/debug/turn").body(Body::empty()).unwrap()),
+        );
+        tokio::time::sleep(Duration::from_millis(100)).await;
+        assert!(!turn.is_finished(), "書き込みが順番を待っていない");
+        assert_eq!(state.game.snapshot().world.turn, 1);
+
+        drop(writer);
+        let res = turn.await.unwrap().unwrap();
+        assert_eq!(res.status(), StatusCode::SEE_OTHER);
+        assert_eq!(state.game.snapshot().world.turn, 2);
     }
 
     #[tokio::test]

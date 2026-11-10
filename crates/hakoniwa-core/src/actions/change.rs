@@ -310,8 +310,8 @@ pub fn set_perl_field(island: &mut Island, config: &GameConfig, key: &str, value
         "auc8" => island.auction.auc8 = s,
         "auc9" => island.auction.auc9 = with_default("0,0,0,0,0"),
         "anflag" => island.survey_flag = if int == 0 { 1 } else { int },
-        "land" => island.map.cells.iter_mut().for_each(|c| c.kind = 0),
-        "landValue" => island.map.cells.iter_mut().for_each(|c| c.value = 0),
+        "land" => island.map.cells_mut().iter_mut().for_each(|c| c.kind = 0),
+        "landValue" => island.map.cells_mut().iter_mut().for_each(|c| c.value = 0),
         "command" => island.commands.fill(PlannedCommand::default()),
         "lbbs" => island.lbbs.fill(String::new()),
         _ => {

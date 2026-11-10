@@ -70,13 +70,15 @@ fn import_files(files: &Files) -> GameState {
 fn fix_want(want: &mut GameState) {
     // 移植版は Perl 版の負荷計測のログを出さない
     for turn in &mut want.logs.turns {
-        turn.retain(|e| !e.message.contains("負荷計測"));
+        std::sync::Arc::make_mut(turn).retain(|e| !e.message.contains("負荷計測"));
     }
     // Hakoniwa Cup の試合のログの「−」(full_turn_tests.rs の stadium_dash)
     let fix = |m: &mut String| *m = m.replace('－', "−");
     want.logs.hcup.iter_mut().for_each(|m| fix(&mut m.message));
     for turn in &mut want.logs.turns {
-        turn.iter_mut().for_each(|e| fix(&mut e.message));
+        std::sync::Arc::make_mut(turn)
+            .iter_mut()
+            .for_each(|e| fix(&mut e.message));
     }
 }
 

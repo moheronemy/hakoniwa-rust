@@ -126,7 +126,7 @@ pub fn remote_addr(app: &Arc<AppState>, headers: &HeaderMap, peer: Option<Socket
 
 #[cfg(test)]
 pub(crate) mod test_util {
-    use std::sync::{Arc, Mutex};
+    use std::sync::Arc;
 
     use axum::body::Body;
     use axum::http::{Request, header};
@@ -136,7 +136,6 @@ pub(crate) mod test_util {
     use http_body_util::BodyExt;
     use rand::SeedableRng;
     use rand::rngs::StdRng;
-    use tokio::sync::RwLock;
     use tower::ServiceExt;
 
     use crate::{AppState, ServerOptions, app};
@@ -158,8 +157,7 @@ pub(crate) mod test_util {
             options: ServerOptions::default(),
             sessions: Default::default(),
             state_path: dir.path().join("state.json"),
-            game: RwLock::new(game),
-            rng: Mutex::new(StdRng::seed_from_u64(0)),
+            game: crate::store::Store::new(game, StdRng::seed_from_u64(0)),
         });
         (state, dir)
     }

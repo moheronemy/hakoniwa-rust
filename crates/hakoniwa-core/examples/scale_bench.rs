@@ -9,6 +9,9 @@
 //!     --fixture size-128-1 --islands 1000 --turns 3 --max-turn-secs 10
 //! ```
 //!
+//! `--save PATH` を付けると、複製して作った (ターンを進める前の) 状態を `state.json` の形で保存する
+//! (サーバーを目標の規模で動かして確かめるため)。
+//!
 //! `size-128-1` は 128×128 の 3/4 が陸 (全地形をばらまいたもの) で、最悪の場合に近い。
 //! `size-128-2` は 6 割が海。12×12 なら `phase4-mix-1` など。
 
@@ -27,6 +30,7 @@ struct Args {
     islands: usize,
     turns: usize,
     max_turn_secs: Option<f64>,
+    save: Option<std::path::PathBuf>,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -35,6 +39,7 @@ fn parse_args() -> Result<Args, String> {
         islands: 1000,
         turns: 3,
         max_turn_secs: None,
+        save: None,
     };
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
@@ -46,6 +51,7 @@ fn parse_args() -> Result<Args, String> {
             "--max-turn-secs" => {
                 args.max_turn_secs = Some(value()?.parse().map_err(|e| format!("{a}: {e}"))?)
             }
+            "--save" => args.save = Some(value()?.into()),
             _ => return Err(format!("知らない引数 {a}")),
         }
     }
@@ -95,6 +101,11 @@ fn main() -> ExitCode {
         args.islands * size * size
     );
 
+    if let Some(path) = &args.save {
+        hakoniwa_core::storage::save(path, &game).expect("保存できません");
+        println!("{} に保存しました", path.display());
+    }
+
     let mut rng = StdRng::seed_from_u64(1);
     let mut worst: f64 = 0.0;
     for _ in 0..args.turns {
@@ -102,7 +113,7 @@ fn main() -> ExitCode {
         let report = run_turn(&mut game, &config, &mut rng);
         let secs = t.elapsed().as_secs_f64();
         worst = worst.max(secs);
-        let logs = game.logs.turns.first().map_or(0, Vec::len);
+        let logs = game.logs.turns.first().map_or(0, |t| t.len());
         println!(
             "ターン {:>4}: {secs:>7.3} 秒  ログ {logs} 件  残った島 {}",
             report.turn,

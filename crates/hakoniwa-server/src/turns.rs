@@ -3,39 +3,49 @@
 //! Perl 版はアクセスがあったときに「前回の更新から 1 ターンの秒数が過ぎていれば」
 //! 1 ターン進めていた。移植版はサーバーが定期的に時刻を確かめ、過ぎているターンを
 //! すべて順に処理する (止まっていた間の分も追いつく)。
+//!
+//! ターン処理は書き込みの順番待ち ([`crate::store`]) に並び、今の状態の複製に対して
+//! 別のスレッドで行う。そのあいだ画面は 1 つ前の状態を出し、操作はターンが終わるまで待つ。
 
 use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Result;
-use hakoniwa_core::model::GameState;
 use hakoniwa_core::storage;
 use hakoniwa_core::turn::run_turn;
 
+use crate::store::Writer;
 use crate::{AppState, now_unix};
 
 /// 1 ターン進めて保存する。バックアップのターンなら、保存の前に前のデータを退避する
-fn run_one(app: &AppState, game: &mut GameState) -> Result<i64> {
-    let mut next = game.clone();
-    let report = {
-        let mut rng = app.rng.lock().expect("rng lock poisoned");
-        run_turn(&mut next, &app.config, &mut *rng)
-    };
-    if report.backup_due {
-        storage::rotate_backups(&app.state_path, app.config.backup_keep)?;
-    }
-    storage::save(&app.state_path, &next)?;
-    // 保存できたときだけメモリ上の状態を進める
-    *game = next;
-    Ok(report.turn)
+async fn run_one(app: &AppState, writer: &mut Writer<'_>) -> Result<i64> {
+    let current = writer.current();
+    let config = app.config.clone();
+    let path = app.state_path.clone();
+    let mut rng = writer.rng().clone();
+    let (next, turn, rng) = tokio::task::spawn_blocking(move || -> Result<_> {
+        let mut next = (*current).clone();
+        drop(current);
+        let report = run_turn(&mut next, &config, &mut rng);
+        if report.backup_due {
+            storage::rotate_backups(&path, config.backup_keep)?;
+        }
+        storage::save(&path, &next)?;
+        Ok((next, report.turn, rng))
+    })
+    .await??;
+    // 保存できたときだけ新しい状態を公開し、乱数を進める
+    *writer.rng() = rng;
+    writer.publish(Arc::new(next));
+    Ok(turn)
 }
 
 /// 時刻が来ているターンをすべて処理する。処理したターン番号を返す
 pub async fn run_due_turns(app: &AppState, now: i64) -> Result<Vec<i64>> {
-    let mut game = app.game.write().await;
+    let mut writer = app.game.write().await;
     let mut done = Vec::new();
-    while game.world.turn_due(now, &app.config) {
-        done.push(run_one(app, &mut game)?);
+    while writer.current().world.turn_due(now, &app.config) {
+        done.push(run_one(app, &mut writer).await?);
     }
     Ok(done)
 }
@@ -43,8 +53,8 @@ pub async fn run_due_turns(app: &AppState, now: i64) -> Result<Vec<i64>> {
 /// 時刻に関係なく 1 ターン進める (デバッグモードの「ターンを進める」)。
 /// Perl 版と同じく、最終更新時刻も 1 ターン分進む
 pub async fn force_turn(app: &AppState) -> Result<i64> {
-    let mut game = app.game.write().await;
-    run_one(app, &mut game)
+    let mut writer = app.game.write().await;
+    run_one(app, &mut writer).await
 }
 
 /// 定期的にターンの時刻を確かめる

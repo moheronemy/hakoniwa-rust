@@ -360,7 +360,7 @@ fn ijiri(
             let v = if l2n > 4000.0 { 4000 } else { perl::trunc(l2n) };
             let size = config.island_size;
             if arg == 1.0 {
-                for c in island.map.cells.iter_mut() {
+                for c in island.map.cells_mut().iter_mut() {
                     c.kind = kind;
                     c.value = v;
                 }
