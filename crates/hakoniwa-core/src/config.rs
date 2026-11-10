@@ -39,6 +39,8 @@ pub struct GameConfig {
     pub log_max: usize,
     /// トップページに表示するログのターン数 (`$HtopLogTurn`)
     pub top_log_turns: usize,
+    /// トップページの「諸島の状況」に一度に表示する島の数 (`$viewNumber`)
+    pub top_view_number: usize,
     /// 発見ログ保持行数 (`$HhistoryMax`)
     pub history_max: usize,
     /// Hakoniwa Cup ログ保持行数 (`$HhcMax`)
@@ -114,6 +116,7 @@ impl Default for GameConfig {
             command_max: 40,
             log_max: 8,
             top_log_turns: 1,
+            top_view_number: 20,
             history_max: 20,
             hcup_log_max: 20,
             backup_every_turns: 12,

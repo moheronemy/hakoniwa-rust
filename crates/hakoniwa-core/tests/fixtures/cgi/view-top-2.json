@@ -1,0 +1,7 @@
+{"fixture": "view-top",
+ "perl_settings": {"HhideMoneyMode": "1", "viewNumber": "2", "AnkeitoOnOff": "1"},
+ "requests": [
+  {"form": {}},
+  {"form": {}, "query": "view2="},
+  {"form": {}, "query": "view5="}
+]}

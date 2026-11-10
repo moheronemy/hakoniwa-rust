@@ -1,0 +1,5 @@
+{"fixture": "view-top", "requests": [
+  {"form": {}},
+  {"form": {}, "query": "view1="},
+  {"form": {}, "query": "viewALL="}
+]}
