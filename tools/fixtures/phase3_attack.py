@@ -305,6 +305,7 @@ for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
     # 島 3: 撃つ許可、大学 99 と 4 (叩き落とされにくい)
     b = {}
     home(b, row=11, extra=(("College", 99), ("College", 4)))
+    b[(11, 0)] = mon(1, 5)  # 島 1 は島 3 を撃つ許可がない (怪獣がいるので賠償金ではなく中止)
     put(f, 3, b)
     f.ips(3, etc7="2,5,2")
     for i in (1, 2, 3):
@@ -312,6 +313,7 @@ for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
     cmds = {1: [], 3: [], 2: []}
     for (x, y), (_, shooter, kind, arg) in zip(SPOTS, MON_SPEC):
         cmds[shooter].append((kind, 2, x, y, arg))
+    cmds[1].append((NM, 3, 11, 0, 1))
     for i, c in cmds.items():
         f.commands(i, c)
     if turn:
@@ -320,7 +322,7 @@ for name, turn in (("phase3-attack-mon", None), ("phase3-attack-mon6", 6)):
 
 # ---------------------------------------------------------------------------
 # phase3-attack-boat: 難民 (平和賞 16・32、平地に 5 人を超える残り)、ステルスは難民なし、
-# 基地なし、賠償金
+# 基地なし、賠償金 (許可の状態が 2 でも相手の島が違えば賠償金)、動物園のない島への動物派遣
 f = Fixture("phase3-attack-boat")
 t = {(0, 0): ("Bigtown", 3000), (2, 0): ("Bigtown", 3000), (1, 1): ("Bigtown", 3000),
      (6, 0): ("Bigtown", 2015), (8, 0): ("Bigtown", 2015), (7, 1): ("Bigtown", 2015),
@@ -359,6 +361,7 @@ f.commands(3, [
     (PP, 2, 6, 0, 1),
     (ST, 2, 0, 4, 1),
     (SEND, 2, 0, 0, 1),
+    (NM, 1, 5, 5, 1),
 ])
 f.commands(2, [
     (NM, 2, 0, 0, 1),
@@ -371,19 +374,21 @@ f = Fixture("phase3-attack-send")
 # 大学 99 があるので eisei5 が残る (estimate が消さない)
 # 島 2: 動物園 (怪獣 1 が 3 匹)、大使館 3 つ (それ以上受け入れない)。許可は島 3 (状態 1)
 t = {(x, 0): ("Plains", 0) for x in range(12)}
-t.update({(0, 2): ("Zoo", 0), (1, 2): ("Taishi", 1), (2, 2): ("Taishi", 3),
+t.update({(0, 2): ("Zoo", 0), (1, 2): ("Taishi", 3), (2, 2): ("Taishi", 3),
           (3, 2): ("Taishi", 3), (4, 2): ("Forest", 10), (5, 2): ("College", 99)})
 home(t, row=11)
 put(f, 2, t)
 f.ips(2, etc7="1,0,3", etc6=",".join(["0", "3"] + ["0"] * 29))
-f.main(2, eisei5="0,0,0,0,0,300,0")
-# 島 1: 動物園 (怪獣 1 と 30 を 2 匹ずつ)、島 2 への許可
+f.main(2, eisei5="0,0,0,0,0,50,0")
+# 島 1: 動物園 (怪獣 1 と 30 を 2 匹ずつ、7 を 1 匹)、島 2 への許可。
+# 島 2 の経験値 (eisei5 の 6 番目) は 50 なので、怪獣 7 (経験値 30 の 2 倍) は送れない
 a = {(x, 0): ("Plains", 0) for x in range(12)}
 a[(0, 2)] = ("Zoo", 0)
 a[(1, 2)] = ("College", 99)
+a[(2, 2)] = ("RottenSea", 5)  # 怪獣はいないが腐海があるので、許可がなくても賠償金にはならない
 home(a, row=11)
 put(f, 1, a)
-f.ips(1, etc7="2,0,2", etc6=",".join(["0", "2"] + ["0"] * 28 + ["2"]))
+f.ips(1, etc7="2,0,2", etc6=",".join(["0", "2"] + ["0"] * 5 + ["1"] + ["0"] * 22 + ["2"]))
 f.main(1, eisei5="0,0,0,0,0,100,0")
 # 島 3: 発電所がない (エネルギー不足)、島 2 への許可
 b = {(x, 0): ("Plains", 0) for x in range(12)}
@@ -398,6 +403,7 @@ f.commands(1, [
     (SEND, 99, 0, 0, 1),
     (SEND, 3, 0, 0, 1),
     (SEND, 2, 0, 0, 31),
+    (SEND, 2, 0, 0, 7),
     (SEND, 2, 0, 0, 1),
     (TAISHI, 99, 0, 0, 0),
     (TAISHI, 1, 0, 0, 0),
@@ -405,7 +411,7 @@ f.commands(1, [
     (TAISHI, 3, 20, 0, 0),
     (TAISHI, 3, 0, 2, 0),
     (TAISHI, 3, 1, 0, 0),
-    (NM, 3, 0, 0, 1),
+    (NM, 3, 0, 0, 1),  # 島 3 がこのターンに島 1 に大使館を置いたので同盟になっている
 ])
 f.commands(3, [
     (NM, 2, 0, 0, 1),
@@ -417,6 +423,7 @@ f.commands(2, [
     (SEND, 1, 0, 0, 1),
     (TAISHI, 1, 3, 0, 0),
     (TAISHI, 3, 3, 0, 0),
+    (NM, 1, 0, 0, 1),
 ])
 f.save()
 
