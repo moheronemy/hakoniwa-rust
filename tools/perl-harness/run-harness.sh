@@ -5,8 +5,9 @@
 # Usage: tools/perl-harness/run-harness.sh FIXTURE STEPS
 #   FIXTURE  directory name under crates/hakoniwa-core/tests/fixtures
 #   STEPS    comma separated, e.g. estimate,estimate,income,commands
-# Writes FIXTURE.rand0.expected.json and FIXTURE.rand50.expected.json
-# (rand() pinned to 0 and to 0.5).
+# Writes FIXTURE.rand<D>.expected.json for each D in $RANDS (default "0 50"),
+# with rand() pinned to the number 0.D (e.g. 0 -> 0, 50 -> 0.5, 03125 -> 1/32).
+# Use exact binary fractions so that Rust's generator can produce the same value.
 set -eu
 root=$(cd "$(dirname "$0")/../.." && pwd)
 fixture="$root/crates/hakoniwa-core/tests/fixtures/$1"
@@ -20,7 +21,7 @@ awk '/require\(\$jcode\)/ { skip = 1 } skip && /^sub / { skip = 0 } !skip { prin
 cp "$root/hako-r-a_FE/hako-turn.cgi" "$work/turn.cgi"
 
 cd "$work"
-for r in 0 50; do
+for r in ${RANDS:-0 50}; do
   rm -rf data && cp -r "$fixture" data
   out="$fixture.rand$r.expected.json"
   STEPS="$steps" HAKO_RAND="0.$r" \

@@ -173,6 +173,25 @@ pub(crate) const RAND_HALF: u64 = 1 << 63;
 
 /// `fixture` を Perl 版の期待値と突き合わせる。`rng_value` は 0 か [`RAND_HALF`]
 pub(crate) fn check_fixture(fixture: &str, rng_value: u64) {
+    check_fixture_at(fixture, if rng_value == 0 { "0" } else { "50" });
+}
+
+/// `rand()` を `0.<digits>` に固定した期待値 (`<fixture>.rand<digits>.expected.json`) と突き合わせる。
+/// `0.<digits>` は 2 進で割り切れる数 (1/32 = 0.03125 など) にすること
+pub(crate) fn check_fixture_at(fixture: &str, digits: &str) {
+    let r: f64 = format!("0.{digits}").parse().unwrap();
+    // rand 0.8 の f64 は u64 の上位 53 ビット × 2^-53
+    let mantissa = r * (1u64 << 53) as f64;
+    assert_eq!(mantissa.fract(), 0.0, "0.{digits} is not representable");
+    let rng_value = (mantissa as u64) << 11;
+    check_fixture_inner(
+        fixture,
+        rng_value,
+        &format!("{fixture}.rand{digits}.expected.json"),
+    );
+}
+
+fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
     let config = GameConfig::default();
     let import = legacy::import_dir(
         &fixture_dir().join(fixture),
@@ -181,12 +200,8 @@ pub(crate) fn check_fixture(fixture: &str, rng_value: u64) {
     )
     .unwrap();
     let mut islands = import.state.world.islands;
-    let expected_file = format!(
-        "{fixture}.rand{}.expected.json",
-        if rng_value == 0 { "0" } else { "50" }
-    );
     let expected: Vec<Value> = serde_json::from_str(
-        &std::fs::read_to_string(fixture_dir().join(&expected_file))
+        &std::fs::read_to_string(fixture_dir().join(expected_file))
             .unwrap_or_else(|e| panic!("{expected_file}: {e}")),
     )
     .unwrap();
@@ -614,4 +629,84 @@ fn phase2_monster_misc_matches_perl_with_rand_0() {
 #[test]
 fn phase2_monster_misc_matches_perl_with_rand_half() {
     check_fixture("phase2-monster-misc", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_1_matches_perl_with_rand_0() {
+    check_fixture("phase2-mix-1", 0);
+}
+
+#[test]
+fn phase2_mix_1_matches_perl_with_rand_half() {
+    check_fixture("phase2-mix-1", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_2_matches_perl_with_rand_0() {
+    check_fixture("phase2-mix-2", 0);
+}
+
+#[test]
+fn phase2_mix_2_matches_perl_with_rand_half() {
+    check_fixture("phase2-mix-2", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_3_matches_perl_with_rand_0() {
+    check_fixture("phase2-mix-3", 0);
+}
+
+#[test]
+fn phase2_mix_3_matches_perl_with_rand_half() {
+    check_fixture("phase2-mix-3", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_4_matches_perl_with_rand_0() {
+    check_fixture("phase2-mix-4", 0);
+}
+
+#[test]
+fn phase2_mix_4_matches_perl_with_rand_half() {
+    check_fixture("phase2-mix-4", RAND_HALF);
+}
+
+#[test]
+fn phase2_mix_1_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase2-mix-1", "03125");
+}
+
+#[test]
+fn phase2_mix_1_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase2-mix-1", "96875");
+}
+
+#[test]
+fn phase2_mix_2_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase2-mix-2", "03125");
+}
+
+#[test]
+fn phase2_mix_2_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase2-mix-2", "96875");
+}
+
+#[test]
+fn phase2_mix_3_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase2-mix-3", "03125");
+}
+
+#[test]
+fn phase2_mix_3_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase2-mix-3", "96875");
+}
+
+#[test]
+fn phase2_mix_4_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase2-mix-4", "03125");
+}
+
+#[test]
+fn phase2_mix_4_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase2-mix-4", "96875");
 }
