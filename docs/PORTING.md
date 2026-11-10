@@ -89,16 +89,18 @@ tools/
 | `encode`, `checkPassword` | パスワード照合 | 未 (下記「パスワード」) |
 | `turnMain` | `core::turn::run_turn` | 一部 (下記「フェーズ 1」) |
 | `estimate`, `income` | `core::turn::estimate`, `core::turn::income` | 済 (Perl 版と突き合わせ済み) |
-| `countGrow`, `doIslandunemployed` | `core::turn` | 未 |
-| `doEachHex` | `core::turn::hex` (地形ごとに分割) | 未 |
+| `doIslandunemployed` | `core::turn` | 未 |
+| `doEachHex` | `core::turn::hex` (地形の系統ごとに分割) | 済 (Perl 版と突き合わせ済み) |
 | `doCommand` | `core::turn::command` (計画ごとに分割) | 共通部分・資金繰り・放棄のみ |
-| `doIslandProcess`, `wideDamage`, `wideDamageli` | `core::turn::island`, `core::disaster` | 未 |
+| `doIslandProcess`, `wideDamageli` | `core::turn::island`, `core::disaster` | 未 |
+| `wideDamage` | `core::turn::hex::monster::wide_damage` | 済 |
 | `makeRandomPointArray`, `randomArray`, `monsterSpec` | `core::turn` | 済 |
-| `countAround`, `expToLevel`, `nameToNumber` | `core::turn` など | 未 |
+| `countAround`, `countGrow`, `landName` | `core::land`, `core::turn::hex::town` | 済 |
+| `expToLevel`, `nameToNumber` | `core::turn` など | 未 |
 | `newIslandMain`, `makeNewIsland`, `makeNewLand` | `core::island::create` | 未 |
 | `changeMain`, `changeOwner` | `core::island` | 未 |
 | `logOut`, `logLate`, `logSecret`, `logHistory`, `logFlush` | `core::log::TurnLog` | 済 |
-| `log*` (281 個の文面) | `core::log::msg` (Perl 版と同じ HTML の文面) | 使う分から順に (いま 10 個) |
+| `log*` (281 個の文面) | `core::log::msg` と各ファイルの文面 (Perl 版と同じ HTML) | 使う分から順に (doEachHex で使う分まで済) |
 | `islandSort`, 部門賞の `islandSort*` | `core::turn::ranking` | 済 |
 | `tempTopPage`, ランキング表示の `islandSort*` | サーバーのトップページ・ランキング | 一部 (順位表のみ) |
 | `islandInfo`, `islandMap`, `landString`, `landName`, `tempOwner`, `tempCommand`, `commandMain` | サーバーの開発画面・観光画面 | 未 |
