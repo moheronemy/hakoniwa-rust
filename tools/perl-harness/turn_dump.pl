@@ -55,7 +55,7 @@ my @scratch = qw(shouhi ene sabun con99 factory1 factory2 factoryt oil bas htf s
   hou shu sin jin h10 h11 co0 co1 co4 co7 co8 co77 co99 c13 c28 tet m26 m27 m74 m75 m79
   m84 m93 kyu ky2 zoo sci pro sba amu kin tra tra1 tra2 fukeikimoney unemployed
   monsterlive2 kachiten kachitent shoritu styusho teamforce force uni tuni auc0c auc5c
-  dead ownfe absent incomemoney);
+  dead ownfe absent incomemoney trainmoney trainmoney2);
 
 sub str { my $v = shift; defined $v ? Encode::decode('euc-jp', "$v") : '' }
 
