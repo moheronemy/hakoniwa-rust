@@ -16,7 +16,7 @@ use std::fmt;
 use serde::de::Error as _;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::model::{LogEntry, LogRecord};
+use crate::model::LogEntry;
 
 /// 1 つのかたまりの行数
 pub const CHUNK: usize = 1024;
@@ -30,7 +30,7 @@ const LEVEL: i32 = 1;
 struct Packed {
     /// 行数
     len: usize,
-    /// `CHUNK` 行ずつ ([`LogRecord`] の並び) bincode にして zstd で圧縮したもの
+    /// `CHUNK` 行ずつ bincode にして zstd で圧縮したもの
     chunks: Vec<Vec<u8>>,
     /// 島 ID → その島が関わる行を含むかたまりの番号 (昇順)
     index: BTreeMap<i64, Vec<u32>>,
@@ -42,14 +42,9 @@ pub struct TurnLog(Packed);
 impl TurnLog {
     /// 行の並びから作る。かたまりの圧縮は CPU の数だけ並べて行う (ゲームの結果には関わらない)
     pub fn new(entries: Vec<LogEntry>) -> Self {
-        Self::from_records(entries.into_iter().map(LogRecord::from_entry).collect())
-    }
-
-    /// 溜めたログ (文面と出来事) から作る。出来事は文面にせずに持つ
-    pub fn from_records(entries: Vec<LogRecord>) -> Self {
         let len = entries.len();
         let mut index: BTreeMap<i64, Vec<u32>> = BTreeMap::new();
-        let groups: Vec<&[LogRecord]> = entries.chunks(CHUNK).collect();
+        let groups: Vec<&[LogEntry]> = entries.chunks(CHUNK).collect();
         // かたまりごとに島 ID を集めて重複を除いてから索引に入れる
         // (行ごとに索引を引くと、数百万行では圧縮より時間がかかる)
         let mut ids: Vec<i64> = Vec::with_capacity(CHUNK * 2);
@@ -78,7 +73,7 @@ impl TurnLog {
     pub fn entries(&self) -> Vec<LogEntry> {
         let mut out = Vec::with_capacity(self.0.len);
         for chunk in &self.0.chunks {
-            out.extend(decompress(chunk).iter().map(LogRecord::to_entry));
+            out.extend(decompress(chunk));
         }
         out
     }
@@ -91,7 +86,6 @@ impl TurnLog {
         list.iter()
             .flat_map(|&n| decompress(&self.0.chunks[n as usize]))
             .filter(|e| e.island1 == Some(id) || e.island2 == Some(id))
-            .map(|r| r.to_entry())
             .collect()
     }
 
@@ -108,7 +102,7 @@ impl TurnLog {
                 decompress(chunk)
                     .into_iter()
                     .enumerate()
-                    .map(move |(i, r)| (n * CHUNK + i, r.to_entry()))
+                    .map(move |(i, e)| (n * CHUNK + i, e))
             })
             .skip(start % CHUNK)
     }
@@ -128,19 +122,19 @@ impl TurnLog {
 
 /// 1 つのかたまりを圧縮する。圧縮器 (zstd の作業領域) はスレッドの中で使い回す
 /// (かたまりごとに作ると、それだけで圧縮より時間がかかる)
-fn compress(z: &mut zstd::bulk::Compressor<'_>, raw: &mut Vec<u8>, group: &[LogRecord]) -> Vec<u8> {
+fn compress(z: &mut zstd::bulk::Compressor<'_>, raw: &mut Vec<u8>, group: &[LogEntry]) -> Vec<u8> {
     raw.clear();
     bincode::serialize_into(&mut *raw, group).expect("ログを bincode にできない");
     z.compress(raw).expect("ログを圧縮できない")
 }
 
-fn compress_part(part: &[&[LogRecord]]) -> Vec<Vec<u8>> {
+fn compress_part(part: &[&[LogEntry]]) -> Vec<Vec<u8>> {
     let mut z = zstd::bulk::Compressor::new(LEVEL).expect("圧縮器を作れない");
     let mut raw = Vec::new();
     part.iter().map(|g| compress(&mut z, &mut raw, g)).collect()
 }
 
-fn compress_all(groups: &[&[LogRecord]]) -> Vec<Vec<u8>> {
+fn compress_all(groups: &[&[LogEntry]]) -> Vec<Vec<u8>> {
     let threads = std::thread::available_parallelism()
         .map(|n| n.get())
         .unwrap_or(1)
@@ -161,7 +155,7 @@ fn compress_all(groups: &[&[LogRecord]]) -> Vec<Vec<u8>> {
     })
 }
 
-fn decompress(chunk: &[u8]) -> Vec<LogRecord> {
+fn decompress(chunk: &[u8]) -> Vec<LogEntry> {
     // 1 かたまりは CHUNK 行。1 行あたりの上限を大きめに見積もる
     let raw = zstd::bulk::decompress(chunk, CHUNK * 64 * 1024).expect("ログを展開できない");
     bincode::deserialize(&raw).expect("ログの形が違う")

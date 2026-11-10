@@ -522,14 +522,16 @@ pub(super) fn kyujo(
         }
         if value > 0 {
             island.money += value;
-            ctx.log.oil_money(
+            ctx.log.out(
                 turn,
-                id,
-                &island.name,
-                (h.x, h.y),
-                (h.land_kind, h.lv),
-                value,
-                &ctx.config.units.money,
+                oil_money(
+                    &island.name,
+                    &land_name(h.land_kind, h.lv),
+                    &h.point(),
+                    &format!("{value}{}", ctx.config.units.money),
+                ),
+                Some(id),
+                None,
             );
         }
     }
@@ -609,14 +611,16 @@ pub(super) fn umiamu(
         }
         if value > 0 {
             island.money += value;
-            ctx.log.oil_money(
+            ctx.log.out(
                 ctx.turn,
-                island.id,
-                &island.name,
-                (h.x, h.y),
-                (h.land_kind, h.lv),
-                value,
-                &ctx.config.units.money,
+                oil_money(
+                    &island.name,
+                    &land_name(h.land_kind, h.lv),
+                    &h.point(),
+                    &format!("{value}{}", ctx.config.units.money),
+                ),
+                Some(island.id),
+                None,
             );
         }
     }
@@ -718,6 +722,14 @@ fn kankou_migrate(name: &str, l_name: &str, t_name: &str, point: &str, pop: &str
     format!(
         "{}から{}の<B>{l_name}</B>へ<B>{pop}</B>の観光者が来てくれました。ありがとうございます。",
         msg::island(t_name),
+        msg::island_at(name, point)
+    )
+}
+
+/// `logOilMoney`
+fn oil_money(name: &str, l_name: &str, point: &str, amount: &str) -> String {
+    format!(
+        "{}の<B>{l_name}</B>から、<B>{amount}</B>の収益が上がりました。",
         msg::island_at(name, point)
     )
 }
