@@ -19,6 +19,8 @@ mod land;
 mod magic;
 mod ops;
 
+pub(crate) use attack::exp_to_level;
+
 use crate::land::{land_name, perl_get};
 use crate::model::{Island, PlannedCommand};
 use crate::tables::{CommandKind as C, HOUSE_LEVELS, LandKind};

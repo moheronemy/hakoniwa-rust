@@ -1,0 +1,8 @@
+{"fixture": "phase5-view-2", "requests": [
+  {"query": "Sight=1"},
+  {"query": "Sight=2"},
+  {"query": "Sight=3"},
+  {"form": {"ISLANDID": "1", "PASSWORD": "pass1", "OwnerButton": "1"}},
+  {"form": {"ISLANDID": "2", "PASSWORD": "pass2", "OwnerButton": "1"}},
+  {"form": {"ISLANDID": "3", "PASSWORD": "pass3", "OwnerButton": "1"}}
+]}
