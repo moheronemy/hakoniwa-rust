@@ -647,6 +647,33 @@ mod tests {
         assert_eq!(journals, 1);
     }
 
+    /// ディレクトリを丸ごと複製する (テスト用データを開くと中身を整理するので、写しを開く)
+    fn copy_dir(from: &Path, to: &Path) {
+        fs::create_dir_all(to).unwrap();
+        for e in fs::read_dir(from).unwrap().flatten() {
+            let p = e.path();
+            if p.is_dir() {
+                copy_dir(&p, &to.join(e.file_name()));
+            } else {
+                fs::copy(&p, to.join(e.file_name())).unwrap();
+            }
+        }
+    }
+
+    /// 形式の版 1 (bincode) で書いたデータディレクトリ (`tests/fixtures/persist-v1`、
+    /// スナップショット・ターンのログ・操作の差分 3 件) を読める。今後、形式を変えても読めること
+    #[test]
+    fn reads_format_1_data() {
+        let fixtures = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures");
+        let tmp = tempfile::tempdir().unwrap();
+        copy_dir(&fixtures.join("persist-v1"), tmp.path());
+        let (_, state) = DataDir::open(tmp.path()).unwrap().unwrap();
+        let file = fs::File::open(fixtures.join("persist-v1.expected.json.gz")).unwrap();
+        let want: serde_json::Value =
+            serde_json::from_reader(flate2::read::GzDecoder::new(file)).unwrap();
+        assert_eq!(json(&state), want);
+    }
+
     #[test]
     fn a_half_written_record_is_dropped() {
         let tmp = tempfile::tempdir().unwrap();
