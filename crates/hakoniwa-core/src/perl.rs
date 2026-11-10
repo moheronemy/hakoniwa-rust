@@ -156,6 +156,37 @@ pub fn html_escape(s: &str) -> String {
     out
 }
 
+/// `cgiInput` が入力の文字に加える加工: 制御文字 (0x00〜0x1f) とカンマを取り除く。
+///
+/// Perl 版は値を URL デコードしてから `KEY=([^\&]*)\&` で切り出すので、値の中の `&` から
+/// 後ろが消える。これは入力の読み取りの不具合なので移植版では再現しない
+/// (突き合わせのデータには `&` を入れない)
+pub fn cgi_text(s: &str) -> String {
+    s.chars().filter(|&c| c >= ' ' && c != ',').collect()
+}
+
+/// `cutColumn($s, $c)`: EUC-JP のバイト数 (半角 1、全角 2) で `c` 桁に切り詰める。
+/// 全角の文字で `c` を 1 桁超えることがある (Perl 版のまま)
+pub fn cut_column(s: &str, c: usize) -> String {
+    let width = |ch: char| if ch.is_ascii() { 1 } else { 2 };
+    if s.chars().map(width).sum::<usize>() <= c {
+        return s.to_string();
+    }
+    let mut out = String::new();
+    let mut count = 0;
+    let mut chars = s.chars();
+    while count < c {
+        match chars.next() {
+            Some(ch) => {
+                out.push(ch);
+                count += width(ch);
+            }
+            None => break,
+        }
+    }
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -218,5 +249,14 @@ mod tests {
         for _ in 0..100 {
             assert!((-4..=0).contains(&random(&mut rng, -5)));
         }
+    }
+
+    #[test]
+    fn cut_column_counts_euc_bytes() {
+        assert_eq!(cut_column("abc", 5), "abc");
+        assert_eq!(cut_column("あいうえお", 4), "あい");
+        // 全角で 1 桁はみ出す (Perl 版のまま)
+        assert_eq!(cut_column("aあいう", 4), "aあい");
+        assert_eq!(cgi_text("a,b\tc\nd"), "abcd");
     }
 }

@@ -1,0 +1,3 @@
+{"fixture": "legacy-turn3", "requests": [
+  {"form": {"ISLANDID": "1", "PASSWORD": "pass1", "MESSAGE": "やあ<b>,\"x\"", "MessageButton1": "1"}}
+]}

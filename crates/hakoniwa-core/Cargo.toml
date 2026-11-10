@@ -11,6 +11,7 @@ toml.workspace = true
 thiserror.workspace = true
 encoding_rs.workspace = true
 rand.workspace = true
+pwhash = "1"
 
 [dev-dependencies]
 tempfile.workspace = true

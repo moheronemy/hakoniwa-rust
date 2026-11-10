@@ -1,5 +1,6 @@
 //! Hakoniwa R.A. (箱庭諸島2 ver2.30 改造版) の Rust 移植のコア。
 //!
+//! - [`actions`] — 画面からの操作 (島の登録・計画の入力・掲示板など)
 //! - [`config`] — ゲーム設定 (Perl 版の設定値)
 //! - [`tables`] — 地形・計画・怪獣などの定義表 (Perl 版から自動生成)
 //! - [`model`] — セーブデータのモデル
@@ -12,6 +13,7 @@
 //!
 //! ゲームのルールは移植の途中。進み具合は `docs/PORTING.md` を参照。
 
+pub mod actions;
 pub mod config;
 pub mod land;
 pub mod legacy;

@@ -1,7 +1,8 @@
 """Helpers for building Perl-format fixtures for the Perl comparison tests.
 
 A fixture starts as a copy of tests/fixtures/legacy-turn3 (real data written by the
-Perl version: 3 islands, ids 3, 1, 2 in that order in hakojima.dat) and is then
+Perl version: 3 islands, ids 3, 1, 2 in that order in hakojima.dat; the password of island N
+is "passN") and is then
 edited: maps, planned commands and single values of the per-island data files.
 
 Typical use (see phase2_town.py):
