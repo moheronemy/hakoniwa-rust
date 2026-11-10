@@ -141,6 +141,8 @@ fn field(island: &Island, name: &str) -> String {
         "trainmoney2" => n(sc.trainmoney2),
         "hcsankaflag" => n(sc.hcsankaflag),
         "stsankahantei" => n(sc.hex.stadium.stsankahantei),
+        "bigmissile" => n(sc.command.build.bigmissile),
+        "par" => n(sc.par),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -759,4 +761,65 @@ fn phase2_mix_6_matches_perl_with_rand_50() {
 #[test]
 fn phase2_mix_6_matches_perl_with_rand_96875() {
     check_fixture_at("phase2-mix-6", "96875");
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-1", 0);
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-1", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-1", "03125");
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase3-build-1", "96875");
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-2", 0);
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-2", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-2", "03125");
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase3-build-2", "96875");
+}
+
+/// 動物園の新設の入荷ループは random(5) が 0 になるまで回るので、rand 0.5 では Perl 版が止まらない
+#[test]
+fn phase3_build_zoo_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-zoo", 0);
+}
+
+#[test]
+fn phase3_build_zoo_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-zoo", "03125");
+}
+
+#[test]
+fn phase3_build_zoo2_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-zoo2", 0);
+}
+
+#[test]
+fn phase3_build_zoo2_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-zoo2", "03125");
 }

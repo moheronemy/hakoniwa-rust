@@ -19,11 +19,11 @@ mod city;
 mod hazards;
 mod industry;
 mod leisure;
-mod monster;
+pub(crate) mod monster;
 mod sea;
 mod special;
 mod stadium;
-mod town;
+pub(crate) mod town;
 mod train;
 
 use crate::log::tags::{self, wrap};
