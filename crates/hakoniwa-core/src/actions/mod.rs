@@ -10,6 +10,8 @@
 //! 検証は `perl_compat_tests`: 元の Perl CGI に同じ操作を送った結果
 //! (`tools/perl-harness/run_cgi.py` が `tests/fixtures/cgi/` に作る) と突き合わせる。
 
+pub mod change;
+pub mod create;
 pub mod owner;
 pub mod password;
 

@@ -1,0 +1,514 @@
+{
+ "fixture": "legacy-turn3",
+ "rand": [
+  "64453125",
+  "30078125",
+  "78906250",
+  "09375000",
+  "14453125",
+  "18750000",
+  "73046875",
+  "11328125",
+  "42578125",
+  "07421875",
+  "17187500",
+  "86718750",
+  "83593750",
+  "13671875",
+  "48046875",
+  "17968750",
+  "84765625",
+  "11718750",
+  "24609375",
+  "44531250",
+  "12109375",
+  "79296875",
+  "09765625",
+  "44140625",
+  "08984375",
+  "26562500",
+  "57812500",
+  "83593750",
+  "28515625",
+  "23437500",
+  "61328125",
+  "35937500",
+  "20312500",
+  "37500000",
+  "74218750",
+  "19140625",
+  "12500000",
+  "11718750",
+  "41015625",
+  "99218750",
+  "85156250",
+  "62500000",
+  "92968750",
+  "90625000",
+  "72265625",
+  "59765625",
+  "49609375",
+  "35937500",
+  "48437500",
+  "16015625",
+  "59765625",
+  "98828125",
+  "68359375",
+  "89453125",
+  "57421875",
+  "14453125",
+  "23437500",
+  "83593750",
+  "32812500",
+  "68359375",
+  "30078125",
+  "97656250",
+  "83984375",
+  "07812500",
+  "15234375",
+  "62500000",
+  "67968750",
+  "69921875",
+  "99218750",
+  "91015625",
+  "13671875",
+  "18359375",
+  "53906250",
+  "94531250",
+  "12890625",
+  "12109375",
+  "61718750",
+  "89062500",
+  "56640625",
+  "76953125",
+  "69140625",
+  "04296875",
+  "92187500",
+  "70703125",
+  "33593750",
+  "23046875",
+  "98437500",
+  "11718750",
+  "43359375",
+  "57421875",
+  "25781250",
+  "49218750",
+  "79296875",
+  "78125000",
+  "99218750",
+  "16015625",
+  "33203125",
+  "89453125",
+  "80078125",
+  "55468750",
+  "27343750",
+  "85937500",
+  "55468750",
+  "82812500",
+  "71484375",
+  "75781250",
+  "46093750",
+  "30078125",
+  "16406250",
+  "35156250",
+  "30078125",
+  "46093750",
+  "46484375",
+  "02343750",
+  "96875000",
+  "36328125",
+  "52343750",
+  "56250000",
+  "00781250",
+  "28906250",
+  "83593750",
+  "73828125",
+  "63671875",
+  "25000000",
+  "10546875",
+  "91015625",
+  "78125000",
+  "79296875",
+  "79687500",
+  "78515625",
+  "20703125",
+  "96093750",
+  "80078125",
+  "12109375",
+  "37890625",
+  "13281250",
+  "41406250",
+  "87890625",
+  "32421875",
+  "21875000",
+  "67968750",
+  "10156250",
+  "20312500",
+  "00000000",
+  "30078125",
+  "19921875",
+  "72656250",
+  "05078125",
+  "14062500",
+  "41406250",
+  "75000000",
+  "29687500",
+  "50390625",
+  "69140625",
+  "72656250",
+  "94531250",
+  "24218750",
+  "23046875",
+  "97265625",
+  "92968750",
+  "95703125",
+  "96484375",
+  "62109375",
+  "16796875",
+  "28515625",
+  "20312500",
+  "68359375",
+  "52734375",
+  "95703125",
+  "32031250",
+  "04296875",
+  "41015625",
+  "72265625",
+  "29296875",
+  "05078125",
+  "59375000",
+  "17968750",
+  "51953125",
+  "73046875",
+  "33203125",
+  "71093750",
+  "44531250",
+  "65625000",
+  "44531250",
+  "38671875",
+  "47656250",
+  "80078125",
+  "45312500",
+  "39843750",
+  "98437500",
+  "71093750",
+  "05468750",
+  "05468750",
+  "55859375",
+  "94140625",
+  "51562500",
+  "38671875",
+  "68750000",
+  "89062500"
+ ],
+ "requests": [
+  {
+   "form": {
+    "ISLANDNAME": "I0",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.0"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I1",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.1"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I2",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.2"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I3",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.3"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I4",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.4"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I5",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.5"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I6",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.6"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I7",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.7"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I8",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.8"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I9",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.9"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I10",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.10"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I11",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.11"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I12",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.12"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I13",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.13"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I14",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.14"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I15",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.15"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I16",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.16"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I17",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.17"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I18",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.18"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I19",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.19"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I20",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.20"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I21",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.21"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I22",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.22"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I23",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.23"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I24",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.24"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I25",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.25"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "I26",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.0.26"
+  },
+  {
+   "form": {
+    "ISLANDNAME": "Over",
+    "OWNERNAME": "o",
+    "PASSWORD": "pw",
+    "PASSWORD2": "pw",
+    "MESSAGE": "よろしく",
+    "NewIslandButton": "1"
+   },
+   "addr": "10.1.1.1"
+  }
+ ]
+}

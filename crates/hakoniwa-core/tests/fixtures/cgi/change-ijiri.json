@@ -1,0 +1,291 @@
+{
+ "fixture": "legacy-turn3",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "12345x",
+    "OWNERNAME": "money",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Masc",
+    "OWNERNAME": "msexe",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "7",
+    "OWNERNAME": "mshp",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "8",
+    "OWNERNAME": "msap",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "9",
+    "OWNERNAME": "mswin",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "<b>",
+    "OWNERNAME": "comment",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Own",
+    "OWNERNAME": "ownername",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Alpha2",
+    "OWNERNAME": "name",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "1,2",
+    "OWNERNAME": "etc8",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "auc0",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "1",
+    "OWNERNAME": "unknownkey",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "zzq",
+    "OWNERNAME": "land",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhomiya",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "",
+    "OWNERNAME": "",
+    "OLDPASS": "uhusnuvnurkanjhfhomiya",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "3",
+    "ISLANDNAME": "zzq",
+    "OWNERNAME": "lbbs",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "3",
+    "ISLANDNAME": "9",
+    "OWNERNAME": "id",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "1.2.3.4",
+    "OWNERNAME": "ip3",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "5",
+    "OWNERNAME": "ip9",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "77",
+    "OWNERNAME": "eis3",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "5",
+    "OWNERNAME": "etc2",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "x",
+    "OWNERNAME": "etc6",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "3",
+    "OWNERNAME": "eisei2",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "y",
+    "OWNERNAME": "eisei4",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "4",
+    "OWNERNAME": "kei",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "0",
+    "OWNERNAME": "anflag",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "ISLANDNAME": "Alpha3",
+    "OWNERNAME": "name",
+    "OLDPASS": "uhusnuvnurkanjhfhiji",
+    "PASSWORD": "",
+    "PASSWORD2": "",
+    "ChangeInfoButton": "1"
+   }
+  }
+ ]
+}

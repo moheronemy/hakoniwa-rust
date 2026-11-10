@@ -5,7 +5,7 @@
 //! 印を付けてある。詳しくは docs/PORTING.md を参照。
 
 pub(crate) mod command;
-mod estimate;
+pub(crate) mod estimate;
 pub(crate) mod hex;
 mod income;
 pub(crate) mod island;
