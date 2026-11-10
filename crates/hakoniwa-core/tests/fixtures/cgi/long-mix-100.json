@@ -1,0 +1,648 @@
+{
+ "fixture": "phase7-long-mix-100",
+ "rand": [
+  "95703125",
+  "86328125",
+  "94921875",
+  "85156250",
+  "05859375",
+  "09375000",
+  "08593750",
+  "36328125",
+  "83593750",
+  "17187500",
+  "73828125",
+  "81250000",
+  "67187500",
+  "85546875",
+  "30859375",
+  "25390625",
+  "60937500",
+  "21484375",
+  "60937500",
+  "03906250",
+  "58203125",
+  "68359375",
+  "16015625",
+  "43359375",
+  "64062500",
+  "39453125",
+  "80468750",
+  "72656250",
+  "86328125",
+  "99609375",
+  "51171875",
+  "95312500",
+  "37500000",
+  "54687500",
+  "93750000",
+  "44531250",
+  "50390625",
+  "26953125",
+  "90234375",
+  "03906250",
+  "87109375",
+  "03125000",
+  "36718750",
+  "46875000",
+  "93359375",
+  "32031250",
+  "91015625",
+  "38281250",
+  "42578125",
+  "89453125",
+  "88671875",
+  "52734375",
+  "16796875",
+  "56250000",
+  "17968750",
+  "23828125",
+  "23437500",
+  "02734375",
+  "17968750",
+  "32812500",
+  "17578125",
+  "13671875",
+  "51171875",
+  "51171875",
+  "36328125",
+  "51562500",
+  "67578125",
+  "56250000",
+  "18359375",
+  "99609375",
+  "89453125",
+  "44921875",
+  "79687500",
+  "41796875",
+  "73828125",
+  "52734375",
+  "91015625",
+  "91015625",
+  "76562500",
+  "36718750",
+  "79296875",
+  "59375000",
+  "35546875",
+  "36328125",
+  "98437500",
+  "85937500",
+  "96484375",
+  "44921875",
+  "16406250",
+  "95703125",
+  "75781250",
+  "40234375",
+  "71875000",
+  "74218750",
+  "46484375",
+  "65625000",
+  "53125000",
+  "25000000",
+  "49218750",
+  "28125000",
+  "92578125"
+ ],
+ "snapshots": true,
+ "timeout": 60,
+ "requests": [
+  {
+   "time": 1794290410,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "5",
+    "COMMAND": "33",
+    "AMOUNT": "0",
+    "TARGETID": "4",
+    "POINTX": "7",
+    "POINTY": "1",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "time": 1794290420,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "3",
+    "COMMAND": "104",
+    "AMOUNT": "2",
+    "TARGETID": "4",
+    "POINTX": "2",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794312000,
+   "form": {}
+  },
+  {
+   "time": 1794312010,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "2",
+    "COMMAND": "37",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "10",
+    "POINTY": "6",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton4": "1"
+   }
+  },
+  {
+   "time": 1794333600,
+   "form": {}
+  },
+  {
+   "time": 1794333610,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "1",
+    "COMMAND": "105",
+    "AMOUNT": "5",
+    "TARGETID": "4",
+    "POINTX": "2",
+    "POINTY": "6",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794333620,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "AMOUNT": "0",
+    "BousaiButton3": "1"
+   }
+  },
+  {
+   "time": 1794355200,
+   "form": {}
+  },
+  {
+   "time": 1794355210,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "24",
+    "AMOUNT": "2",
+    "TARGETID": "3",
+    "POINTX": "4",
+    "POINTY": "2",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "time": 1794376800,
+   "form": {}
+  },
+  {
+   "time": 1794376810,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "0",
+    "COMMAND": "30",
+    "AMOUNT": "5",
+    "TARGETID": "3",
+    "POINTX": "5",
+    "POINTY": "4",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "time": 1794376820,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "3",
+    "COMMAND": "25",
+    "AMOUNT": "1",
+    "TARGETID": "3",
+    "POINTX": "5",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794398400,
+   "form": {}
+  },
+  {
+   "time": 1794398410,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "3",
+    "COMMAND": "14",
+    "AMOUNT": "0",
+    "TARGETID": "1",
+    "POINTX": "2",
+    "POINTY": "5",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "time": 1794398420,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "1",
+    "COMMAND": "37",
+    "AMOUNT": "2",
+    "TARGETID": "4",
+    "POINTX": "7",
+    "POINTY": "1",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794420000,
+   "form": {}
+  },
+  {
+   "time": 1794420010,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "5",
+    "COMMAND": "20",
+    "AMOUNT": "0",
+    "TARGETID": "4",
+    "POINTX": "7",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "time": 1794420020,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "5",
+    "COMMAND": "70",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "7",
+    "POINTY": "10",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "time": 1794441600,
+   "form": {}
+  },
+  {
+   "time": 1794441610,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "1",
+    "COMMAND": "5",
+    "AMOUNT": "5",
+    "TARGETID": "5",
+    "POINTX": "3",
+    "POINTY": "8",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794441620,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "1",
+    "COMMAND": "5",
+    "AMOUNT": "3",
+    "TARGETID": "4",
+    "POINTX": "3",
+    "POINTY": "3",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794463200,
+   "form": {}
+  },
+  {
+   "time": 1794484800,
+   "form": {}
+  },
+  {
+   "time": 1794484810,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "AMOUNT": "0",
+    "KankouButton3": "1"
+   }
+  },
+  {
+   "time": 1794506400,
+   "form": {}
+  },
+  {
+   "time": 1794528000,
+   "form": {}
+  },
+  {
+   "time": 1794549600,
+   "form": {}
+  },
+  {
+   "time": 1794571200,
+   "form": {}
+  },
+  {
+   "time": 1794592800,
+   "form": {}
+  },
+  {
+   "time": 1794592810,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "2",
+    "COMMAND": "115",
+    "AMOUNT": "1",
+    "TARGETID": "4",
+    "POINTX": "8",
+    "POINTY": "3",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "time": 1794592820,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "0",
+    "COMMAND": "112",
+    "AMOUNT": "5",
+    "TARGETID": "1",
+    "POINTX": "9",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton4": "1"
+   }
+  },
+  {
+   "time": 1794614400,
+   "form": {}
+  },
+  {
+   "time": 1794636000,
+   "form": {}
+  },
+  {
+   "time": 1794636010,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "1",
+    "COMMAND": "6",
+    "AMOUNT": "5",
+    "TARGETID": "2",
+    "POINTX": "10",
+    "POINTY": "4",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794636020,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "2",
+    "COMMAND": "26",
+    "AMOUNT": "3",
+    "TARGETID": "5",
+    "POINTX": "3",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton1": "1"
+   }
+  },
+  {
+   "time": 1794636030,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "AMOUNT": "20",
+    "ChochikuButton3": "1"
+   }
+  },
+  {
+   "time": 1794657600,
+   "form": {}
+  },
+  {
+   "time": 1794679200,
+   "form": {}
+  },
+  {
+   "time": 1794679210,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "35",
+    "AMOUNT": "2",
+    "TARGETID": "5",
+    "POINTX": "10",
+    "POINTY": "5",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794700800,
+   "form": {}
+  },
+  {
+   "time": 1794700810,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "4",
+    "COMMAND": "3",
+    "AMOUNT": "1",
+    "TARGETID": "2",
+    "POINTX": "9",
+    "POINTY": "8",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794700820,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass3",
+    "NUMBER": "5",
+    "COMMAND": "26",
+    "AMOUNT": "1",
+    "TARGETID": "3",
+    "POINTX": "8",
+    "POINTY": "10",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton3": "1"
+   }
+  },
+  {
+   "time": 1794722400,
+   "form": {}
+  },
+  {
+   "time": 1794722410,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "3",
+    "COMMAND": "25",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "4",
+    "POINTY": "7",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton4": "1"
+   }
+  },
+  {
+   "time": 1794722420,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "3",
+    "COMMAND": "37",
+    "AMOUNT": "3",
+    "TARGETID": "1",
+    "POINTX": "10",
+    "POINTY": "5",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton4": "1"
+   }
+  },
+  {
+   "time": 1794744000,
+   "form": {}
+  },
+  {
+   "time": 1794744010,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "2",
+    "COMMAND": "13",
+    "AMOUNT": "5",
+    "TARGETID": "2",
+    "POINTX": "7",
+    "POINTY": "10",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794744020,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "2",
+    "COMMAND": "119",
+    "AMOUNT": "1",
+    "TARGETID": "1",
+    "POINTX": "3",
+    "POINTY": "7",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794765600,
+   "form": {}
+  },
+  {
+   "time": 1794765610,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass2",
+    "NUMBER": "0",
+    "COMMAND": "76",
+    "AMOUNT": "2",
+    "TARGETID": "5",
+    "POINTX": "1",
+    "POINTY": "7",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton2": "1"
+   }
+  },
+  {
+   "time": 1794765620,
+   "addr": "10.0.0.1",
+   "form": {
+    "PASSWORD": "pass1",
+    "NUMBER": "5",
+    "COMMAND": "45",
+    "AMOUNT": "3",
+    "TARGETID": "5",
+    "POINTX": "7",
+    "POINTY": "9",
+    "COMMANDMODE": "insert",
+    "LAMOUNT1": "0",
+    "CommandButton5": "1"
+   }
+  },
+  {
+   "time": 1794787200,
+   "form": {}
+  }
+ ],
+ "allow_errors": [
+  26
+ ]
+}

@@ -343,61 +343,8 @@ pub fn make_new_land(config: &GameConfig, rng: &mut dyn RngCore) -> IslandMap {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::super::password::verify;
-    use super::super::perl_compat_tests::{Case, cgi_dir, check_case};
+    use super::super::perl_compat_tests::{Case, SeqRng, check_case};
     use super::*;
-    use rand::RngCore;
-
-    /// `rand()` を JSON の `"rand": ["5", "25", ...]` の順に返す乱数 (Perl 側と同じく先頭へ戻る)
-    pub(crate) struct SeqRng {
-        values: Vec<u64>,
-        pos: usize,
-    }
-
-    impl SeqRng {
-        pub(crate) fn for_case(name: &str) -> Self {
-            let json: serde_json::Value = serde_json::from_str(
-                &std::fs::read_to_string(cgi_dir().join(format!("{name}.json"))).unwrap(),
-            )
-            .unwrap();
-            let values = json["rand"]
-                .as_array()
-                .expect("rand は配列")
-                .iter()
-                .map(|v| {
-                    let r: f64 = format!("0.{}", v.as_str().unwrap()).parse().unwrap();
-                    let m = r * (1u64 << 53) as f64;
-                    assert_eq!(m.fract(), 0.0);
-                    (m as u64) << 11
-                })
-                .collect();
-            Self { values, pos: 0 }
-        }
-    }
-
-    impl RngCore for SeqRng {
-        fn next_u64(&mut self) -> u64 {
-            let v = self.values[self.pos % self.values.len()];
-            self.pos += 1;
-            v
-        }
-        fn next_u32(&mut self) -> u32 {
-            (self.next_u64() >> 32) as u32
-        }
-        fn fill_bytes(&mut self, dest: &mut [u8]) {
-            rand_core_fill(self, dest)
-        }
-        fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), rand::Error> {
-            rand_core_fill(self, dest);
-            Ok(())
-        }
-    }
-
-    fn rand_core_fill(rng: &mut SeqRng, dest: &mut [u8]) {
-        for chunk in dest.chunks_mut(8) {
-            let b = rng.next_u64().to_le_bytes();
-            chunk.copy_from_slice(&b[..chunk.len()]);
-        }
-    }
 
     fn input(case: &Case, n: usize) -> [String; 5] {
         [

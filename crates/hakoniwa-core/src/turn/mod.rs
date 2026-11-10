@@ -17,6 +17,8 @@ mod ranking;
 #[cfg(test)]
 mod full_turn_tests;
 #[cfg(test)]
+mod long_run_tests;
+#[cfg(test)]
 mod perl_compat_tests;
 
 use std::collections::HashMap;
