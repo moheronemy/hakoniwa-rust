@@ -10,3 +10,6 @@ Thumbs.db
 # Rust build output and local runtime data
 /target/
 /data/
+
+# Claude Code local state (agent worktrees)
+/.claude/
