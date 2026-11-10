@@ -149,6 +149,8 @@ fn field(island: &Island, name: &str) -> String {
         "gyo" => n(sc.gyo),
         "hot" => n(sc.hot),
         "prepare2" => n(sc.command.land.prepare2),
+        "bigmissile" => n(sc.command.build.bigmissile),
+        "par" => n(sc.par),
         "dead" => {
             if sc.dead {
                 "1".into()
@@ -887,4 +889,95 @@ fn phase3_land_matches_perl_with_rand_1_32() {
 #[test]
 fn phase3_land_matches_perl_with_rand_1_128() {
     check_fixture_at("phase3-land", "0078125");
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-1", 0);
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-1", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-1", "03125");
+}
+
+#[test]
+fn phase3_build_1_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase3-build-1", "96875");
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-2", 0);
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-2", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-2", "03125");
+}
+
+#[test]
+fn phase3_build_2_matches_perl_with_rand_31_32() {
+    check_fixture_at("phase3-build-2", "96875");
+}
+
+#[test]
+fn phase3_build_3_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-3", 0);
+}
+
+#[test]
+fn phase3_build_3_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-3", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_4_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-4", 0);
+}
+
+#[test]
+fn phase3_build_4_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-4", RAND_HALF);
+}
+
+#[test]
+fn phase3_build_5_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-5", 0);
+}
+
+#[test]
+fn phase3_build_5_matches_perl_with_rand_half() {
+    check_fixture("phase3-build-5", RAND_HALF);
+}
+
+/// 動物園の新設の入荷ループは random(5) が 0 になるまで回るので、rand 0.5 では Perl 版が止まらない
+#[test]
+fn phase3_build_zoo_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-zoo", 0);
+}
+
+#[test]
+fn phase3_build_zoo_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-zoo", "03125");
+}
+
+#[test]
+fn phase3_build_zoo2_matches_perl_with_rand_0() {
+    check_fixture("phase3-build-zoo2", 0);
+}
+
+#[test]
+fn phase3_build_zoo2_matches_perl_with_rand_1_32() {
+    check_fixture_at("phase3-build-zoo2", "03125");
 }
