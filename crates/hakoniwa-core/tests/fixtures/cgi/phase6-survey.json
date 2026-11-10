@@ -1,0 +1,61 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "wrong",
+    "ann": "1",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "pass1",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "pass1",
+    "ann": "0",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "2",
+    "PASSWORD": "pass2",
+    "ann": "1",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "pass1",
+    "ann": "3",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "pass1",
+    "ann": "4",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "3",
+    "PASSWORD": "pass3",
+    "ann": "7",
+    "AnkeButton": "1"
+   }
+  }
+ ]
+}

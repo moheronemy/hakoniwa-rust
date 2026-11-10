@@ -1,0 +1,20 @@
+{
+ "fixture": "phase6-screens-t49",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "MESSAGE": "t49",
+    "PASSWORD": "pass1",
+    "TotoButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "s49",
+    "PASSWORD": "pass3",
+    "TotosButton3": "1"
+   }
+  }
+ ]
+}

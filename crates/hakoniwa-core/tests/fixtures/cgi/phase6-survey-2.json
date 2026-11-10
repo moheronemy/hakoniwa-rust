@@ -1,0 +1,30 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "ISLANDID": "1",
+    "PASSWORD": "pass1",
+    "ann": "5.0",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "3",
+    "PASSWORD": "pass3",
+    "ann": "abc",
+    "AnkeButton": "1"
+   }
+  },
+  {
+   "form": {
+    "ISLANDID": "3",
+    "PASSWORD": "pass3",
+    "ann": " 2",
+    "AnkeButton": "1"
+   }
+  }
+ ]
+}

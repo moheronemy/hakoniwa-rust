@@ -1,0 +1,78 @@
+{
+ "fixture": "phase6-screens",
+ "rand": "0",
+ "requests": [
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass1",
+    "TARGETID": "2",
+    "AMOUNT": "5",
+    "MsButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "wrong",
+    "TARGETID": "3",
+    "AMOUNT": "6",
+    "MsButton1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "wrong",
+    "TARGETID": "3",
+    "AMOUNT": "4",
+    "Ms2Button1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass1",
+    "TARGETID": "3",
+    "AMOUNT": "8",
+    "Ms2Button1": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass3",
+    "TARGETID": "1",
+    "AMOUNT": "7",
+    "Ms2Button3": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass2",
+    "TARGETID": "1",
+    "AMOUNT": "0",
+    "MsButton2": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass3",
+    "TARGETID": "<b>",
+    "AMOUNT": "3x",
+    "MsButton3": "1"
+   }
+  },
+  {
+   "form": {
+    "MESSAGE": "x",
+    "PASSWORD": "pass2",
+    "TARGETID": "3",
+    "AMOUNT": "6",
+    "Ms2Button2": "1"
+   }
+  }
+ ]
+}
