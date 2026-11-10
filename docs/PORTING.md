@@ -28,15 +28,22 @@ crates/
       income.rs       income (収入と食料消費)
       command.rs      doCommand の共通部分、資金繰り、放棄
       ranking.rs      並べ替えと部門賞
+      hex/            doEachHex (成長と単ヘックス災害)              … フェーズ 2
+        mod.rs          前置き・マスのループ・地形ごとの振り分け・収益ログ
+        town.rs         町・港町・海底都市・平地
+        hazards.rs      全マス共通の判定 (核融合発電所・漏電・小彗星・火災)
+        industry.rs city.rs train.rs leisure.rs stadium.rs special.rs sea.rs monster.rs
+                        地形の系統ごと
       perl_compat_tests.rs  Perl 版との突き合わせテスト
+    src/land.rs     地形の名前 (landName)・周囲の数え上げ (countAround)
     tests/fixtures/legacy-turn3/  Perl 版で作った実データ
-    tests/fixtures/phase1-mix/    フェーズ 1 の突き合わせ用データ (+ *.expected.json)
+    tests/fixtures/phase1-mix/    突き合わせ用データ (+ *.expected.json)。ほかに phase2-* など
   hakoniwa-server/  Web サーバー (トップページ、ターンの定時実行、デバッグ用のターン進行)
   hako-convert/     Perl 版データ → state.json の変換ツール
 tools/
   gen-tables.sh     hako-main.cgi から tables.rs を再生成する
-  make-phase1-fixture.py      突き合わせ用データを作る
-  perl-harness/run-phase1.sh  元の Perl コードで期待値 (*.expected.json) を作る
+  fixtures/                   突き合わせ用データを作るスクリプト (fixturelib.py と各データ)
+  perl-harness/run-harness.sh 元の Perl コードで期待値 (*.expected.json) を作る
 ```
 
 `tables.rs` は手で書き写さず、Perl に設定部分を実行させて値を取り出している
@@ -138,15 +145,21 @@ DES の値はログイン成功時に置き換える。
 
 移植した関数は、元の Perl コードそのものを同じ入力で動かした結果と比べる。
 
-1. `tools/make-phase1-fixture.py` が、ほぼすべての地形や特殊な記念碑・大学などを置いた
-   Perl 形式のデータ (`tests/fixtures/phase1-mix/`) を作る
-2. `tools/perl-harness/run-phase1.sh` が、`hako-main.cgi` (設定と関数だけ) と `hako-turn.cgi` を読み込み、
-   `rand()` の値と座標の並びを固定して `estimate` (2 回)・`income`・計画の実行を動かし、
-   すべての値とログを `*.expected.json` に書き出す (`rand()` を 0 と 0.5 に固定した 2 通り)
+1. `tools/fixtures/*.py` が、`fixturelib.py` を使って Perl 形式のデータ
+   (`tests/fixtures/<名前>/`) を作る。元にするのは Perl 版で作った `legacy-turn3`
+2. `tools/perl-harness/run-harness.sh <名前> <段階>` が、`hako-main.cgi` (設定と関数だけ) と
+   `hako-turn.cgi` を読み込み、`rand()` の値と座標の並びを固定して、指定した段階
+   (`estimate`, `income`, `commands`, `eachhex` を並べたもの) を島ごとに動かす。
+   段階ごとにすべての値とログを `*.expected.json` に書き出す (`rand()` を 0 と 0.5 に固定した 2 通り)
 3. `turn::perl_compat_tests` が同じ条件で移植版を動かし、島の値・一時値・地形の値・
    計画・ログが 1 つ残らず一致することを確かめる
 
-フェーズ 2 以降も、移植した関数をこのハーネスに足していく。
+| データ | 段階 | 確かめていること |
+|---|---|---|
+| `phase1-mix` | estimate, estimate, income, commands | 集計・収入・資金繰りと放棄 (ほぼ全地形) |
+| `phase2-town` | estimate, eachhex, estimate | 町・平地・火災・漏電・不景気・人口の増減 |
+
+データを作るときは、まだ移植していない系統の地形を置かないこと (Perl と結果が変わる)。
 
 ### Perl 版を手で動かす
 
