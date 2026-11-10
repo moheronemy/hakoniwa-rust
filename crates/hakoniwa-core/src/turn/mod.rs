@@ -247,7 +247,7 @@ pub struct TurnReport {
 }
 
 /// `makeRandomPointArray`
-fn make_random_point_array(rng: &mut dyn RngCore, size: usize) -> Vec<(usize, usize)> {
+pub(crate) fn make_random_point_array(rng: &mut dyn RngCore, size: usize) -> Vec<(usize, usize)> {
     let mut points: Vec<(usize, usize)> = (0..size)
         .flat_map(|y| (0..size).map(move |x| (x, y)))
         .collect();
