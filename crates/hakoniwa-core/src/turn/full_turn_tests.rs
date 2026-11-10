@@ -42,6 +42,17 @@ fn turn_basic_matches_perl() {
     check_turn("turn-basic", &[]);
 }
 
+/// 地図の大きさ ($HislandSize) を 32・128 にしたターン全体 (tools/fixtures/scale_size.py のデータ)
+#[test]
+fn turn_size_32_matches_perl() {
+    check_turn("turn-size-32", &[]);
+}
+
+#[test]
+fn turn_size_128_matches_perl() {
+    check_turn("turn-size-128", &[]);
+}
+
 // ---- ハコオク (turnMain 857〜903 行、934〜1116 行) -------------------------------
 // データは tools/fixtures/phase6_auction.py で作る。
 

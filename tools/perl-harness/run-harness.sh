@@ -19,6 +19,13 @@ trap 'rm -rf "$work"' EXIT
 awk '/require\(\$jcode\)/ { skip = 1 } skip && /^sub / { skip = 0 } !skip { print }' \
   "$root/hako-r-a_FE/hako-main.cgi" > "$work/main.pl"
 cp "$root/hako-r-a_FE/hako-turn.cgi" "$work/turn.cgi"
+# 地図の大きさ ($HislandSize) を変えたデータ (fixturelib の Fixture(name, size=N))
+if [ -f "$fixture/island_size" ]; then
+  size=$(cat "$fixture/island_size")
+  grep -q '^\$HislandSize = 12;' "$work/main.pl"
+  sed -i "s/^\\\$HislandSize = 12;/\\\$HislandSize = $size;/" "$work/main.pl"
+  grep -q "^\\\$HislandSize = $size;" "$work/main.pl"
+fi
 
 cd "$work"
 for r in ${RANDS:-0 50}; do

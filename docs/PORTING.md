@@ -175,6 +175,7 @@ Perl 版はパスワードを `crypt($pw, 'h2')` (伝統的な DES crypt。先�
 | `phase4-mix-1`〜`6` | estimate, income, commands, eachhex, process, estimate (2 ターン分) | 政策・人工衛星・お守りも入れた全地形の島に全種類の計画。rand は 1/2, 3/4, 31/32 |
 | `phase4-policy-1`〜`4` | process | 政策の調整・維持費・食料と資金のあふれの上限 |
 | `phase2-mix-1`〜`6` | estimate, income, commands, eachhex, estimate, eachhex, estimate | 全地形を混ぜた島 (系統をまたぐ相互作用)。5, 6 は複合値も壊してある。rand は 0, 1/32, 1/2, 31/32 |
+| `size-13-1`, `size-32-1`, `size-128-1`, `size-128-2` | estimate, income, commands, eachhex, process, estimate | 地図の大きさ (`$HislandSize`) を 12 以外にした島。データの `island_size` で大きさを指定する ([SCALING.md](SCALING.md)) |
 
 比べているのは、島の保存される値と一時値、全マスの地形の種類と値、計画、ログ、記録ログ。
 `rand()` の固定値は `RANDS="0 03125 50 96875"` のように指定できる (2 進で割り切れる数にすること)。

@@ -224,11 +224,27 @@ pub(crate) fn check_fixture_at(fixture: &str, digits: &str) {
     );
 }
 
+/// データの地図の大きさ。`island_size` のファイルがあればその値 (fixturelib の `Fixture(name, size=N)`)
+pub(crate) fn fixture_island_size(dir: &Path) -> usize {
+    match std::fs::read_to_string(dir.join("island_size")) {
+        Ok(s) => s.trim().parse().expect("island_size"),
+        Err(_) => GameConfig::default().island_size,
+    }
+}
+
 fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
-    let config = GameConfig::default();
+    let dir = fixture_dir().join(fixture);
+    let size = fixture_island_size(&dir);
+    let config = GameConfig {
+        island_size: size,
+        ..GameConfig::default()
+    };
     let import = legacy::import_dir(
-        &fixture_dir().join(fixture),
-        &ImportOptions::default(),
+        &dir,
+        &ImportOptions {
+            island_size: size,
+            ..ImportOptions::default()
+        },
         &mut StepRng::new(0, 0),
     )
     .unwrap();
@@ -241,7 +257,6 @@ fn check_fixture_inner(fixture: &str, rng_value: u64, expected_file: &str) {
             .unwrap_or_else(|e| panic!("{expected_file}: {e}"));
 
     let mut rng = StepRng::new(rng_value, 0);
-    let size = config.island_size;
     let mut ctx = TurnContext {
         config: &config,
         rng: &mut rng,
@@ -1697,4 +1712,25 @@ phase4_mix_tests! {
     phase4_policy_2_matches_perl => "phase4-policy-2",
     phase4_policy_3_matches_perl => "phase4-policy-3",
     phase4_policy_4_matches_perl => "phase4-policy-4",
+}
+
+/// 地図の大きさを 12 以外にした島で、島全体の処理まで含めたターンを 1 回 (tools/fixtures/scale_size.py)
+macro_rules! size_tests {
+    ($($name:ident => $fixture:literal,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                check_fixture_at($fixture, "50");
+                check_fixture_at($fixture, "75");
+                check_fixture_at($fixture, "96875");
+            }
+        )*
+    };
+}
+
+size_tests! {
+    size_13_1_matches_perl => "size-13-1",
+    size_32_1_matches_perl => "size-32-1",
+    size_128_1_matches_perl => "size-128-1",
+    size_128_2_matches_perl => "size-128-2",
 }

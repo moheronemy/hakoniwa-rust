@@ -16,6 +16,10 @@ Typical use (see phase2_town.py):
     f.save()
 
 Then: tools/perl-harness/run-harness.sh phase2-mything estimate,eachhex
+
+Fixture(name, size=N) makes N x N maps ($HislandSize = N): the template's 12 x 12 maps are
+padded with sea, and the size is written to the file `island_size`, which the harness and
+the Rust comparison tests read.
 """
 import pathlib
 import re
@@ -55,13 +59,27 @@ def monster(kind, hp):
 
 
 class Fixture:
-    def __init__(self, name):
+    def __init__(self, name, size=SIZE):
         self.dir = FIXTURES / name
         if self.dir.exists():
             shutil.rmtree(self.dir)
         shutil.copytree(TEMPLATE, self.dir)
+        self.size = size
+        if size != SIZE:
+            self._resize(size)
         # 島 ID → hakojima.dat の何番目か (add_islands で増える)
         self.pos = dict(POS)
+
+    def _resize(self, size):
+        """地図を size × size にする (12 × 12 を左上に残し、残りは海)"""
+        assert size >= SIZE, size
+        sea = f"{LAND['Sea']:02x}{0:03x}".encode()
+        for path in sorted(self.dir.glob("island.*")):
+            lines = path.read_bytes().split(b"\n")
+            rows = [r + sea * (size - SIZE) for r in lines[:SIZE]]
+            rows += [sea * size] * (size - SIZE)
+            path.write_bytes(b"\n".join(rows + lines[SIZE:]))
+        (self.dir / "island_size").write_text(f"{size}\n")
 
     def _lines(self, file):
         return (self.dir / file).read_bytes().split(b"\n")
@@ -72,13 +90,14 @@ class Fixture:
     def map(self, island_id, cells, fill=("Sea", 0)):
         """島の地図を行優先で cells (地形名, 値) に置き換える。残りは fill"""
         flat = [(LAND[n], v) for n, v in cells]
-        flat += [(LAND[fill[0]], fill[1])] * (SIZE * SIZE - len(flat))
-        assert len(flat) == SIZE * SIZE, len(flat)
+        n = self.size * self.size
+        flat += [(LAND[fill[0]], fill[1])] * (n - len(flat))
+        assert len(flat) == n, len(flat)
         self._set_map(island_id, flat)
 
     def grid(self, island_id, rows, legend):
-        """文字の格子で地図を書く。rows は 12 文字 × 12 行、legend は 文字 → (地形名, 値)"""
-        assert len(rows) == SIZE and all(len(r) == SIZE for r in rows), rows
+        """文字の格子で地図を書く。rows は size 文字 × size 行、legend は 文字 → (地形名, 値)"""
+        assert len(rows) == self.size and all(len(r) == self.size for r in rows), rows
         flat = [(LAND[legend[c][0]], legend[c][1]) for r in rows for c in r]
         self._set_map(island_id, flat)
 
@@ -87,8 +106,9 @@ class Fixture:
         bad = [c for c in flat if not 0 <= c[1] <= 0xFFF]
         assert not bad, bad
         lines = self._lines(f"island.{island_id}")
-        for y in range(SIZE):
-            lines[y] = "".join(f"{k:02x}{v:03x}" for k, v in flat[y * SIZE:(y + 1) * SIZE]).encode()
+        size = self.size
+        for y in range(size):
+            lines[y] = "".join(f"{k:02x}{v:03x}" for k, v in flat[y * size:(y + 1) * size]).encode()
         self._write(f"island.{island_id}", lines)
 
     def cells(self, island_id, cells):
@@ -105,7 +125,7 @@ class Fixture:
         """計画の先頭を (kind, target, x, y, arg) の並びで置き換える"""
         lines = self._lines(f"island.{island_id}")
         for i, cmd in enumerate(commands):
-            lines[SIZE + i] = ",".join(str(v) for v in cmd).encode()
+            lines[self.size + i] = ",".join(str(v) for v in cmd).encode()
         self._write(f"island.{island_id}", lines)
 
     def _set(self, file, layout, island_id, values):

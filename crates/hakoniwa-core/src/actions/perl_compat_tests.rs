@@ -47,9 +47,27 @@ impl Case {
 }
 
 pub(crate) fn import(dir: &Path) -> GameState {
-    legacy::import_dir(dir, &ImportOptions::default(), &mut StepRng::new(0, 0))
+    import_sized(dir, GameConfig::default().island_size)
+}
+
+/// 地図の大きさ (`$HislandSize`) を指定して読み込む
+pub(crate) fn import_sized(dir: &Path, island_size: usize) -> GameState {
+    let opts = ImportOptions {
+        island_size,
+        ..ImportOptions::default()
+    };
+    legacy::import_dir(dir, &opts, &mut StepRng::new(0, 0))
         .unwrap_or_else(|e| panic!("{}: {e}", dir.display()))
         .state
+}
+
+/// ケースの `perl_settings` の `HislandSize` (run_cgi_settings.py)。無ければ既定値
+pub(crate) fn case_island_size(json: &Value) -> usize {
+    match &json["perl_settings"]["HislandSize"] {
+        Value::String(s) => s.parse().expect("HislandSize"),
+        Value::Number(n) => n.as_u64().expect("HislandSize") as usize,
+        _ => GameConfig::default().island_size,
+    }
 }
 
 /// `rand()` を `0.<digits>` に固定する乱数 (rand 0.8 の f64 は u64 の上位 53 ビット × 2^-53)
@@ -141,16 +159,20 @@ pub(crate) fn check_case_with(
         &std::fs::read_to_string(cgi_dir().join(format!("{name}.json"))).unwrap(),
     )
     .unwrap();
-    let mut game = import(&dir.join("before"));
+    let size = case_island_size(&json);
+    let mut game = import_sized(&dir.join("before"), size);
     let mut case = Case {
         now: json["time"].as_i64().unwrap_or(game.world.last_time + 1),
         rng: pinned_rng(json["rand"].as_str().unwrap_or("0")),
         requests: json["requests"].as_array().cloned().unwrap_or_default(),
     };
-    let config = GameConfig::default();
+    let config = GameConfig {
+        island_size: size,
+        ..GameConfig::default()
+    };
     apply(&mut game, &config, &mut case);
 
-    let mut want = import(&dir.join("after"));
+    let mut want = import_sized(&dir.join("after"), size);
     fix_want(&mut want);
     let want = serde_json::to_value(want).unwrap();
     let got = serde_json::to_value(&game).unwrap();
