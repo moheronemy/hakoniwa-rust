@@ -140,18 +140,22 @@ pub(crate) mod test_util {
 
     use crate::{AppState, ServerOptions, app};
 
-    /// Perl 版のデータ (3 島。島 N のパスワードは "passN") を読み込んだサーバー
+    /// Perl 版のデータ (3 島。島 N のパスワードは "passN") を読み込んだサーバー。
+    ///
+    /// 最終更新時刻はいまにする。島の登録は時刻が来ていれば先にターンを進めるので、
+    /// データの時刻のままだと、テストを走らせる日によってターンが進んで結果が変わる
     pub fn legacy_app() -> (Arc<AppState>, tempfile::TempDir) {
         let dir = tempfile::tempdir().unwrap();
         let src = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../hakoniwa-core/tests/fixtures/legacy-turn3");
-        let game = legacy::import_dir(
+        let mut game = legacy::import_dir(
             &src,
             &ImportOptions::default(),
             &mut StdRng::seed_from_u64(0),
         )
         .unwrap()
         .state;
+        game.world.last_time = crate::now_unix();
         let data_dir = dir.path().join("store");
         let data = hakoniwa_core::persist::DataDir::create(&data_dir, &game).unwrap();
         let state = Arc::new(AppState {

@@ -82,7 +82,7 @@ tools/
 | 設定値 (`hako-main.cgi` 1〜1240 行) | `core::config`, `core::tables` | 済 |
 | `readIslandsFile`, `readIsland` | `core::legacy::import_dir` | 済 |
 | `writeIslandsFile`, `writeIsland`, `writeIslandsOwner` | `core::storage::save` (JSON) | 済 (Perl 形式への書き出しはしない) |
-| `logFilePrint`, `historyPrint`, `hcPrint`, `aucPrint` | `core::model::Logs` + サーバーの画面 | データは済、画面は一部 |
+| `logFilePrint`, `historyPrint`, `hcPrint`, `aucPrint` | `core::model::Logs` + `core::view::top` (トップページ・`/history`) | 済 |
 | `hakolock*`, `unlock` | サーバーの `RwLock` | 済 (不要) |
 | `random`, `int`, `htmlEscape`, `aboutMoney` | `core::perl`, `core::model::money_for_others` | 済 |
 | `cgiInput`, `cookieInput`, `cookieOutput` | サーバーのフォームとセッション (`pages/`, `session.rs`)、入力の加工は `perl::cgi_text` / `cut_column` | 済 (クッキーにパスワードは入れない) |
@@ -97,12 +97,13 @@ tools/
 | `wideDamage` | `core::turn::hex::monster::wide_damage` | 済 |
 | `makeRandomPointArray`, `randomArray`, `monsterSpec` | `core::turn` | 済 |
 | `countAround`, `countGrow`, `landName` | `core::land`, `core::turn::hex::town` | 済 |
-| `expToLevel`, `nameToNumber` | `core::turn` など | 未 |
+| `expToLevel` | `core::turn::command::exp_to_level` (計画の実行と地図の表示) | 済 |
+| `nameToNumber` | `core::actions::{create, change}` (島の名前の重なりの判定) | 済 |
 | `newIslandMain`, `makeNewIsland`, `makeNewLand` | `core::actions::create` | 済 (Perl 版と突き合わせ済み) |
 | `changeMain`, `changeOwner` | `core::actions::change` | 済 (Perl 版と突き合わせ済み) |
 | `commandMain`, `commentMain`, `shoueneMain` ほか政策, `localBbsMain` | `core::actions::{command, owner, policy, lbbs}` | 済 (Perl 版と突き合わせ済み) |
 | `logOut`, `logLate`, `logSecret`, `logHistory`, `logFlush` | `core::log::TurnLog` | 済 |
-| `log*` (281 個の文面) | `core::log::msg` と各ファイルの文面 (Perl 版と同じ HTML) | 使う分から順に (doEachHex で使う分まで済) |
+| `log*` (281 個の文面) | `core::log::msg` と各ファイルの文面 (Perl 版と同じ HTML) | 済 (ターン処理と画面で使うもの。Perl 版と突き合わせ済み) |
 | `islandSort`, 部門賞の `islandSort*` | `core::turn::ranking` | 済 |
 | `tempTopPage`, ランキング表示の `islandSort*` | `core::view::top` + サーバーのトップページ | 済 (Perl 版と突き合わせ済み) |
 | `islandInfo`, `islandMap`, `landString`, `tempOwner`, `tempCommand`, `tempRecent` | `core::view::{info, map, owner}` + サーバーの開発画面・観光画面 | 済 (Perl 版と突き合わせ済み) |
